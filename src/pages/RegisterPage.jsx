@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
 import { siteText } from '../content/siteText'
-import { getRegisterValidationError } from '../utils/authValidation'
+import { useAuth } from '../context/AuthContext'
+import {
+  getRegisterValidationError,
+  mapRegisterApiError,
+  splitFullName,
+} from '../utils/authValidation'
 
 export function RegisterPage() {
+  const { register } = useAuth()
   const page = siteText.auth.register
   const [formValues, setFormValues] = useState({
     fullName: '',
@@ -34,16 +40,33 @@ export function RegisterPage() {
       return
     }
 
+    const { firstname, lastname } = splitFullName(formValues.fullName)
+    if (!firstname || !lastname) {
+      setErrorMessage('Veuillez renseigner votre prenom ET votre nom.')
+      return
+    }
+
     setIsSubmitting(true)
-    await new Promise((resolve) => window.setTimeout(resolve, 500))
-    setInfoMessage(page.info)
-    setFormValues({
-      fullName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    })
-    setIsSubmitting(false)
+
+    try {
+      await register({
+        email: formValues.email.trim(),
+        firstname,
+        lastname,
+        plainPassword: formValues.password,
+      })
+      setInfoMessage(page.info)
+      setFormValues({
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      })
+    } catch (error) {
+      setErrorMessage(mapRegisterApiError(error))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (

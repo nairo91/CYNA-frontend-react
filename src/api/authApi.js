@@ -1,39 +1,79 @@
-import { apiPost } from './http'
+import { apiGet, apiPost, setAuthTokenProvider } from './http'
 
 export const AUTH_TOKEN_STORAGE_KEY = 'cyna_auth_token'
 
-export async function loginWithPassword(credentials) {
-  return apiPost('/api/login_check', credentials)
-}
+/* -------------------------------------------------------------------------- */
+/* Stockage du token                                                          */
+/* -------------------------------------------------------------------------- */
 
 export function saveAuthToken(token, rememberMe = true) {
-  if (typeof window === 'undefined') {
-    return
-  }
-
+  if (typeof window === 'undefined') return
   clearAuthToken()
-
-  if (rememberMe) {
-    window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token)
-    return
-  }
-
-  window.sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token)
+  const storage = rememberMe ? window.localStorage : window.sessionStorage
+  storage.setItem(AUTH_TOKEN_STORAGE_KEY, token)
 }
 
 export function getAuthToken() {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
-  return window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ?? window.sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY)
+  if (typeof window === 'undefined') return null
+  return (
+    window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) ??
+    window.sessionStorage.getItem(AUTH_TOKEN_STORAGE_KEY)
+  )
 }
 
 export function clearAuthToken() {
-  if (typeof window === 'undefined') {
-    return
-  }
-
+  if (typeof window === 'undefined') return
   window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
   window.sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+}
+
+// Enregistre getAuthToken comme fournisseur pour le client HTTP
+// (évite la dépendance circulaire authApi <-> http).
+setAuthTokenProvider(getAuthToken)
+
+/* -------------------------------------------------------------------------- */
+/* Endpoints                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * POST /api/login_check (géré par LexikJWT). Retourne { token }.
+ */
+export function loginWithPassword(credentials) {
+  return apiPost('/api/login_check', credentials, { authenticated: false })
+}
+
+/**
+ * POST /api/users — déclenche le UserRegistrationProcessor côté Symfony.
+ *
+ * @param {{ email: string, firstname: string, lastname: string, plainPassword: string }} payload
+ */
+export function registerUser(payload) {
+  return apiPost('/api/users', payload, { authenticated: false })
+}
+
+/**
+ * GET /api/me — profil de l'utilisateur courant (nécessite un JWT valide).
+ */
+export function fetchCurrentUser() {
+  return apiGet('/api/me')
+}
+
+/** POST /api/verify-email */
+export function verifyEmail({ email, token }) {
+  return apiPost('/api/verify-email', { email, token }, { authenticated: false })
+}
+
+/** POST /api/password/forgot */
+export function requestPasswordReset(email) {
+  return apiPost('/api/password/forgot', { email }, { authenticated: false })
+}
+
+/** POST /api/password/reset */
+export function resetPassword({ token, password }) {
+  return apiPost('/api/password/reset', { token, password }, { authenticated: false })
+}
+
+/** Déconnexion côté client (stateless JWT : rien à appeler côté API). */
+export function logout() {
+  clearAuthToken()
 }

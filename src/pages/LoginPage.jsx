@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { loginWithPassword, saveAuthToken } from '../api/authApi'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
 import { siteText } from '../content/siteText'
+import { useAuth } from '../context/AuthContext'
 import { getLoginValidationError, mapLoginApiError } from '../utils/authValidation'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { login } = useAuth()
   const page = siteText.auth.login
   const [formValues, setFormValues] = useState({
     email: '',
@@ -16,6 +18,9 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+
+  // Si l'utilisateur a été redirigé par <ProtectedRoute>, on revient à la page d'origine.
+  const redirectTo = location.state?.from?.pathname ?? '/espace-client'
 
   const handleChange = (event) => {
     const { name, type, value, checked } = event.target
@@ -39,15 +44,13 @@ export function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      const response = await loginWithPassword({
+      await login({
         email: formValues.email.trim(),
         password: formValues.password,
+        rememberMe: formValues.rememberMe,
       })
-      if (response?.token) {
-        saveAuthToken(response.token, formValues.rememberMe)
-      }
       setSuccessMessage(page.success)
-      window.setTimeout(() => navigate('/espace-client'), 700)
+      window.setTimeout(() => navigate(redirectTo, { replace: true }), 500)
     } catch (error) {
       setErrorMessage(mapLoginApiError(error))
     } finally {
@@ -114,9 +117,9 @@ export function LoginPage() {
             <span>{page.rememberMe}</span>
           </label>
 
-          <a className="auth-text-link" href="#footer-contact">
+          <Link className="auth-text-link" to="/forgot-password">
             {page.forgotPassword}
-          </a>
+          </Link>
         </div>
 
         {errorMessage ? <div className="auth-feedback auth-feedback-error">{errorMessage}</div> : null}
