@@ -57,7 +57,7 @@ export function ContactPage() {
         {status === 'done' ? (
           <div className="auth-feedback auth-feedback-success">{text.success}</div>
         ) : (
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form id="contact-form" className="auth-form contact-form" onSubmit={handleSubmit}>
             <div className="auth-form-grid">
               <label className="auth-field">
                 <span>{text.nameLabel}</span>
