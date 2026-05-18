@@ -118,9 +118,18 @@ export function Navbar() {
           {renderCartButton('cart-button cart-button-mobile')}
 
           <div className="nav-mobile-extra">
-            {siteText.nav.mobileLinks
-              .filter((link) => !isAuthenticated || (link.to !== '/login' && link.to !== '/register'))
-              .map((link) => renderSecondaryLink(link, 'nav-mobile-link'))}
+            {isAuthenticated
+              ? siteText.nav.mobileLinksAuth.map((link) => {
+                  if (link.action === 'logout') {
+                    return <button className="nav-mobile-link" key="logout" type="button" onClick={handleLogout}>{link.label}</button>
+                  }
+                  if (link.state) {
+                    return <Link className="nav-mobile-link" key={link.label} to={link.to} state={link.state}>{link.label}</Link>
+                  }
+                  return renderSecondaryLink(link, 'nav-mobile-link')
+                })
+              : siteText.nav.mobileLinksGuest.map((link) => renderSecondaryLink(link, 'nav-mobile-link'))
+            }
           </div>
         </div>
       </div>
