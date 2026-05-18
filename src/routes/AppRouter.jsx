@@ -2,13 +2,16 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppShell } from '../components/AppShell'
 import { AuthProvider } from '../context/AuthContext'
 import { CartProvider } from '../context/CartContext'
+import { AboutPage } from '../pages/AboutPage'
 import { AccountPage } from '../pages/AccountPage'
 import { CartPage } from '../pages/CartPage'
+import { CGUPage } from '../pages/CGUPage'
 import { CategoriesPage } from '../pages/CategoriesPage'
 import { CheckoutPage } from '../pages/CheckoutPage'
 import { ContactPage } from '../pages/ContactPage'
 import { ForgotPasswordPage } from '../pages/ForgotPasswordPage'
 import { HomePage } from '../pages/HomePage'
+import { LegalPage } from '../pages/LegalPage'
 import { LoginPage } from '../pages/LoginPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { OrderConfirmationPage } from '../pages/OrderConfirmationPage'
@@ -32,6 +35,9 @@ export function AppRouter() {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/cgu" element={<CGUPage />} />
+              <Route path="/mentions-legales" element={<LegalPage />} />
+              <Route path="/a-propos" element={<AboutPage />} />
 
               {/* Auth */}
               <Route path="/login" element={<LoginPage />} />
