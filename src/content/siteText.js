@@ -210,6 +210,7 @@ export const siteText = {
       tabOrders: 'Commandes',
       tabAddresses: 'Adresses',
       tabPayments: 'Paiement',
+      tabSecurity: 'Securite',
       profileFirstname: 'Prenom',
       profileLastname: 'Nom',
       profileEmail: 'E-mail',

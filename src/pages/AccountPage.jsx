@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
 import { getMyOrders } from '../api/orderApi'
 import { createPaymentMethod, deletePaymentMethod, getMyPaymentMethods } from '../api/paymentMethodApi'
+import SecuritySettings from '../components/account/SecuritySettings'
 import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 
@@ -11,6 +12,7 @@ const TABS = [
   { id: 'orders', labelKey: 'tabOrders' },
   { id: 'addresses', labelKey: 'tabAddresses' },
   { id: 'payments', labelKey: 'tabPayments' },
+  { id: 'security', labelKey: 'tabSecurity' },
 ]
 
 function formatPrice(value) {
@@ -31,7 +33,7 @@ function formatDate(iso) {
 export function AccountPage() {
   const text = siteText.pages.account
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const { user, logout, checkAuth } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
 
   const handleLogout = () => {
@@ -70,6 +72,7 @@ export function AccountPage() {
           {activeTab === 'orders' ? <OrdersTab text={text} /> : null}
           {activeTab === 'addresses' ? <AddressesTab text={text} /> : null}
           {activeTab === 'payments' ? <PaymentsTab text={text} /> : null}
+          {activeTab === 'security' ? <SecuritySettings currentUser={user} onUserUpdate={checkAuth} /> : null}
         </div>
       </div>
     </section>

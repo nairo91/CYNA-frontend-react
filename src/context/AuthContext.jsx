@@ -4,6 +4,7 @@ import {
   fetchCurrentUser,
   getAuthToken,
   loginWithPassword,
+  loginVerify2fa,
   logout as logoutClient,
   registerUser,
   saveAuthToken,
@@ -65,8 +66,26 @@ export function AuthProvider({ children }) {
     setIsAuthenticating(true)
     try {
       const response = await loginWithPassword({ email, password })
+      if (response?.requires2fa) {
+        return response
+      }
       if (!response?.token) {
         throw new Error('Réponse de login invalide.')
+      }
+      saveAuthToken(response.token, rememberMe)
+      const me = await hydrateUser()
+      return me
+    } finally {
+      setIsAuthenticating(false)
+    }
+  }, [hydrateUser])
+
+  const verify2fa = useCallback(async ({ email, password, code, rememberMe = true }) => {
+    setIsAuthenticating(true)
+    try {
+      const response = await loginVerify2fa({ email, password, code })
+      if (!response?.token) {
+        throw new Error('Réponse de login 2FA invalide.')
       }
       saveAuthToken(response.token, rememberMe)
       const me = await hydrateUser()
@@ -97,11 +116,13 @@ export function AuthProvider({ children }) {
       isInitializing,
       isAuthenticating,
       login,
+      verify2fa,
       register,
       logout,
       refresh: hydrateUser,
+      checkAuth: hydrateUser,
     }),
-    [user, isInitializing, isAuthenticating, login, register, logout, hydrateUser],
+    [user, isInitializing, isAuthenticating, login, verify2fa, register, logout, hydrateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -192,6 +192,18 @@ export function Chatbot({ currentUser }) {
               <h2>{copy.title}</h2>
               <p>{copy.status}</p>
             </div>
+            <button
+              type="button"
+              className="chatbot-close-button"
+              onClick={() => setIsOpen(false)}
+              aria-label={copy.close}
+              title={copy.close}
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </header>
 
           <div className="chatbot-messages" role="log" aria-live="polite" ref={messagesRef}>

@@ -73,6 +73,10 @@ export function resetPassword({ token, password }) {
   return apiPost('/api/password/reset', { token, password }, { authenticated: false })
 }
 
+export function loginVerify2fa(payload) {
+  return apiPost('/api/login/2fa-verify', payload, { authenticated: false })
+}
+
 /** Déconnexion côté client (stateless JWT : rien à appeler côté API). */
 export function logout() {
   clearAuthToken()
