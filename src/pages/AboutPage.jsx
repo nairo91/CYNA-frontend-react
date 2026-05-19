@@ -45,31 +45,6 @@ export function AboutPage() {
           </div>
         </article>
 
-        <article className="panel about-block">
-          <span className="eyebrow">Equipe</span>
-          <h2 className="about-block-title">{page.teamTitle}</h2>
-          <p className="section-copy">{page.teamCopy}</p>
-          <div className="about-team">
-            {page.team.map((member) => (
-              <div className="about-team-card" key={member.name}>
-                <div className="about-team-avatar" aria-hidden="true">
-                  {member.name
-                    .split(' ')
-                    .map((part) => part[0])
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </div>
-                <div className="about-team-info">
-                  <strong>{member.name}</strong>
-                  <span className="about-team-role">{member.role}</span>
-                  <p className="section-copy">{member.bio}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
-
         <article className="panel about-block about-cta">
           <span className="eyebrow">Contact</span>
           <h2 className="about-block-title">{page.ctaTitle}</h2>

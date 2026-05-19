@@ -342,6 +342,13 @@ export const siteText = {
       fieldsRequired: 'Veuillez remplir tous les champs.',
       invalidEmail: 'Adresse e-mail invalide.',
       genericError: "Impossible d'envoyer le message pour le moment.",
+      teamTitle: 'Notre equipe',
+      teamCopy: 'Le projet CYNA est porte par :',
+      teamMembers: [
+        'MIRONA Orian',
+        'PLOQUIN Juliann',
+        'LEONARD Donavan',
+      ],
     },
     cgu: {
       eyebrow: 'Conditions generales',
@@ -477,30 +484,6 @@ export const siteText = {
         {
           title: 'Exigence',
           copy: "La cybersecurite ne tolere pas l'a-peu-pres. Nous appliquons a nos livrables le meme niveau d'exigence que nous attendons de nos outils.",
-        },
-      ],
-      teamTitle: 'Notre equipe',
-      teamCopy: "Une equipe pluridisciplinaire reunissant analystes SOC, consultants GRC et ingenieurs cloud, qui partagent une meme exigence operationnelle.",
-      team: [
-        {
-          name: 'Alexandre Vidal',
-          role: 'President & co-fondateur',
-          bio: 'Ancien RSSI dans le secteur banque-assurance, Alexandre dirige la strategie de CYNA-IT depuis sa creation.',
-        },
-        {
-          name: 'Camille Berthier',
-          role: 'Directrice du SOC',
-          bio: 'Quinze ans en analyse de menaces, Camille pilote nos operations de supervision 24/7 et nos analystes.',
-        },
-        {
-          name: 'Yannis Mercier',
-          role: 'Responsable conseil GRC',
-          bio: 'Specialiste ISO 27001 et NIS 2, Yannis accompagne nos clients dans leur mise en conformite reglementaire.',
-        },
-        {
-          name: 'Sofia Lemoine',
-          role: 'Lead ingenieure cloud',
-          bio: 'Expert AWS et Azure, Sofia conduit les missions de durcissement et de migration securisee de nos clients.',
         },
       ],
       ctaTitle: 'Discutons de votre projet',
