@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react'
 import {
   addItemToCart,
@@ -258,7 +259,7 @@ export function CartProvider({ children }) {
     () =>
       state.items.reduce((sum, it) => {
         const price = Number(it.price)
-        if (Number.isFinite(price)) return sum + price * (it.quantity ?? 0)
+        if (Number.isFinite(price)) return sum + price * (it.quantity ?? 0) * (it.durationMonths ?? 1)
         return sum
       }, 0),
     [state.items],

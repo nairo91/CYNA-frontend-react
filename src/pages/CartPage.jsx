@@ -61,7 +61,7 @@ export function CartPage() {
         <div className="cart-list">
           {items.map((it) => {
             const lineKey = it.id ?? it.productId
-            const linePrice = Number(it.price) * (it.quantity ?? 0)
+            const linePrice = Number(it.price) * (it.quantity ?? 0) * (it.durationMonths ?? 1)
             return (
               <article className="cart-line panel" key={lineKey}>
                 <div className="cart-line-media">

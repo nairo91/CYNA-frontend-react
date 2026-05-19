@@ -1775,3 +1775,66 @@ main {
 .button-danger:active {
   transform: translateY(0);
 }
+
+.checkout-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(18rem, 0.8fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.checkout-main {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.checkout-summary {
+  position: sticky;
+  top: 6rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.checkout-summary h2,
+.checkout-payment-panel h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.checkout-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.checkout-summary-row span:first-child {
+  color: var(--text-soft, rgba(255, 255, 255, 0.68));
+}
+
+.checkout-summary hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.checkout-payment-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 1rem;
+}
+
+.stripe-payment-form {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 860px) {
+  .checkout-form {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-summary {
+    position: static;
+  }
+}
