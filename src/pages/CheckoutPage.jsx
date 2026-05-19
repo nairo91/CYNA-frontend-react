@@ -4,6 +4,7 @@ import { createAddress, getMyAddresses } from '../api/addressApi'
 import { createOrder } from '../api/orderApi'
 import { getMyPaymentMethods } from '../api/paymentMethodApi'
 import { siteText } from '../content/siteText'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 
 function formatPrice(value) {
@@ -19,6 +20,7 @@ function formatPrice(value) {
 export function CheckoutPage() {
   const text = siteText.pages.checkout
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { items, subtotal, clearCart } = useCart()
 
   const [addresses, setAddresses] = useState([])
@@ -27,12 +29,15 @@ export function CheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState('')
   const [showNewAddress, setShowNewAddress] = useState(false)
   const [newAddress, setNewAddress] = useState({
-    label: 'Adresse principale',
-    line1: '',
-    line2: '',
-    postalCode: '',
+    firstname: user?.firstname ?? '',
+    lastname: user?.lastname ?? '',
+    adresse1: '',
+    adresse2: '',
+    zipCode: '',
     city: '',
+    region: '',
     country: 'France',
+    mobilephone: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -51,6 +56,17 @@ export function CheckoutPage() {
     return () => { cancelled = true }
   }, [])
 
+  // Pré-remplir nom/prénom dès que user est dispo
+  useEffect(() => {
+    if (user) {
+      setNewAddress((a) => ({
+        ...a,
+        firstname: a.firstname || user.firstname || '',
+        lastname: a.lastname || user.lastname || '',
+      }))
+    }
+  }, [user])
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setErrorMessage('')
@@ -65,12 +81,15 @@ export function CheckoutPage() {
       let billingAddressIri = selectedAddress
       if (showNewAddress) {
         const created = await createAddress({
-          label: newAddress.label || 'Adresse principale',
-          line1: newAddress.line1,
-          line2: newAddress.line2 || null,
-          postalCode: newAddress.postalCode,
+          firstname: newAddress.firstname,
+          lastname: newAddress.lastname,
+          adresse1: newAddress.adresse1,
+          adresse2: newAddress.adresse2 || null,
+          zipCode: newAddress.zipCode,
           city: newAddress.city,
+          region: newAddress.region,
           country: newAddress.country,
+          mobilephone: newAddress.mobilephone,
         })
         billingAddressIri = `/api/addresses/${created.id}`
       }
@@ -101,6 +120,8 @@ export function CheckoutPage() {
     }
   }
 
+  const upd = (field) => (e) => setNewAddress({ ...newAddress, [field]: e.target.value })
+
   return (
     <section className="section">
       <div className="container">
@@ -127,7 +148,7 @@ export function CheckoutPage() {
                         checked={selectedAddress === iri}
                         onChange={() => setSelectedAddress(iri)}
                       />
-                      <span>{addr.label || addr.line1} - {addr.postalCode} {addr.city}</span>
+                      <span>{addr.firstname} {addr.lastname} - {addr.adresse1} - {addr.zipCode} {addr.city}</span>
                     </label>
                   )
                 })}
@@ -137,30 +158,15 @@ export function CheckoutPage() {
               </>
             ) : (
               <div className="auth-form-grid">
-                <label className="auth-field">
-                  <span>{text.label}</span>
-                  <input value={newAddress.label} onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })} />
-                </label>
-                <label className="auth-field">
-                  <span>{text.line1}</span>
-                  <input required value={newAddress.line1} onChange={(e) => setNewAddress({ ...newAddress, line1: e.target.value })} />
-                </label>
-                <label className="auth-field">
-                  <span>{text.line2}</span>
-                  <input value={newAddress.line2} onChange={(e) => setNewAddress({ ...newAddress, line2: e.target.value })} />
-                </label>
-                <label className="auth-field">
-                  <span>{text.postalCode}</span>
-                  <input required value={newAddress.postalCode} onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })} />
-                </label>
-                <label className="auth-field">
-                  <span>{text.city}</span>
-                  <input required value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} />
-                </label>
-                <label className="auth-field">
-                  <span>{text.country}</span>
-                  <input required value={newAddress.country} onChange={(e) => setNewAddress({ ...newAddress, country: e.target.value })} />
-                </label>
+                <label className="auth-field"><span>{text.firstname}</span><input required value={newAddress.firstname} onChange={upd('firstname')} /></label>
+                <label className="auth-field"><span>{text.lastname}</span><input required value={newAddress.lastname} onChange={upd('lastname')} /></label>
+                <label className="auth-field"><span>{text.line1}</span><input required value={newAddress.adresse1} onChange={upd('adresse1')} /></label>
+                <label className="auth-field"><span>{text.line2}</span><input value={newAddress.adresse2} onChange={upd('adresse2')} /></label>
+                <label className="auth-field"><span>{text.postalCode}</span><input required value={newAddress.zipCode} onChange={upd('zipCode')} /></label>
+                <label className="auth-field"><span>{text.city}</span><input required value={newAddress.city} onChange={upd('city')} /></label>
+                <label className="auth-field"><span>{text.region}</span><input required value={newAddress.region} onChange={upd('region')} /></label>
+                <label className="auth-field"><span>{text.country}</span><input required value={newAddress.country} onChange={upd('country')} /></label>
+                <label className="auth-field"><span>{text.mobile}</span><input required type="tel" value={newAddress.mobilephone} onChange={upd('mobilephone')} /></label>
                 {addresses.length > 0 ? (
                   <button type="button" className="button-secondary" onClick={() => setShowNewAddress(false)}>
                     {text.cancel}
@@ -184,7 +190,7 @@ export function CheckoutPage() {
                     checked={selectedPayment === pm.id}
                     onChange={() => setSelectedPayment(pm.id)}
                   />
-                  <span>{pm.label} - **** {pm.maskedNumber ?? ''}</span>
+                  <span>{pm.brand ?? pm.provider} - **** {pm.last4} ({pm.expMonth}/{pm.expYear})</span>
                 </label>
               ))
             )}

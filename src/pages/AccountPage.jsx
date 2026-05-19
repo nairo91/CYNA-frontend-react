@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
+import { createAddress, deleteAddress, getMyAddresses } from '../api/addressApi'
 import { getMyOrders } from '../api/orderApi'
 import { createPaymentMethod, deletePaymentMethod, getMyPaymentMethods } from '../api/paymentMethodApi'
 import SecuritySettings from '../components/account/SecuritySettings'
@@ -70,7 +70,7 @@ export function AccountPage() {
         <div className="account-panel panel">
           {activeTab === 'profile' ? <ProfileTab user={user} text={text} /> : null}
           {activeTab === 'orders' ? <OrdersTab text={text} /> : null}
-          {activeTab === 'addresses' ? <AddressesTab text={text} /> : null}
+          {activeTab === 'addresses' ? <AddressesTab text={text} user={user} /> : null}
           {activeTab === 'payments' ? <PaymentsTab text={text} /> : null}
           {activeTab === 'security' ? <SecuritySettings currentUser={user} onUserUpdate={checkAuth} /> : null}
         </div>
@@ -124,10 +124,22 @@ function OrdersTab({ text }) {
   )
 }
 
-function AddressesTab({ text }) {
+function AddressesTab({ text, user }) {
+  const initialForm = () => ({
+    firstname: user?.firstname ?? '',
+    lastname: user?.lastname ?? '',
+    adresse1: '',
+    adresse2: '',
+    zipCode: '',
+    city: '',
+    region: '',
+    country: 'France',
+    mobilephone: '',
+  })
+
   const [addresses, setAddresses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [form, setForm] = useState({ label: '', line1: '', line2: '', postalCode: '', city: '', country: 'France' })
+  const [form, setForm] = useState(initialForm())
   const [showForm, setShowForm] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -145,8 +157,18 @@ function AddressesTab({ text }) {
     event.preventDefault()
     setErrorMessage('')
     try {
-      await createAddress(form)
-      setForm({ label: '', line1: '', line2: '', postalCode: '', city: '', country: 'France' })
+      await createAddress({
+        firstname: form.firstname,
+        lastname: form.lastname,
+        adresse1: form.adresse1,
+        adresse2: form.adresse2 || null,
+        zipCode: form.zipCode,
+        city: form.city,
+        region: form.region,
+        country: form.country,
+        mobilephone: form.mobilephone,
+      })
+      setForm(initialForm())
       setShowForm(false)
       reload()
     } catch (err) {
@@ -163,6 +185,8 @@ function AddressesTab({ text }) {
     }
   }
 
+  const upd = (field) => (e) => setForm({ ...form, [field]: e.target.value })
+
   if (isLoading) return <p>{text.loading}</p>
 
   return (
@@ -174,8 +198,9 @@ function AddressesTab({ text }) {
           {addresses.map((a) => (
             <li className="account-list-item" key={a.id}>
               <div>
-                <strong>{a.label || a.line1}</strong>
-                <p className="section-copy">{a.line1}{a.line2 ? `, ${a.line2}` : ''} - {a.postalCode} {a.city}, {a.country}</p>
+                <strong>{a.firstname} {a.lastname}</strong>
+                <p className="section-copy">{a.adresse1}{a.adresse2 ? `, ${a.adresse2}` : ''} - {a.zipCode} {a.city}, {a.region}, {a.country}</p>
+                <p className="section-copy">{a.mobilephone}</p>
               </div>
               <button type="button" className="button-secondary" onClick={() => handleDelete(a.id)}>{text.delete}</button>
             </li>
@@ -188,17 +213,20 @@ function AddressesTab({ text }) {
       ) : (
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-form-grid">
-            <label className="auth-field"><span>{text.fieldLabel}</span><input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.fieldLine1}</span><input required value={form.line1} onChange={(e) => setForm({ ...form, line1: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.fieldLine2}</span><input value={form.line2} onChange={(e) => setForm({ ...form, line2: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.fieldPostal}</span><input required value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.fieldCity}</span><input required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.fieldCountry}</span><input required value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} /></label>
+            <label className="auth-field"><span>{text.firstname}</span><input required value={form.firstname} onChange={upd('firstname')} /></label>
+            <label className="auth-field"><span>{text.lastname}</span><input required value={form.lastname} onChange={upd('lastname')} /></label>
+            <label className="auth-field"><span>{text.fieldLine1}</span><input required value={form.adresse1} onChange={upd('adresse1')} /></label>
+            <label className="auth-field"><span>{text.fieldLine2}</span><input value={form.adresse2} onChange={upd('adresse2')} /></label>
+            <label className="auth-field"><span>{text.fieldPostal}</span><input required value={form.zipCode} onChange={upd('zipCode')} /></label>
+            <label className="auth-field"><span>{text.fieldCity}</span><input required value={form.city} onChange={upd('city')} /></label>
+            <label className="auth-field"><span>{text.fieldRegion}</span><input required value={form.region} onChange={upd('region')} /></label>
+            <label className="auth-field"><span>{text.fieldCountry}</span><input required value={form.country} onChange={upd('country')} /></label>
+            <label className="auth-field"><span>{text.fieldMobile}</span><input required type="tel" value={form.mobilephone} onChange={upd('mobilephone')} /></label>
           </div>
           {errorMessage ? <div className="auth-feedback auth-feedback-error">{errorMessage}</div> : null}
           <div className="hero-actions">
             <button type="submit" className="button-primary">{text.save}</button>
-            <button type="button" className="button-secondary" onClick={() => setShowForm(false)}>{text.cancel}</button>
+            <button type="button" className="button-secondary" onClick={() => { setShowForm(false); setErrorMessage('') }}>{text.cancel}</button>
           </div>
         </form>
       )}
@@ -210,7 +238,7 @@ function PaymentsTab({ text }) {
   const [methods, setMethods] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ label: '', last4: '', expiryMonth: 12, expiryYear: 2030 })
+  const [form, setForm] = useState({ brand: 'Visa', last4: '', expMonth: 12, expYear: new Date().getFullYear() + 3 })
   const [errorMessage, setErrorMessage] = useState('')
 
   const reload = () => {
@@ -226,16 +254,19 @@ function PaymentsTab({ text }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setErrorMessage('')
+    if (!/^\d{4}$/.test(form.last4)) {
+      setErrorMessage(text.paymentInvalidLast4)
+      return
+    }
     try {
       await createPaymentMethod({
-        label: form.label || 'Carte bancaire',
+        brand: form.brand || 'Visa',
         last4: form.last4,
-        expiryMonth: Number(form.expiryMonth),
-        expiryYear: Number(form.expiryYear),
-        provider: 'mock',
+        expMonth: Number(form.expMonth),
+        expYear: Number(form.expYear),
       })
       setShowForm(false)
-      setForm({ label: '', last4: '', expiryMonth: 12, expiryYear: 2030 })
+      setForm({ brand: 'Visa', last4: '', expMonth: 12, expYear: new Date().getFullYear() + 3 })
       reload()
     } catch (err) {
       setErrorMessage(err?.message ?? text.genericError)
@@ -255,8 +286,8 @@ function PaymentsTab({ text }) {
           {methods.map((pm) => (
             <li className="account-list-item" key={pm.id}>
               <div>
-                <strong>{pm.label}</strong>
-                <p className="section-copy">**** {pm.last4 ?? pm.maskedNumber ?? '????'} - {pm.expiryMonth}/{pm.expiryYear}</p>
+                <strong>{pm.brand ?? pm.provider}</strong>
+                <p className="section-copy">**** {pm.last4} - {pm.expMonth}/{pm.expYear}</p>
               </div>
               <button type="button" className="button-secondary" onClick={() => handleDelete(pm.id)}>{text.delete}</button>
             </li>
@@ -270,15 +301,21 @@ function PaymentsTab({ text }) {
         <form className="auth-form" onSubmit={handleSubmit}>
           <p className="section-copy">{text.paymentsNote}</p>
           <div className="auth-form-grid">
-            <label className="auth-field"><span>{text.paymentLabel}</span><input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} /></label>
-            <label className="auth-field"><span>{text.paymentLast4}</span><input maxLength={4} value={form.last4} onChange={(e) => setForm({ ...form, last4: e.target.value })} required /></label>
-            <label className="auth-field"><span>{text.paymentMonth}</span><input type="number" min={1} max={12} value={form.expiryMonth} onChange={(e) => setForm({ ...form, expiryMonth: e.target.value })} required /></label>
-            <label className="auth-field"><span>{text.paymentYear}</span><input type="number" min={new Date().getFullYear()} value={form.expiryYear} onChange={(e) => setForm({ ...form, expiryYear: e.target.value })} required /></label>
+            <label className="auth-field"><span>{text.paymentBrand}</span>
+              <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })}>
+                <option value="Visa">Visa</option>
+                <option value="Mastercard">Mastercard</option>
+                <option value="Amex">American Express</option>
+              </select>
+            </label>
+            <label className="auth-field"><span>{text.paymentLast4}</span><input maxLength={4} pattern="\d{4}" value={form.last4} onChange={(e) => setForm({ ...form, last4: e.target.value })} required /></label>
+            <label className="auth-field"><span>{text.paymentMonth}</span><input type="number" min={1} max={12} value={form.expMonth} onChange={(e) => setForm({ ...form, expMonth: e.target.value })} required /></label>
+            <label className="auth-field"><span>{text.paymentYear}</span><input type="number" min={new Date().getFullYear()} value={form.expYear} onChange={(e) => setForm({ ...form, expYear: e.target.value })} required /></label>
           </div>
           {errorMessage ? <div className="auth-feedback auth-feedback-error">{errorMessage}</div> : null}
           <div className="hero-actions">
             <button type="submit" className="button-primary">{text.save}</button>
-            <button type="button" className="button-secondary" onClick={() => setShowForm(false)}>{text.cancel}</button>
+            <button type="button" className="button-secondary" onClick={() => { setShowForm(false); setErrorMessage('') }}>{text.cancel}</button>
           </div>
         </form>
       )}
