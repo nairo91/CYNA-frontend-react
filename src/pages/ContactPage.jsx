@@ -82,6 +82,18 @@ export function ContactPage() {
             </button>
           </form>
         )}
+
+        {text.teamMembers && text.teamMembers.length > 0 ? (
+          <div className="contact-team" style={{ marginTop: '2rem' }}>
+            <h2>{text.teamTitle}</h2>
+            <p>{text.teamCopy}</p>
+            <ul>
+              {text.teamMembers.map((member) => (
+                <li key={member}>{member}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </section>
   )
