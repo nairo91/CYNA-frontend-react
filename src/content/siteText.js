@@ -21,9 +21,26 @@ export const siteText = {
       { label: 'Se connecter', to: '/login' },
       { label: "S'inscrire", to: '/register' },
       { label: 'Contact', to: '/contact' },
-      { label: 'CGU', href: '#footer-legal' },
-      { label: 'Mentions legales', href: '#footer-legal' },
-      { label: 'A propos de CYNA', href: '#footer-about' },
+      { label: 'CGU', to: '/cgu' },
+      { label: 'Mentions legales', to: '/mentions-legales' },
+      { label: 'A propos de CYNA', to: '/a-propos' },
+    ],
+    mobileLinksGuest: [
+      { label: 'Se connecter', to: '/login' },
+      { label: "S'inscrire", to: '/register' },
+      { label: 'Contact', to: '/contact' },
+      { label: 'CGU', to: '/cgu' },
+      { label: 'Mentions legales', to: '/mentions-legales' },
+      { label: 'A propos de CYNA', to: '/a-propos' },
+    ],
+    mobileLinksAuth: [
+      { label: 'Mon espace client', to: '/espace-client' },
+      { label: 'Mes commandes', to: '/espace-client', state: { tab: 'orders' } },
+      { label: 'Contact', to: '/contact' },
+      { label: 'CGU', to: '/cgu' },
+      { label: 'Mentions legales', to: '/mentions-legales' },
+      { label: 'A propos de CYNA', to: '/a-propos' },
+      { label: 'Se deconnecter', action: 'logout' },
     ],
     accountLabel: 'Mon espace',
     accountHint: 'Acceder a votre espace client',
@@ -67,17 +84,25 @@ export const siteText = {
   footer: {
     title: 'CYNA',
     copy: 'CYNA accompagne les entreprises dans le choix de solutions cyber lisibles.',
+    legalTitle: 'Liens legaux',
     legalLinks: [
-      { label: 'Mentions legales', href: '#footer-legal' },
-      { label: 'CGU', href: '#footer-legal' },
+      { label: 'Mentions legales', to: '/mentions-legales' },
+      { label: 'CGU', to: '/cgu' },
+      { label: 'A propos de CYNA', to: '/a-propos' },
       { label: 'Contact', to: '/contact' },
-      { label: 'A propos de CYNA', href: '#footer-about' },
+    ],
+    followTitle: 'Nous suivre',
+    followLinks: [
+      { label: 'LinkedIn', href: '#' },
+      { label: 'Twitter / X', href: '#' },
+      { label: 'GitHub', href: '#' },
     ],
     socialLinks: [
       { label: 'LinkedIn', href: 'https://www.linkedin.com', external: true },
       { label: 'YouTube', href: 'https://www.youtube.com', external: true },
       { label: 'X', href: 'https://x.com', external: true },
     ],
+    copyright: '(c) {year} CYNA-IT - Tous droits reserves.',
   },
   pages: {
     categories: {
@@ -317,6 +342,171 @@ export const siteText = {
       fieldsRequired: 'Veuillez remplir tous les champs.',
       invalidEmail: 'Adresse e-mail invalide.',
       genericError: "Impossible d'envoyer le message pour le moment.",
+    },
+    cgu: {
+      eyebrow: 'Conditions generales',
+      title: "Conditions Generales d'Utilisation",
+      copy: "Ces conditions encadrent l'utilisation de la plateforme CYNA-IT et de ses services. En naviguant sur le site, vous acceptez les regles decrites ci-dessous.",
+      lastUpdate: 'Derniere mise a jour : 19 mai 2026',
+      articles: [
+        {
+          number: 'Article 1',
+          title: "Objet et champ d'application",
+          paragraphs: [
+            "Les presentes Conditions Generales d'Utilisation (CGU) ont pour objet de definir les modalites et conditions dans lesquelles CYNA-IT met a disposition de ses utilisateurs la plateforme accessible a l'adresse cyna-it.fr ainsi que les services de cybersecurite associes.",
+            "Toute utilisation du site implique l'acceptation pleine et entiere des presentes CGU. CYNA-IT se reserve le droit de les modifier a tout moment pour les adapter aux evolutions de la plateforme ou de la legislation en vigueur.",
+          ],
+        },
+        {
+          number: 'Article 2',
+          title: 'Acces au site et aux services',
+          paragraphs: [
+            "L'acces au site est ouvert a tout utilisateur disposant d'une connexion Internet. Certaines fonctionnalites necessitent la creation d'un compte client securise via une adresse e-mail valide et un mot de passe robuste.",
+            "CYNA-IT met tout en oeuvre pour assurer une disponibilite continue du service, mais ne peut etre tenue responsable des interruptions liees a la maintenance, aux attaques tierces ou a des cas de force majeure.",
+            "L'utilisateur s'engage a proteger ses identifiants et a signaler sans delai toute utilisation frauduleuse de son compte aupres du support CYNA-IT.",
+          ],
+        },
+        {
+          number: 'Article 3',
+          title: 'Responsabilites',
+          paragraphs: [
+            "L'utilisateur s'engage a utiliser la plateforme conformement aux lois en vigueur et a ne pas porter atteinte a la securite des systemes d'information de CYNA-IT ou de tiers.",
+            "Toute tentative d'intrusion, d'analyse non autorisee, de retro-ingenierie ou de denis de service fera l'objet de poursuites judiciaires conformement aux articles 323-1 et suivants du Code penal.",
+            "CYNA-IT ne saurait etre tenue responsable d'un mauvais usage des solutions de cybersecurite proposees ni des dommages indirects pouvant resulter d'une exploitation hors specifications.",
+          ],
+        },
+        {
+          number: 'Article 4',
+          title: 'Propriete intellectuelle',
+          paragraphs: [
+            "L'ensemble des contenus presents sur le site (textes, logos, marques, graphismes, code source, illustrations) est la propriete exclusive de CYNA-IT ou de ses partenaires editeurs.",
+            "Toute reproduction, representation, modification ou diffusion totale ou partielle des contenus, sans autorisation ecrite prealable, est strictement interdite et constitue un acte de contrefacon sanctionne par les articles L.335-2 et suivants du Code de la propriete intellectuelle.",
+          ],
+        },
+        {
+          number: 'Article 5',
+          title: 'Droit applicable et juridiction',
+          paragraphs: [
+            "Les presentes CGU sont regies par le droit francais. Toute reclamation peut etre adressee au support CYNA-IT a l'adresse contact@cyna-it.fr.",
+            "A defaut de resolution amiable, tout litige relatif a l'interpretation ou a l'execution des presentes sera soumis aux tribunaux competents du ressort de la Cour d'appel de Paris.",
+          ],
+        },
+      ],
+    },
+    legal: {
+      eyebrow: 'Mentions legales',
+      title: 'Mentions legales',
+      copy: 'Informations relatives a l\'editeur du site CYNA-IT, conformement a la loi n.2004-575 du 21 juin 2004 pour la confiance dans l\'economie numerique.',
+      lastUpdate: 'Derniere mise a jour : 19 mai 2026',
+      sections: [
+        {
+          title: "Editeur du site",
+          items: [
+            { label: 'Raison sociale', value: 'CYNA-IT SAS' },
+            { label: 'Capital social', value: '100 000 EUR' },
+            { label: 'Siege social', value: '12 rue de la Cybersecurite, 75011 Paris, France' },
+            { label: 'RCS', value: 'Paris B 902 481 376' },
+            { label: 'TVA intracommunautaire', value: 'FR 32 902481376' },
+            { label: 'Directeur de la publication', value: 'M. Alexandre Vidal, President' },
+            { label: 'Contact', value: 'contact@cyna-it.fr - 01 80 00 00 00' },
+          ],
+        },
+        {
+          title: "Hebergeur",
+          items: [
+            { label: 'Raison sociale', value: 'OVH SAS' },
+            { label: 'Siege social', value: '2 rue Kellermann, 59100 Roubaix, France' },
+            { label: 'Telephone', value: '+33 9 72 10 10 07' },
+            { label: 'Site web', value: 'www.ovhcloud.com' },
+          ],
+        },
+        {
+          title: 'Propriete intellectuelle',
+          paragraphs: [
+            "L'ensemble du contenu de ce site (architecture, textes, illustrations, photographies, marques, logos, charte graphique) est la propriete exclusive de CYNA-IT ou de ses ayants droit.",
+            "Toute reproduction integrale ou partielle de ces elements, par quelque procede que ce soit, sans autorisation expresse de CYNA-IT, est interdite et constituerait une contrefacon sanctionnee par les articles L.335-2 et suivants du Code de la propriete intellectuelle.",
+          ],
+        },
+        {
+          title: 'Donnees personnelles',
+          paragraphs: [
+            "CYNA-IT collecte et traite des donnees personnelles dans le respect du Reglement General sur la Protection des Donnees (RGPD) et de la loi Informatique et Libertes du 6 janvier 1978 modifiee.",
+            "Les donnees collectees sont strictement necessaires a la gestion de votre compte, au traitement de vos commandes et a l'amelioration de nos services. Elles sont conservees pour la duree legale applicable.",
+            "Conformement a la reglementation, vous disposez d'un droit d'acces, de rectification, d'opposition, de portabilite et de suppression sur vos donnees. Ces droits peuvent etre exerces a l'adresse dpo@cyna-it.fr.",
+            "En cas de litige, vous avez la possibilite d'introduire une reclamation aupres de la CNIL (Commission Nationale de l'Informatique et des Libertes).",
+          ],
+        },
+        {
+          title: 'Cookies',
+          paragraphs: [
+            "Le site cyna-it.fr utilise des cookies strictement necessaires a son fonctionnement (authentification, panier) ainsi que des cookies de mesure d'audience anonymises.",
+            "Vous pouvez a tout moment ajuster vos preferences via le bandeau de gestion des cookies ou les parametres de votre navigateur.",
+          ],
+        },
+      ],
+    },
+    about: {
+      eyebrow: 'A propos',
+      title: 'CYNA-IT, la cybersecurite plus claire pour les entreprises',
+      copy: "Depuis 2018, CYNA-IT accompagne les directions IT et metiers dans la selection, le deploiement et la supervision de solutions de cybersecurite adaptees a leurs enjeux reels.",
+      missionTitle: 'Notre mission',
+      missionParagraphs: [
+        "Rendre la cybersecurite lisible, accessible et actionnable pour toutes les entreprises francaises, des PME industrielles aux ETI a forte exposition reglementaire.",
+        "Notre conviction : un bon outil ne sert a rien sans un cadre clair. Chaque service CYNA-IT est pense pour s'integrer dans la realite operationnelle de nos clients, sans alourdir leurs equipes.",
+      ],
+      stats: [
+        { value: '+180', label: 'Clients accompagnes' },
+        { value: '24/7', label: 'Supervision SOC' },
+        { value: '15 ans', label: "D'experience cyber cumulee" },
+        { value: '100%', label: 'Equipe basee en France' },
+      ],
+      valuesTitle: 'Nos valeurs',
+      values: [
+        {
+          title: 'Clarte',
+          copy: 'Nous expliquons ce que nous proposons. Pas de jargon inutile, pas de promesses floues : des livrables concrets et mesurables.',
+        },
+        {
+          title: 'Independance',
+          copy: "Nous restons libres dans notre conseil. Nos recommandations sont guidees par votre contexte, pas par un editeur partenaire.",
+        },
+        {
+          title: 'Proximite',
+          copy: 'Un interlocuteur dedie, des points reguliers, une equipe joignable. La relation prime sur le contrat.',
+        },
+        {
+          title: 'Exigence',
+          copy: "La cybersecurite ne tolere pas l'a-peu-pres. Nous appliquons a nos livrables le meme niveau d'exigence que nous attendons de nos outils.",
+        },
+      ],
+      teamTitle: 'Notre equipe',
+      teamCopy: "Une equipe pluridisciplinaire reunissant analystes SOC, consultants GRC et ingenieurs cloud, qui partagent une meme exigence operationnelle.",
+      team: [
+        {
+          name: 'Alexandre Vidal',
+          role: 'President & co-fondateur',
+          bio: 'Ancien RSSI dans le secteur banque-assurance, Alexandre dirige la strategie de CYNA-IT depuis sa creation.',
+        },
+        {
+          name: 'Camille Berthier',
+          role: 'Directrice du SOC',
+          bio: 'Quinze ans en analyse de menaces, Camille pilote nos operations de supervision 24/7 et nos analystes.',
+        },
+        {
+          name: 'Yannis Mercier',
+          role: 'Responsable conseil GRC',
+          bio: 'Specialiste ISO 27001 et NIS 2, Yannis accompagne nos clients dans leur mise en conformite reglementaire.',
+        },
+        {
+          name: 'Sofia Lemoine',
+          role: 'Lead ingenieure cloud',
+          bio: 'Expert AWS et Azure, Sofia conduit les missions de durcissement et de migration securisee de nos clients.',
+        },
+      ],
+      ctaTitle: 'Discutons de votre projet',
+      ctaCopy: 'Une question, un audit a planifier, un besoin urgent ? Notre equipe est joignable rapidement.',
+      ctaPrimary: 'Nous contacter',
+      ctaSecondary: 'Voir nos solutions',
     },
   },
   auth: {
