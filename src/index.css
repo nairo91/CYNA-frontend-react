@@ -1,27 +1,10 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark, valentine;
+}
+
 :root {
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color: rgba(242, 247, 252, 0.96);
-  background:
-    radial-gradient(circle at top left, rgba(24, 90, 201, 0.32), transparent 26%),
-    radial-gradient(circle at 85% 10%, rgba(31, 171, 232, 0.18), transparent 24%),
-    linear-gradient(180deg, #07111f 0%, #09182d 54%, #060d18 100%);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   --page-max-width: 1240px;
-  --surface: rgba(255, 255, 255, 0.05);
-  --surface-strong: rgba(255, 255, 255, 0.09);
-  --line: rgba(255, 255, 255, 0.11);
-  --line-strong: rgba(132, 221, 255, 0.34);
-  --text-soft: rgba(222, 231, 242, 0.76);
-  --brand: #1d8dff;
-  --brand-strong: #0e5cf0;
-  --brand-soft: rgba(29, 141, 255, 0.16);
-  --brand-glow: rgba(122, 228, 255, 0.22);
-  --shadow: 0 22px 54px rgba(2, 9, 19, 0.34);
 }
 
 * {

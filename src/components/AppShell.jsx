@@ -8,9 +8,9 @@ export function AppShell({ children }) {
   const { user } = useAuth()
 
   return (
-    <div className="page-shell">
+    <div className="min-h-screen flex flex-col bg-base-100 text-base-content font-sans">
       <Navbar />
-      <main>{children}</main>
+      <main className="flex-1 w-full flex flex-col">{children}</main>
       <Footer />
       <Chatbot currentUser={user} />
     </div>

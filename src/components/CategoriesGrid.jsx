@@ -8,38 +8,41 @@ export function CategoriesGrid({ categories, isLoading, error }) {
   const section = siteText.home.categories
 
   return (
-    <section className="section" id="categories">
-      <div className="container">
+    <section className="py-16 bg-base-100" id="categories">
+      <div className="container mx-auto px-4">
         <SectionHeading
           eyebrow="Catalogue CYNA"
           title={section.title}
           copy={section.copy}
-          meta={<Link to="/categories">{section.meta}</Link>}
+          meta={<Link to="/categories" className="btn btn-ghost btn-sm gap-2">{section.meta} <span className="material-symbols-outlined text-sm">arrow_forward</span></Link>}
         />
 
         <ResourceState
           isLoading={isLoading}
           error={error}
           skeletonCount={6}
-          loadingClassName="loading-grid loading-grid-categories"
+          loadingClassName="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           errorMessage={section.error}
         >
-          <div className="grid-categories">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
-              <article className="category-card" key={category.id ?? category.slug}>
-                <Link className="category-card-link" to="/categories">
-                  <div className="category-media">
+              <article className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-300 hover:border-primary/50 group" key={category.id ?? category.slug}>
+                <Link className="flex flex-col h-full" to="/categories">
+                  <figure className="relative h-48 overflow-hidden bg-base-300">
                     <img
                       src={resolveMediaUrl(category.image, category.name)}
                       alt={`Illustration de la categorie ${category.name}`}
                       loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                     />
+                    <div className="absolute top-4 right-4">
+                      <span className="badge badge-secondary shadow-md font-medium">{section.chip}</span>
+                    </div>
+                  </figure>
+                  <div className="card-body p-6">
+                    <h3 className="card-title text-xl text-base-content group-hover:text-primary transition-colors mb-2">{category.name}</h3>
+                    <p className="text-base-content/70 flex-grow text-sm leading-relaxed">{category.description ?? section.fallbackDescription}</p>
                   </div>
-                  <div className="category-body">
-                    <strong>{category.name}</strong>
-                    <p className="section-copy category-copy">{category.description ?? section.fallbackDescription}</p>
-                  </div>
-                  <span className="category-chip">{section.chip}</span>
                 </Link>
               </article>
             ))}
