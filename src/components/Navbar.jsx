@@ -9,6 +9,8 @@ const THEMES = [
   { id: 'dark', label: 'Sombre', icon: 'dark_mode' },
   { id: 'light', label: 'Clair', icon: 'light_mode' },
   { id: 'valentine', label: 'Valentine', icon: 'favorite' },
+  { id: 'luxury', label: 'Luxury', icon: 'diamond' },
+  { id: 'night', label: 'Night', icon: 'nights_stay' },
 ]
 
 export function Navbar() {
