@@ -1,10 +1,166 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark, valentine, luxury, night;
 }
 
+/* ==========================================================================
+   CYNA DESIGN SYSTEM TOKENS
+   Source of truth: DESIGN.md (sections 2, 3, 4, 5).
+   shadcn/ui semantic tokens (--background, --foreground, etc.) + Cyna brand
+   tokens (--cyna-navy-*, --cyna-cyan-*). DaisyUI legacy classes below remain
+   on their own variables (--brand, --surface, --text-soft) during transition.
+   ========================================================================== */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans:
+    "Inter", "Geist", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono:
+    "JetBrains Mono", "Geist Mono", ui-monospace, "Cascadia Code",
+    "Source Code Pro", monospace;
+}
+
 :root {
   --page-max-width: 1240px;
+
+  /* Radius base (shadcn convention) */
+  --radius: 0.625rem;
+
+  /* Light mode — Confident technical: white surface, navy text, cyan accent */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.04 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.04 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.04 270);
+  --primary: oklch(0.65 0.16 215);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.005 270);
+  --secondary-foreground: oklch(0.18 0.04 270);
+  --muted: oklch(0.96 0.005 270);
+  --muted-foreground: oklch(0.5 0.02 270);
+  --accent: oklch(0.96 0.005 270);
+  --accent-foreground: oklch(0.18 0.04 270);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.92 0.005 270);
+  --input: oklch(0.92 0.005 270);
+  --ring: oklch(0.65 0.16 215);
+  --chart-1: oklch(0.65 0.16 215);
+  --chart-2: oklch(0.55 0.18 250);
+  --chart-3: oklch(0.7 0.15 150);
+  --chart-4: oklch(0.75 0.14 80);
+  --chart-5: oklch(0.6 0.2 320);
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.18 0.04 270);
+  --sidebar-primary: oklch(0.65 0.16 215);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.96 0.005 270);
+  --sidebar-accent-foreground: oklch(0.18 0.04 270);
+  --sidebar-border: oklch(0.92 0.005 270);
+  --sidebar-ring: oklch(0.65 0.16 215);
+
+  /* Cyna brand tokens — direct hex for marketing surfaces */
+  --cyna-navy-50: #eef0fb;
+  --cyna-navy-100: #d6daf3;
+  --cyna-navy-200: #a5ade3;
+  --cyna-navy-300: #7480d0;
+  --cyna-navy-400: #4e5bbe;
+  --cyna-navy-500: #3540a8;
+  --cyna-navy-600: #28318a;
+  --cyna-navy-700: #1e2470;
+  --cyna-navy-800: #1a1f5c;
+  --cyna-navy-900: #1e1b4b;
+  --cyna-navy-950: #0b0b23;
+  --cyna-cyan-300: #67e8f9;
+  --cyna-cyan-400: #22d3ee;
+  --cyna-cyan-500: #06b6d4;
+}
+
+.dark {
+  --background: oklch(0.13 0.04 270);
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.18 0.04 270);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.18 0.04 270);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.7 0.17 215);
+  --primary-foreground: oklch(0.13 0.04 270);
+  --secondary: oklch(0.22 0.04 270);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.22 0.04 270);
+  --muted-foreground: oklch(0.65 0.02 270);
+  --accent: oklch(0.22 0.04 270);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.28 0.04 270);
+  --input: oklch(0.28 0.04 270);
+  --ring: oklch(0.7 0.17 215);
+  --chart-1: oklch(0.7 0.17 215);
+  --chart-2: oklch(0.6 0.2 250);
+  --chart-3: oklch(0.75 0.15 150);
+  --chart-4: oklch(0.78 0.14 80);
+  --chart-5: oklch(0.65 0.2 320);
+  --sidebar: oklch(0.13 0.04 270);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.7 0.17 215);
+  --sidebar-primary-foreground: oklch(0.13 0.04 270);
+  --sidebar-accent: oklch(0.22 0.04 270);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.28 0.04 270);
+  --sidebar-ring: oklch(0.7 0.17 215);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 * {

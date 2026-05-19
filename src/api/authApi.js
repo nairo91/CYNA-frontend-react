@@ -1,4 +1,4 @@
-import { apiGet, apiPost, setAuthTokenProvider } from './http'
+import { apiGet, apiPatch, apiPost, setAuthTokenProvider } from './http'
 
 export const AUTH_TOKEN_STORAGE_KEY = 'cyna_auth_token'
 
@@ -58,9 +58,22 @@ export function fetchCurrentUser() {
   return apiGet('/api/me')
 }
 
+/**
+ * PATCH /api/me — mise à jour du profil utilisateur courant.
+ * @param {{ firstname?: string, lastname?: string, email?: string }} payload
+ */
+export function updateMyProfile(payload) {
+  return apiPatch('/api/me', payload)
+}
+
 /** POST /api/verify-email */
 export function verifyEmail({ email, token }) {
   return apiPost('/api/verify-email', { email, token }, { authenticated: false })
+}
+
+/** POST /api/verify-email/resend — backend endpoint to be implemented (Sprint 3 ticket). */
+export function resendVerificationEmail({ email }) {
+  return apiPost('/api/verify-email/resend', { email }, { authenticated: false })
 }
 
 /** POST /api/password/forgot */

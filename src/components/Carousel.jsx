@@ -1,110 +1,200 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowLeft, ArrowRight, Check, Pause, Play } from 'lucide-react'
 import { siteText } from '../content/siteText'
+import { cn } from '../lib/utils'
+
+const AUTOPLAY_INTERVAL_MS = 6000
 
 export function Carousel() {
   const slides = siteText.home.slides
+  const totalSlides = slides.length
+
   const [activeIndex, setActiveIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
+  const containerRef = useRef(null)
 
-  const goToPrevious = () => {
-    setActiveIndex((current) => (current - 1 + slides.length) % slides.length)
-  }
-
-  const goToNext = () => {
-    setActiveIndex((current) => (current + 1) % slides.length)
-  }
+  const goToPrevious = () =>
+    setActiveIndex((current) => (current - 1 + totalSlides) % totalSlides)
+  const goToNext = () =>
+    setActiveIndex((current) => (current + 1) % totalSlides)
 
   useEffect(() => {
+    if (isPaused || isFocused || isHovering) return
     const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % slides.length)
-    }, 5000)
-
+      setActiveIndex((current) => (current + 1) % totalSlides)
+    }, AUTOPLAY_INTERVAL_MS)
     return () => window.clearInterval(timer)
-  }, [slides.length])
+  }, [isPaused, isFocused, isHovering, totalSlides])
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+      goToPrevious()
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault()
+      goToNext()
+    }
+  }
+
+  const handleBlur = (event) => {
+    if (!containerRef.current?.contains(event.relatedTarget)) {
+      setIsFocused(false)
+    }
+  }
 
   return (
-    <section className="py-8 bg-base-100" id="top" aria-label="Carrousel d'accueil CYNA">
-      <div className="container mx-auto px-4">
-        <div className="relative overflow-hidden rounded-3xl bg-base-200 border border-base-300 shadow-xl">
-          <div 
-            className="flex transition-transform duration-700 ease-in-out" 
+    <section
+      className="bg-background py-10 lg:py-14"
+      aria-label="Carrousel d'accueil CYNA"
+    >
+      <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
+        <div
+          ref={containerRef}
+          role="region"
+          aria-roledescription="carrousel"
+          aria-label="Slides d'introduction CYNA"
+          tabIndex={0}
+          className="relative overflow-hidden rounded-3xl border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+        >
+          <div
+            className="flex motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out"
             style={{ transform: `translateX(-${activeIndex * 100}%)` }}
           >
-            {slides.map((slide) => (
-              <div className="w-full flex-shrink-0" key={slide.title}>
-                <article className="hero min-h-[500px]">
-                  <div className="hero-content flex-col lg:flex-row p-8 lg:p-16 gap-8 w-full justify-between items-center relative z-10">
-                    <div className="max-w-xl text-left">
-                      <span className="badge badge-secondary badge-outline mb-4 font-semibold tracking-wide uppercase shadow-sm">
+            {slides.map((slide, index) => {
+              const isActive = index === activeIndex
+              return (
+                <article
+                  key={slide.title}
+                  className="w-full flex-shrink-0"
+                  aria-roledescription="slide"
+                  aria-label={`${index + 1} sur ${totalSlides}`}
+                  aria-hidden={!isActive}
+                >
+                  <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-12 lg:p-12 lg:py-16">
+                    <div>
+                      <span className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         {slide.eyebrow}
                       </span>
-                      <h1 className="text-4xl md:text-5xl font-black mb-6 text-base-content leading-tight">
+                      <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
                         {slide.title}
-                      </h1>
-                      <p className="text-lg text-base-content/80 mb-8 leading-relaxed">
+                      </h2>
+                      <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground lg:text-lg">
                         {slide.copy}
                       </p>
-                      <div className="flex flex-wrap gap-4">
-                        <Link className="btn btn-primary shadow-lg shadow-primary/20" to={slide.to}>
+                      <div className="mt-6 flex flex-wrap gap-3">
+                        <Link
+                          to={slide.to}
+                          tabIndex={isActive ? 0 : -1}
+                          aria-hidden={!isActive}
+                          className="group inline-flex h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                        >
                           {slide.cta}
+                          <ArrowRight
+                            className="ms-2 h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                            aria-hidden="true"
+                          />
                         </Link>
                       </div>
                     </div>
 
-                    <div className="w-full lg:w-96 rounded-2xl bg-neutral text-neutral-content p-6 shadow-2xl border border-neutral-focus opacity-90 relative overflow-hidden" aria-hidden="true">
-                      {/* Decorative elements for the visual card */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-bl-full blur-2xl"></div>
-                      <div className="relative z-10">
-                        <strong className="block text-xl mb-4 font-bold text-primary-content">{slide.visualTitle}</strong>
-                        <ul className="space-y-3 mb-6">
-                          {slide.visualItems.map((item) => (
-                            <li key={item} className="flex items-center gap-2 text-sm text-neutral-content/80">
-                              <span className="material-symbols-outlined text-primary text-sm">check_circle</span>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="flex gap-2 h-1.5 w-full bg-base-100/10 rounded-full overflow-hidden">
-                          <div className="h-full bg-primary/80 w-1/3 rounded-full"></div>
-                          <div className="h-full bg-secondary/80 w-1/4 rounded-full"></div>
-                          <div className="h-full bg-accent/80 w-1/5 rounded-full"></div>
-                        </div>
+                    <div
+                      className="relative overflow-hidden rounded-2xl border border-border bg-background/60 p-6"
+                      aria-hidden="true"
+                    >
+                      <strong className="block text-xs font-semibold uppercase tracking-wider text-primary">
+                        {slide.visualTitle}
+                      </strong>
+                      <ul className="mt-4 space-y-3">
+                        {slide.visualItems.map((item) => (
+                          <li
+                            key={item}
+                            className="flex items-start gap-2 text-sm text-foreground/80"
+                          >
+                            <Check
+                              className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary"
+                              aria-hidden="true"
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-6 flex gap-1.5">
+                        <div className="h-1 flex-1 rounded-full bg-primary/60" />
+                        <div className="h-1 flex-1 rounded-full bg-primary/30" />
+                        <div className="h-1 flex-1 rounded-full bg-primary/15" />
                       </div>
                     </div>
                   </div>
                 </article>
-              </div>
-            ))}
+              )
+            })}
           </div>
-          
-          {/* Controls overlay */}
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-6 z-20">
-            <button className="btn btn-circle btn-sm btn-ghost bg-base-100/30 backdrop-blur-sm hover:bg-base-100/50" type="button" onClick={goToPrevious} aria-label="Afficher la slide precedente">
-              <span className="material-symbols-outlined">arrow_back</span>
+
+          <div className="relative flex items-center justify-center gap-3 border-t border-border bg-background/40 px-14 py-3 lg:px-16">
+            <button
+              type="button"
+              onClick={goToPrevious}
+              aria-label="Slide précédente"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             </button>
 
-            <div className="flex gap-3" aria-label="Navigation du carrousel">
+            <div
+              className="flex items-center gap-2"
+              role="tablist"
+              aria-label="Indicateurs de slide"
+            >
               {slides.map((slide, index) => (
                 <button
                   key={slide.title}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${index === activeIndex ? 'w-8 bg-primary' : 'w-2.5 bg-base-content/30 hover:bg-base-content/50'}`}
                   type="button"
-                  aria-label={`Afficher la slide ${index + 1}`}
+                  role="tab"
+                  aria-selected={index === activeIndex}
+                  aria-label={`Aller à la slide ${index + 1}`}
                   onClick={() => setActiveIndex(index)}
+                  className={cn(
+                    'h-2 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                    index === activeIndex
+                      ? 'w-8 bg-primary'
+                      : 'w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60'
+                  )}
                 />
               ))}
             </div>
 
-            <button className="btn btn-circle btn-sm btn-ghost bg-base-100/30 backdrop-blur-sm hover:bg-base-100/50" type="button" onClick={goToNext} aria-label="Afficher la slide suivante">
-              <span className="material-symbols-outlined">arrow_forward</span>
+            <button
+              type="button"
+              onClick={goToNext}
+              aria-label="Slide suivante"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsPaused((value) => !value)}
+              aria-label={isPaused ? 'Reprendre la lecture' : 'Mettre en pause'}
+              aria-pressed={isPaused}
+              className="absolute end-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {isPaused ? (
+                <Play className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Pause className="h-4 w-4" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
-
-        <p className="text-center text-sm text-base-content/60 mt-6 max-w-2xl mx-auto italic">
-          CYNA vous aide à explorer des offres de cybersécurité plus lisibles, plus comparables et mieux adaptées à
-          votre contexte d'entreprise.
-        </p>
       </div>
     </section>
   )

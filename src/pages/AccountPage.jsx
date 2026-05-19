@@ -1,35 +1,121 @@
-import { useEffect, useState } from 'react'
+/* eslint-disable react/prop-types */
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { createAddress, deleteAddress, getMyAddresses } from '../api/addressApi'
+import {
+  AlertCircle,
+  CheckCircle2,
+  CreditCard,
+  Eye,
+  Loader2,
+  LogOut,
+  Mail,
+  MapPin,
+  Pencil,
+  Plus,
+  Printer,
+  Receipt,
+  Search,
+  Send,
+  Shield,
+  Trash2,
+  User,
+  X,
+} from 'lucide-react'
+import { updateMyProfile } from '../api/authApi'
+import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
 import { sendTestMail } from '../api/mailApi'
 import { getMyOrders } from '../api/orderApi'
-import { createPaymentMethod, deletePaymentMethod, getMyPaymentMethods } from '../api/paymentMethodApi'
+import {
+  createPaymentMethod,
+  deletePaymentMethod,
+  getMyPaymentMethods,
+} from '../api/paymentMethodApi'
 import SecuritySettings from '../components/account/SecuritySettings'
 import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
+import { cn } from '../lib/utils'
+
+const INPUT_CLASSES =
+  'h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+
+const LABEL_CLASSES =
+  'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
+
+const PRIMARY_BTN =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+
+const GHOST_BTN =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
 
 const TABS = [
-  { id: 'profile', labelKey: 'tabProfile', icon: 'person' },
-  { id: 'orders', labelKey: 'tabOrders', icon: 'shopping_bag' },
-  { id: 'addresses', labelKey: 'tabAddresses', icon: 'location_on' },
-  { id: 'payments', labelKey: 'tabPayments', icon: 'credit_card' },
-  { id: 'security', labelKey: 'tabSecurity', icon: 'security' },
-  { id: 'mail', labelKey: 'tabMail', icon: 'mail' },
+  { id: 'profile', labelKey: 'tabProfile', Icon: User },
+  { id: 'orders', labelKey: 'tabOrders', Icon: Receipt },
+  { id: 'addresses', labelKey: 'tabAddresses', Icon: MapPin },
+  { id: 'payments', labelKey: 'tabPayments', Icon: CreditCard },
+  { id: 'security', labelKey: 'tabSecurity', Icon: Shield },
+  { id: 'mail', labelKey: 'tabMail', Icon: Mail },
 ]
 
 function formatPrice(value) {
-  const n = Number(value)
-  if (!Number.isFinite(n)) return '—'
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(n)
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) return '—'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 2,
+  }).format(numeric)
 }
 
 function formatDate(iso) {
   if (!iso) return '—'
   try {
-    return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+    return new Date(iso).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
   } catch {
     return iso
   }
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center p-12 text-muted-foreground" role="status">
+      <Loader2 className="h-6 w-6 motion-safe:animate-spin" aria-hidden="true" />
+    </div>
+  )
+}
+
+function EmptyState({ Icon, label, action }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center">
+      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <Icon className="h-6 w-6" aria-hidden="true" />
+      </div>
+      <p className="mt-4 text-sm text-muted-foreground">{label}</p>
+      {action}
+    </div>
+  )
+}
+
+function Field({ label, value, onChange, type = 'text', required, className, readOnly }) {
+  return (
+    <label className={cn('grid gap-1.5', className)}>
+      <span className={LABEL_CLASSES.replace('mb-1.5 block ', '')}>
+        {label}
+        {required ? <span className="text-destructive"> *</span> : null}
+      </span>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        required={required}
+        readOnly={readOnly}
+        className={cn(INPUT_CLASSES, readOnly && 'cursor-not-allowed opacity-60')}
+      />
+    </label>
+  )
 }
 
 export function AccountPage() {
@@ -43,178 +129,224 @@ export function AccountPage() {
     navigate('/', { replace: true })
   }
 
-  return (
-    <section className="py-12 bg-base-100 flex-grow">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <header className="mb-8">
-          <span className="badge badge-primary badge-outline font-semibold mb-3">{text.eyebrow}</span>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-base-content tracking-tight">
-            {user?.firstname ? `${text.greeting}, ${user.firstname}` : text.title}
-          </h1>
-        </header>
+  const activeTabInfo = TABS.find((tab) => tab.id === activeTab)
+  const ActiveIcon = activeTabInfo?.Icon ?? User
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
-          <aside className="w-full lg:w-1/4 flex-shrink-0">
-            <ul className="menu bg-base-200/50 backdrop-blur-sm w-full rounded-2xl shadow-xl border border-base-300 gap-1 p-3 sticky top-24">
-              {TABS.map((tab) => (
-                <li key={tab.id}>
-                  <button
-                    type="button"
-                    className={`flex items-center gap-3 py-3 px-4 rounded-xl transition-all ${
-                      activeTab === tab.id 
-                        ? 'active bg-primary text-primary-content shadow-md shadow-primary/20 hover:bg-primary-focus' 
-                        : 'hover:bg-base-300 text-base-content/80 hover:text-base-content'
-                    }`}
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    <span className="material-symbols-outlined text-lg">{tab.icon}</span>
-                    <span className="font-medium text-[15px]">{text[tab.labelKey]}</span>
-                  </button>
-                </li>
-              ))}
-              <div className="divider my-2"></div>
-              <li>
-                <button 
-                  type="button" 
-                  className="flex items-center gap-3 py-3 px-4 rounded-xl text-error hover:bg-error/10 hover:text-error transition-colors" 
+  return (
+    <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-10 lg:px-6 lg:py-14">
+      <header className="mb-8">
+        <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {text.eyebrow}
+        </span>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+          {user?.firstname ? `${text.greeting}, ${user.firstname}` : text.title}
+        </h1>
+      </header>
+
+      <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
+        <aside>
+          <nav aria-label="Sections du compte" className="lg:sticky lg:top-24">
+            <ul className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1.5 lg:flex-col lg:overflow-visible">
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.id
+                const { Icon } = tab
+                return (
+                  <li key={tab.id} className="flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={cn(
+                        'inline-flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        isActive
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground/80 hover:bg-accent hover:text-foreground'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                      <span className="whitespace-nowrap">{text[tab.labelKey]}</span>
+                    </button>
+                  </li>
+                )
+              })}
+              <li className="mt-1 hidden lg:block">
+                <div className="h-px bg-border" aria-hidden="true" />
+              </li>
+              <li className="flex-shrink-0">
+                <button
+                  type="button"
                   onClick={handleLogout}
+                  className="inline-flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
-                  <span className="material-symbols-outlined text-lg">logout</span>
-                  <span className="font-medium text-[15px]">{text.logout}</span>
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  <span className="whitespace-nowrap">{text.logout}</span>
                 </button>
               </li>
             </ul>
-          </aside>
+          </nav>
+        </aside>
 
-          {/* Main Content Area */}
-          <main className="w-full lg:w-3/4">
-            <div className="bg-base-200/40 backdrop-blur-md rounded-3xl p-6 md:p-10 shadow-xl border border-base-300 min-h-[500px]">
-              <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-base-content border-b border-base-300 pb-4">
-                <span className="material-symbols-outlined text-primary text-3xl">
-                  {TABS.find(t => t.id === activeTab)?.icon}
-                </span>
-                {text[TABS.find(t => t.id === activeTab)?.labelKey]}
-              </h2>
-              
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                {activeTab === 'profile' ? <ProfileTab user={user} text={text} /> : null}
-                {activeTab === 'orders' ? <OrdersTab text={text} /> : null}
-                {activeTab === 'addresses' ? <AddressesTab text={text} user={user} /> : null}
-                {activeTab === 'payments' ? <PaymentsTab text={text} /> : null}
-                {activeTab === 'security' ? <SecuritySettings currentUser={user} onUserUpdate={checkAuth} /> : null}
-                {activeTab === 'mail' ? <MailTab text={text} user={user} /> : null}
-              </div>
-            </div>
-          </main>
-        </div>
+        <main>
+          <div className="rounded-2xl border border-border bg-card p-6 lg:p-8">
+            <h2 className="mb-6 flex items-center gap-3 border-b border-border pb-4 text-xl font-semibold tracking-tight text-foreground">
+              <ActiveIcon className="h-5 w-5 text-primary" aria-hidden="true" />
+              {text[activeTabInfo?.labelKey ?? 'tabProfile']}
+            </h2>
+            {activeTab === 'profile' ? (
+              <ProfileTab user={user} text={text} onUpdated={checkAuth} />
+            ) : null}
+            {activeTab === 'orders' ? <OrdersTab text={text} /> : null}
+            {activeTab === 'addresses' ? <AddressesTab text={text} user={user} /> : null}
+            {activeTab === 'payments' ? <PaymentsTab text={text} /> : null}
+            {activeTab === 'security' ? (
+              <SecuritySettings currentUser={user} onUserUpdate={checkAuth} />
+            ) : null}
+            {activeTab === 'mail' ? <MailTab text={text} user={user} /> : null}
+          </div>
+        </main>
       </div>
-    </section>
+    </div>
   )
 }
 
-function MailTab({ text, user }) {
-  const [recipient, setRecipient] = useState('juliann.ploquin@gmail.com')
-  const [isSending, setIsSending] = useState(false)
+function ProfileTab({ user, text, onUpdated }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [form, setForm] = useState({
+    firstname: user?.firstname ?? '',
+    lastname: user?.lastname ?? '',
+    email: user?.email ?? '',
+  })
+  const [status, setStatus] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
+
+  useEffect(() => {
+    if (!isEditing) {
+      setForm({
+        firstname: user?.firstname ?? '',
+        lastname: user?.lastname ?? '',
+        email: user?.email ?? '',
+      })
+    }
+  }, [user, isEditing])
+
+  if (!user) return <LoadingSpinner />
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setErrorMessage('')
-    setSuccessMessage('')
-    setIsSending(true)
-
+    setStatus('submitting')
     try {
-      const result = await sendTestMail(recipient.trim())
-      setSuccessMessage(text.mailSuccess.replace('{email}', result.recipient ?? recipient.trim()))
+      await updateMyProfile({
+        firstname: form.firstname.trim(),
+        lastname: form.lastname.trim(),
+      })
+      setStatus('success')
+      setIsEditing(false)
+      if (typeof onUpdated === 'function') await onUpdated()
+      window.setTimeout(() => setStatus('idle'), 2500)
     } catch (err) {
       setErrorMessage(err?.message ?? text.genericError)
-    } finally {
-      setIsSending(false)
+      setStatus('idle')
     }
   }
 
-  return (
-    <form className="max-w-xl" onSubmit={handleSubmit}>
-      <p className="text-base-content/70 mb-6">{text.mailIntro}</p>
-      
-      <div className="space-y-4 mb-6">
-        <div className="form-control w-full">
-          <label className="label"><span className="label-text font-medium">{text.mailRecipient}</span></label>
-          <div className="input-group relative flex items-center">
-            <span className="absolute left-3 material-symbols-outlined text-base-content/50">mail</span>
-            <input
-              type="email"
-              className="input input-bordered w-full pl-10 focus:border-primary"
-              value={recipient}
-              onChange={(event) => setRecipient(event.target.value)}
-              autoComplete="email"
-              required
-            />
+  if (isEditing) {
+    return (
+      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+        <Field
+          label={text.profileFirstname}
+          value={form.firstname}
+          onChange={(event) => setForm((current) => ({ ...current, firstname: event.target.value }))}
+          required
+        />
+        <Field
+          label={text.profileLastname}
+          value={form.lastname}
+          onChange={(event) => setForm((current) => ({ ...current, lastname: event.target.value }))}
+          required
+        />
+        <Field
+          className="sm:col-span-2"
+          label={text.profileEmail}
+          value={form.email}
+          readOnly
+          type="email"
+        />
+        {errorMessage ? (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive sm:col-span-2"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <span>{errorMessage}</span>
           </div>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+          <button type="submit" disabled={status === 'submitting'} className={PRIMARY_BTN}>
+            {status === 'submitting' ? (
+              <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
+            ) : null}
+            {text.profileSave}
+          </button>
+          <button type="button" className={GHOST_BTN} onClick={() => setIsEditing(false)}>
+            {text.profileCancel}
+          </button>
         </div>
-        
-        <div className="form-control w-full">
-          <label className="label"><span className="label-text font-medium">{text.mailAccount}</span></label>
-          <div className="input-group relative flex items-center">
-            <span className="absolute left-3 material-symbols-outlined text-base-content/50">person</span>
-            <input className="input input-bordered w-full pl-10 opacity-70 cursor-not-allowed bg-base-200" value={user?.email ?? ''} readOnly />
-          </div>
-        </div>
-      </div>
-      
-      {errorMessage && (
-        <div className="alert alert-error shadow-lg mb-6 rounded-xl">
-          <span className="material-symbols-outlined">error</span>
-          <span>{errorMessage}</span>
-        </div>
-      )}
-      
-      {successMessage && (
-        <div className="alert alert-success shadow-lg mb-6 rounded-xl text-success-content">
-          <span className="material-symbols-outlined">check_circle</span>
-          <span>{successMessage}</span>
-        </div>
-      )}
-      
-      <button type="submit" className="btn btn-primary" disabled={isSending}>
-        {isSending && <span className="loading loading-spinner"></span>}
-        <span className="material-symbols-outlined mr-1">send</span>
-        {isSending ? text.mailSending : text.mailSend}
-      </button>
-    </form>
-  )
-}
+      </form>
+    )
+  }
 
-function ProfileTab({ user, text }) {
-  if (!user) return <div className="flex justify-center p-8"><span className="loading loading-spinner text-primary loading-lg"></span></div>
-  
   const stats = [
-    { label: text.profileFirstname, value: user.firstname || '—', icon: 'badge' },
-    { label: text.profileLastname, value: user.lastname || '—', icon: 'assignment_ind' },
-    { label: text.profileEmail, value: user.email, icon: 'mail' },
-    { label: text.profileVerified, value: user.isVerified ? text.yes : text.no, icon: user.isVerified ? 'verified' : 'pending', color: user.isVerified ? 'text-success' : 'text-warning' },
-    { label: text.profileRoles, value: (user.roles ?? []).join(', '), icon: 'admin_panel_settings' },
+    { label: text.profileFirstname, value: user.firstname || '—' },
+    { label: text.profileLastname, value: user.lastname || '—' },
+    { label: text.profileEmail, value: user.email },
+    {
+      label: text.profileVerified,
+      value: user.isVerified ? text.yes : text.no,
+      tone: user.isVerified ? 'success' : 'warning',
+    },
+    { label: text.profileRoles, value: (user.roles ?? []).join(', ') || '—' },
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {stats.map((stat, i) => (
-        <div key={i} className="card bg-base-100 shadow-sm border border-base-200/60 hover:shadow-md transition-all">
-          <div className="card-body p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-base-200 flex items-center justify-center flex-shrink-0">
-                <span className={`material-symbols-outlined ${stat.color || 'text-primary'}`}>{stat.icon}</span>
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-base-content/50 uppercase tracking-wider mb-1">{stat.label}</h3>
-                <p className="text-base font-semibold text-base-content break-all">{stat.value}</p>
-              </div>
-            </div>
-          </div>
+    <div className="grid gap-4">
+      {status === 'success' ? (
+        <div
+          role="status"
+          className="flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300"
+        >
+          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+          <span>{text.profileSaved}</span>
         </div>
-      ))}
+      ) : null}
+      <dl className="grid gap-4 sm:grid-cols-2">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-xl border border-border bg-background p-4"
+          >
+            <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {stat.label}
+            </dt>
+            <dd
+              className={cn(
+                'mt-1 break-words text-sm font-medium',
+                stat.tone === 'success' && 'text-emerald-300',
+                stat.tone === 'warning' && 'text-amber-300',
+                !stat.tone && 'text-foreground'
+              )}
+            >
+              {stat.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <div>
+        <button type="button" className={PRIMARY_BTN} onClick={() => setIsEditing(true)}>
+          <Pencil className="h-4 w-4" aria-hidden="true" />
+          {text.profileEdit}
+        </button>
+      </div>
     </div>
   )
 }
@@ -222,58 +354,197 @@ function ProfileTab({ user, text }) {
 function OrdersTab({ text }) {
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [yearFilter, setYearFilter] = useState('all')
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     let cancelled = false
     getMyOrders()
-      .then((data) => { if (!cancelled) setOrders(data) })
-      .catch(() => { if (!cancelled) setOrders([]) })
-      .finally(() => { if (!cancelled) setIsLoading(false) })
-    return () => { cancelled = true }
+      .then((data) => {
+        if (!cancelled) setOrders(data)
+      })
+      .catch(() => {
+        if (!cancelled) setOrders([])
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  if (isLoading) return <div className="flex justify-center p-8"><span className="loading loading-spinner text-primary loading-lg"></span></div>
-  
-  if (orders.length === 0) return (
-    <div className="text-center py-16 px-4 border-2 border-dashed border-base-300 rounded-3xl bg-base-100/50">
-      <span className="material-symbols-outlined text-6xl text-base-content/20 mb-4 block">receipt_long</span>
-      <p className="text-lg text-base-content/60 font-medium">{text.ordersEmpty}</p>
-      <Link to="/products" className="btn btn-primary mt-6">Découvrir nos solutions</Link>
-    </div>
-  )
+  const years = useMemo(() => {
+    const set = new Set(
+      orders.map((order) =>
+        order.createdAt ? new Date(order.createdAt).getFullYear() : null
+      )
+    )
+    set.delete(null)
+    return [...set].sort((a, b) => b - a)
+  }, [orders])
+
+  const filtered = useMemo(() => {
+    const trimmedSearch = searchTerm.trim().toLowerCase()
+    return orders.filter((order) => {
+      if (yearFilter !== 'all') {
+        const orderYear = order.createdAt
+          ? new Date(order.createdAt).getFullYear()
+          : null
+        if (String(orderYear) !== String(yearFilter)) return false
+      }
+      if (trimmedSearch) {
+        const ref = (order.reference ?? `#${order.id}`).toLowerCase()
+        if (!ref.includes(trimmedSearch)) return false
+      }
+      return true
+    })
+  }, [orders, yearFilter, searchTerm])
+
+  const grouped = useMemo(() => {
+    const map = new Map()
+    for (const order of filtered) {
+      const year = order.createdAt
+        ? new Date(order.createdAt).getFullYear()
+        : 'Sans date'
+      if (!map.has(year)) map.set(year, [])
+      map.get(year).push(order)
+    }
+    return [...map.entries()].sort(([a], [b]) => {
+      if (typeof a === 'string') return 1
+      if (typeof b === 'string') return -1
+      return Number(b) - Number(a)
+    })
+  }, [filtered])
+
+  if (isLoading) return <LoadingSpinner />
+
+  if (orders.length === 0) {
+    return (
+      <EmptyState
+        Icon={Receipt}
+        label={text.ordersEmpty}
+        action={
+          <Link to="/products" className={cn(PRIMARY_BTN, 'mt-6')}>
+            Découvrir nos solutions
+          </Link>
+        }
+      />
+    )
+  }
+
+  const statusLabel = (status) => {
+    if (status === 'COMPLETED' || status === 'PAID') return text.ordersStatusCompleted
+    if (status === 'PENDING') return text.ordersStatusPending
+    if (status === 'CANCELLED') return text.ordersStatusCancelled
+    return status
+  }
+
+  const statusToneClass = (status) => {
+    if (status === 'COMPLETED' || status === 'PAID') {
+      return 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+    }
+    if (status === 'PENDING') {
+      return 'border-amber-400/30 bg-amber-400/10 text-amber-300'
+    }
+    if (status === 'CANCELLED') {
+      return 'border-destructive/30 bg-destructive/10 text-destructive'
+    }
+    return 'border-border bg-card text-muted-foreground'
+  }
 
   return (
-    <div className="overflow-x-auto bg-base-100 rounded-2xl border border-base-200 shadow-sm">
-      <table className="table table-zebra w-full">
-        <thead>
-          <tr className="bg-base-200 text-base-content/70">
-            <th className="rounded-tl-2xl font-semibold">Référence</th>
-            <th className="font-semibold">Date</th>
-            <th className="font-semibold">Statut</th>
-            <th className="font-semibold text-right">Montant</th>
-            <th className="rounded-tr-2xl text-center font-semibold">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((o) => (
-            <tr key={o.id} className="hover">
-              <td className="font-medium whitespace-nowrap">{o.reference ?? `#${o.id}`}</td>
-              <td className="whitespace-nowrap text-base-content/80">{formatDate(o.createdAt)}</td>
-              <td>
-                <span className={`badge ${o.status === 'COMPLETED' ? 'badge-success' : o.status === 'PENDING' ? 'badge-warning' : 'badge-ghost'} badge-sm`}>
-                  {o.status}
-                </span>
-              </td>
-              <td className="text-right font-bold whitespace-nowrap">{formatPrice(o.totalPrice)}</td>
-              <td className="text-center">
-                <Link className="btn btn-sm btn-ghost btn-circle" to={`/checkout/confirmation/${o.id}`} title={text.view}>
-                  <span className="material-symbols-outlined text-lg">visibility</span>
-                </Link>
-              </td>
-            </tr>
+    <div className="grid gap-6">
+      <div className="grid gap-3 sm:grid-cols-[1fr_12rem_auto]">
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder={text.ordersSearch}
+            className="h-10 w-full rounded-lg border border-border bg-background ps-10 pe-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+            aria-label={text.ordersSearch}
+          />
+        </div>
+        <select
+          value={yearFilter}
+          onChange={(event) => setYearFilter(event.target.value)}
+          aria-label={text.ordersYearFilter}
+          className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+        >
+          <option value="all">
+            {text.ordersYearFilter} — {text.ordersYearAll}
+          </option>
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
           ))}
-        </tbody>
-      </table>
+        </select>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className={GHOST_BTN}
+          aria-label={text.ordersPrint}
+        >
+          <Printer className="h-4 w-4" aria-hidden="true" />
+          {text.ordersPrint}
+        </button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center text-sm text-muted-foreground">
+          Aucune commande ne correspond à la recherche.
+        </p>
+      ) : (
+        grouped.map(([year, list]) => (
+          <section key={year} aria-label={`Commandes ${year}`}>
+            <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {year}{' '}
+              <span className="text-foreground/40">·</span>{' '}
+              {list.length} {list.length > 1 ? 'commandes' : 'commande'}
+            </h3>
+            <ul className="grid gap-2">
+              {list.map((order) => (
+                <li key={order.id}>
+                  <article className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
+                    <div className="flex flex-col">
+                      <span className="font-mono text-sm font-medium tabular-nums text-foreground">
+                        {order.reference ?? `#${order.id}`}
+                      </span>
+                      <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                        {formatDate(order.createdAt)}
+                      </span>
+                    </div>
+                    <span
+                      className={cn(
+                        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
+                        statusToneClass(order.status)
+                      )}
+                    >
+                      {statusLabel(order.status)}
+                    </span>
+                    <span className="font-mono text-base font-semibold tabular-nums text-primary">
+                      {formatPrice(order.totalPrice)}
+                    </span>
+                    <Link
+                      to={`/checkout/confirmation/${order.id}`}
+                      aria-label={`${text.view} ${order.reference ?? `#${order.id}`}`}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      )}
     </div>
   )
 }
@@ -294,6 +565,7 @@ function AddressesTab({ text, user }) {
   const [addresses, setAddresses] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [form, setForm] = useState(initialForm())
+  const [editingId, setEditingId] = useState(null) // null = create mode, number = edit mode
   const [showForm, setShowForm] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -307,23 +579,51 @@ function AddressesTab({ text, user }) {
 
   useEffect(reload, [])
 
+  const startEdit = (address) => {
+    setForm({
+      firstname: address.firstname ?? '',
+      lastname: address.lastname ?? '',
+      adresse1: address.adresse1 ?? '',
+      adresse2: address.adresse2 ?? '',
+      zipCode: address.zipCode ?? '',
+      city: address.city ?? '',
+      region: address.region ?? '',
+      country: address.country ?? 'France',
+      mobilephone: address.mobilephone ?? '',
+    })
+    setEditingId(address.id)
+    setShowForm(true)
+    setErrorMessage('')
+  }
+
+  const closeForm = () => {
+    setShowForm(false)
+    setEditingId(null)
+    setErrorMessage('')
+    setForm(initialForm())
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setErrorMessage('')
+    const payload = {
+      firstname: form.firstname,
+      lastname: form.lastname,
+      adresse1: form.adresse1,
+      adresse2: form.adresse2 || null,
+      zipCode: form.zipCode,
+      city: form.city,
+      region: form.region,
+      country: form.country,
+      mobilephone: form.mobilephone,
+    }
     try {
-      await createAddress({
-        firstname: form.firstname,
-        lastname: form.lastname,
-        adresse1: form.adresse1,
-        adresse2: form.adresse2 || null,
-        zipCode: form.zipCode,
-        city: form.city,
-        region: form.region,
-        country: form.country,
-        mobilephone: form.mobilephone,
-      })
-      setForm(initialForm())
-      setShowForm(false)
+      if (editingId) {
+        await updateAddress(editingId, payload)
+      } else {
+        await createAddress(payload)
+      }
+      closeForm()
       reload()
     } catch (err) {
       setErrorMessage(err?.message ?? text.genericError)
@@ -331,7 +631,7 @@ function AddressesTab({ text, user }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette adresse ?")) return;
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?')) return
     try {
       await deleteAddress(id)
       reload()
@@ -340,129 +640,126 @@ function AddressesTab({ text, user }) {
     }
   }
 
-  const upd = (field) => (e) => setForm({ ...form, [field]: e.target.value })
+  const updField = (field) => (event) =>
+    setForm((current) => ({ ...current, [field]: event.target.value }))
 
-  if (isLoading) return <div className="flex justify-center p-8"><span className="loading loading-spinner text-primary loading-lg"></span></div>
+  if (isLoading) return <LoadingSpinner />
 
   return (
-    <div>
-      {!showForm && (
-        <div className="mb-8 flex justify-between items-center">
-          <p className="text-base-content/70">Gérez vos adresses de facturation et de livraison.</p>
-          <button type="button" className="btn btn-primary" onClick={() => setShowForm(true)}>
-            <span className="material-symbols-outlined">add</span>
-            {text.addAddress}
-          </button>
-        </div>
-      )}
-
-      {!showForm && addresses.length === 0 && (
-        <div className="text-center py-16 px-4 border-2 border-dashed border-base-300 rounded-3xl bg-base-100/50">
-          <span className="material-symbols-outlined text-6xl text-base-content/20 mb-4 block">location_off</span>
-          <p className="text-lg text-base-content/60 font-medium">{text.addressesEmpty}</p>
-        </div>
-      )}
-
-      {!showForm && addresses.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {addresses.map((a) => (
-            <div className="card bg-base-100 shadow-sm border border-base-300 hover:shadow-md transition-shadow" key={a.id}>
-              <div className="card-body p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="card-title text-lg font-bold">{a.firstname} {a.lastname}</h3>
-                  <div className="dropdown dropdown-end">
-                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle btn-sm">
-                      <span className="material-symbols-outlined text-base-content/50">more_vert</span>
-                    </div>
-                    <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-40 p-2 shadow-xl border border-base-200">
-                      <li>
-                        <button type="button" className="text-error hover:bg-error/10 hover:text-error" onClick={() => handleDelete(a.id)}>
-                          <span className="material-symbols-outlined text-sm">delete</span>
-                          {text.delete}
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="text-sm text-base-content/70 space-y-1">
-                  <p>{a.adresse1}</p>
-                  {a.adresse2 && <p>{a.adresse2}</p>}
-                  <p>{a.zipCode} {a.city}</p>
-                  <p>{a.region}, {a.country}</p>
-                  <p className="mt-3 font-medium flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">phone</span> {a.mobilephone}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {showForm && (
-        <div className="card bg-base-100 shadow-xl border border-base-200">
-          <div className="card-body p-6 md:p-8">
-            <div className="flex justify-between items-center border-b border-base-200 pb-4 mb-6">
-              <h3 className="text-xl font-bold">Nouvelle adresse</h3>
-              <button className="btn btn-sm btn-ghost btn-circle" onClick={() => { setShowForm(false); setErrorMessage('') }}>
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.firstname}</span></label>
-                  <input className="input input-bordered w-full" required value={form.firstname} onChange={upd('firstname')} />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.lastname}</span></label>
-                  <input className="input input-bordered w-full" required value={form.lastname} onChange={upd('lastname')} />
-                </div>
-                <div className="form-control w-full md:col-span-2">
-                  <label className="label"><span className="label-text">{text.fieldLine1}</span></label>
-                  <input className="input input-bordered w-full" required value={form.adresse1} onChange={upd('adresse1')} />
-                </div>
-                <div className="form-control w-full md:col-span-2">
-                  <label className="label"><span className="label-text">{text.fieldLine2}</span></label>
-                  <input className="input input-bordered w-full" value={form.adresse2} onChange={upd('adresse2')} />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.fieldPostal}</span></label>
-                  <input className="input input-bordered w-full" required value={form.zipCode} onChange={upd('zipCode')} />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.fieldCity}</span></label>
-                  <input className="input input-bordered w-full" required value={form.city} onChange={upd('city')} />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.fieldRegion}</span></label>
-                  <input className="input input-bordered w-full" required value={form.region} onChange={upd('region')} />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text">{text.fieldCountry}</span></label>
-                  <input className="input input-bordered w-full" required value={form.country} onChange={upd('country')} />
-                </div>
-                <div className="form-control w-full md:col-span-2">
-                  <label className="label"><span className="label-text">{text.fieldMobile}</span></label>
-                  <input className="input input-bordered w-full" required type="tel" value={form.mobilephone} onChange={upd('mobilephone')} />
-                </div>
-              </div>
-              
-              {errorMessage && (
-                <div className="alert alert-error shadow-lg mt-6 rounded-xl">
-                  <span className="material-symbols-outlined">error</span>
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-              
-              <div className="flex gap-3 mt-8 justify-end">
-                <button type="button" className="btn btn-ghost" onClick={() => { setShowForm(false); setErrorMessage('') }}>{text.cancel}</button>
-                <button type="submit" className="btn btn-primary">{text.save}</button>
-              </div>
-            </form>
+    <div className="grid gap-6">
+      {!showForm ? (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Gérez vos adresses de facturation et de livraison.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingId(null)
+                setForm(initialForm())
+                setShowForm(true)
+              }}
+              className={PRIMARY_BTN}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {text.addAddress}
+            </button>
           </div>
-        </div>
+
+          {addresses.length === 0 ? (
+            <EmptyState Icon={MapPin} label={text.addressesEmpty} />
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {addresses.map((address) => (
+                <li key={address.id}>
+                  <article className="flex h-full flex-col rounded-xl border border-border bg-background p-5">
+                    <header className="flex items-start justify-between gap-2">
+                      <h3 className="text-base font-semibold text-foreground">
+                        {address.firstname} {address.lastname}
+                      </h3>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => startEdit(address)}
+                          aria-label={`${text.addressEdit} ${address.adresse1}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(address.id)}
+                          aria-label={`${text.delete} ${address.adresse1}`}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </header>
+                    <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
+                      <p>{address.adresse1}</p>
+                      {address.adresse2 ? <p>{address.adresse2}</p> : null}
+                      <p className="font-mono tabular-nums">
+                        {address.zipCode} {address.city}
+                      </p>
+                      <p>
+                        {address.region}, {address.country}
+                      </p>
+                    </div>
+                    <p className="mt-3 inline-flex items-center gap-1 font-mono text-xs tabular-nums text-foreground/70">
+                      📞 {address.mobilephone}
+                    </p>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-background p-5 lg:p-6">
+          <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
+            <h3 className="text-base font-semibold text-foreground">
+              {editingId ? 'Modifier l\'adresse' : 'Nouvelle adresse'}
+            </h3>
+            <button
+              type="button"
+              onClick={closeForm}
+              aria-label={text.cancel}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label={text.firstname} value={form.firstname} onChange={updField('firstname')} required />
+            <Field label={text.lastname} value={form.lastname} onChange={updField('lastname')} required />
+            <Field className="sm:col-span-2" label={text.fieldLine1} value={form.adresse1} onChange={updField('adresse1')} required />
+            <Field className="sm:col-span-2" label={text.fieldLine2} value={form.adresse2} onChange={updField('adresse2')} />
+            <Field label={text.fieldPostal} value={form.zipCode} onChange={updField('zipCode')} required />
+            <Field label={text.fieldCity} value={form.city} onChange={updField('city')} required />
+            <Field label={text.fieldRegion} value={form.region} onChange={updField('region')} required />
+            <Field label={text.fieldCountry} value={form.country} onChange={updField('country')} required />
+            <Field className="sm:col-span-2" label={text.fieldMobile} value={form.mobilephone} onChange={updField('mobilephone')} type="tel" required />
+          </div>
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+              <span>{errorMessage}</span>
+            </div>
+          ) : null}
+          <div className="mt-5 flex flex-wrap justify-end gap-2">
+            <button type="button" onClick={closeForm} className={GHOST_BTN}>
+              {text.cancel}
+            </button>
+            <button type="submit" className={PRIMARY_BTN}>
+              {text.save}
+            </button>
+          </div>
+        </form>
       )}
     </div>
   )
@@ -472,7 +769,12 @@ function PaymentsTab({ text }) {
   const [methods, setMethods] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ brand: 'Visa', last4: '', expMonth: 12, expYear: new Date().getFullYear() + 3 })
+  const [form, setForm] = useState({
+    brand: 'Visa',
+    last4: '',
+    expMonth: 12,
+    expYear: new Date().getFullYear() + 3,
+  })
   const [errorMessage, setErrorMessage] = useState('')
 
   const reload = () => {
@@ -500,7 +802,12 @@ function PaymentsTab({ text }) {
         expYear: Number(form.expYear),
       })
       setShowForm(false)
-      setForm({ brand: 'Visa', last4: '', expMonth: 12, expYear: new Date().getFullYear() + 3 })
+      setForm({
+        brand: 'Visa',
+        last4: '',
+        expMonth: 12,
+        expYear: new Date().getFullYear() + 3,
+      })
       reload()
     } catch (err) {
       setErrorMessage(err?.message ?? text.genericError)
@@ -508,110 +815,218 @@ function PaymentsTab({ text }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce moyen de paiement ?")) return;
-    try { await deletePaymentMethod(id); reload() } catch (err) { setErrorMessage(err?.message ?? text.genericError) }
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce moyen de paiement ?')) return
+    try {
+      await deletePaymentMethod(id)
+      reload()
+    } catch (err) {
+      setErrorMessage(err?.message ?? text.genericError)
+    }
   }
 
-  if (isLoading) return <div className="flex justify-center p-8"><span className="loading loading-spinner text-primary loading-lg"></span></div>
+  if (isLoading) return <LoadingSpinner />
 
   return (
-    <div>
-      {!showForm && (
-        <div className="mb-8 flex justify-between items-center">
-          <p className="text-base-content/70">Gérez vos cartes bancaires enregistrées.</p>
-          <button type="button" className="btn btn-primary" onClick={() => setShowForm(true)}>
-            <span className="material-symbols-outlined">add</span>
-            {text.addPayment}
-          </button>
-        </div>
-      )}
-
-      {!showForm && methods.length === 0 && (
-        <div className="text-center py-16 px-4 border-2 border-dashed border-base-300 rounded-3xl bg-base-100/50">
-          <span className="material-symbols-outlined text-6xl text-base-content/20 mb-4 block">credit_card_off</span>
-          <p className="text-lg text-base-content/60 font-medium">{text.paymentsEmpty}</p>
-        </div>
-      )}
-
-      {!showForm && methods.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {methods.map((pm) => (
-            <div className="card bg-gradient-to-br from-base-100 to-base-200 border border-base-300 shadow-md hover:shadow-lg transition-all" key={pm.id}>
-              <div className="card-body p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <div className="text-2xl font-black italic tracking-widest text-base-content/40 uppercase">
-                    {pm.brand ?? pm.provider}
-                  </div>
-                  <button className="btn btn-circle btn-sm btn-ghost hover:bg-error hover:text-error-content" onClick={() => handleDelete(pm.id)} title={text.delete}>
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
-                </div>
-                <div className="font-mono text-xl tracking-widest text-base-content/80">
-                  •••• •••• •••• {pm.last4}
-                </div>
-                <div className="flex justify-between items-end mt-4 text-sm text-base-content/60 font-mono">
-                  <span>EXP {pm.expMonth.toString().padStart(2, '0')}/{pm.expYear.toString().slice(-2)}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {showForm && (
-        <div className="card bg-base-100 shadow-xl border border-base-200 max-w-2xl">
-          <div className="card-body p-6 md:p-8">
-            <div className="flex justify-between items-center border-b border-base-200 pb-4 mb-6">
-              <h3 className="text-xl font-bold">Nouveau moyen de paiement</h3>
-              <button className="btn btn-sm btn-ghost btn-circle" onClick={() => { setShowForm(false); setErrorMessage('') }}>
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="alert alert-info shadow-sm mb-6 rounded-xl bg-info/10 text-info">
-                <span className="material-symbols-outlined">info</span>
-                <span className="text-sm">{text.paymentsNote}</span>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-control w-full col-span-2">
-                  <label className="label"><span className="label-text font-medium">{text.paymentBrand}</span></label>
-                  <select className="select select-bordered w-full font-medium" value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })}>
-                    <option value="Visa">Visa</option>
-                    <option value="Mastercard">Mastercard</option>
-                    <option value="Amex">American Express</option>
-                  </select>
-                </div>
-                <div className="form-control w-full col-span-2">
-                  <label className="label"><span className="label-text font-medium">{text.paymentLast4}</span></label>
-                  <input className="input input-bordered w-full font-mono tracking-widest" placeholder="1234" maxLength={4} pattern="\d{4}" value={form.last4} onChange={(e) => setForm({ ...form, last4: e.target.value })} required />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text font-medium">{text.paymentMonth}</span></label>
-                  <input className="input input-bordered w-full text-center" type="number" min={1} max={12} placeholder="MM" value={form.expMonth} onChange={(e) => setForm({ ...form, expMonth: e.target.value })} required />
-                </div>
-                <div className="form-control w-full">
-                  <label className="label"><span className="label-text font-medium">{text.paymentYear}</span></label>
-                  <input className="input input-bordered w-full text-center" type="number" min={new Date().getFullYear()} placeholder="YYYY" value={form.expYear} onChange={(e) => setForm({ ...form, expYear: e.target.value })} required />
-                </div>
-              </div>
-              
-              {errorMessage && (
-                <div className="alert alert-error shadow-lg mt-6 rounded-xl">
-                  <span className="material-symbols-outlined">error</span>
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-              
-              <div className="flex gap-3 mt-8 justify-end">
-                <button type="button" className="btn btn-ghost" onClick={() => { setShowForm(false); setErrorMessage('') }}>{text.cancel}</button>
-                <button type="submit" className="btn btn-primary">{text.save}</button>
-              </div>
-            </form>
+    <div className="grid gap-6">
+      {!showForm ? (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-muted-foreground">
+              Gérez vos cartes bancaires enregistrées.
+            </p>
+            <button type="button" onClick={() => setShowForm(true)} className={PRIMARY_BTN}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {text.addPayment}
+            </button>
           </div>
-        </div>
+
+          {methods.length === 0 ? (
+            <EmptyState Icon={CreditCard} label={text.paymentsEmpty} />
+          ) : (
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {methods.map((pm) => (
+                <li key={pm.id}>
+                  <article className="rounded-xl border border-border bg-gradient-to-br from-background to-card p-5">
+                    <header className="mb-4 flex items-center justify-between">
+                      <span className="font-mono text-sm font-semibold uppercase tracking-widest text-foreground/70">
+                        {pm.brand ?? pm.provider}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(pm.id)}
+                        aria-label={`${text.delete} ${pm.brand}`}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    </header>
+                    <p className="font-mono text-lg tabular-nums tracking-widest text-foreground/80">
+                      •••• •••• •••• {pm.last4}
+                    </p>
+                    <p className="mt-3 font-mono text-xs tabular-nums text-muted-foreground">
+                      EXP {String(pm.expMonth).padStart(2, '0')}/{String(pm.expYear).slice(-2)}
+                    </p>
+                  </article>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="max-w-xl rounded-xl border border-border bg-background p-5 lg:p-6"
+        >
+          <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
+            <h3 className="text-base font-semibold text-foreground">
+              Nouveau moyen de paiement
+            </h3>
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(false)
+                setErrorMessage('')
+              }}
+              aria-label={text.cancel}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+
+          <p className="mb-4 rounded-lg border border-border bg-card px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+            {text.paymentsNote}
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="sm:col-span-2 grid gap-1.5">
+              <span className={LABEL_CLASSES.replace('mb-1.5 block ', '')}>
+                {text.paymentBrand}
+              </span>
+              <select
+                value={form.brand}
+                onChange={(event) => setForm({ ...form, brand: event.target.value })}
+                className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              >
+                <option value="Visa">Visa</option>
+                <option value="Mastercard">Mastercard</option>
+                <option value="Amex">American Express</option>
+              </select>
+            </label>
+            <Field
+              className="sm:col-span-2"
+              label={text.paymentLast4}
+              value={form.last4}
+              onChange={(event) =>
+                setForm({ ...form, last4: event.target.value.replace(/\D/g, '').slice(0, 4) })
+              }
+              required
+            />
+            <Field
+              label={text.paymentMonth}
+              type="number"
+              value={form.expMonth}
+              onChange={(event) => setForm({ ...form, expMonth: event.target.value })}
+              required
+            />
+            <Field
+              label={text.paymentYear}
+              type="number"
+              value={form.expYear}
+              onChange={(event) => setForm({ ...form, expYear: event.target.value })}
+              required
+            />
+          </div>
+
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+              <span>{errorMessage}</span>
+            </div>
+          ) : null}
+
+          <div className="mt-5 flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowForm(false)
+                setErrorMessage('')
+              }}
+              className={GHOST_BTN}
+            >
+              {text.cancel}
+            </button>
+            <button type="submit" className={PRIMARY_BTN}>
+              {text.save}
+            </button>
+          </div>
+        </form>
       )}
     </div>
+  )
+}
+
+function MailTab({ text, user }) {
+  const [recipient, setRecipient] = useState('juliann.ploquin@gmail.com')
+  const [isSending, setIsSending] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setErrorMessage('')
+    setSuccessMessage('')
+    setIsSending(true)
+    try {
+      const result = await sendTestMail(recipient.trim())
+      setSuccessMessage(text.mailSuccess.replace('{email}', result.recipient ?? recipient.trim()))
+    } catch (err) {
+      setErrorMessage(err?.message ?? text.genericError)
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="max-w-xl grid gap-4">
+      <p className="text-sm text-muted-foreground">{text.mailIntro}</p>
+      <Field
+        label={text.mailRecipient}
+        type="email"
+        value={recipient}
+        onChange={(event) => setRecipient(event.target.value)}
+        required
+      />
+      <Field label={text.mailAccount} value={user?.email ?? ''} readOnly />
+      {errorMessage ? (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+          <span>{errorMessage}</span>
+        </div>
+      ) : null}
+      {successMessage ? (
+        <div
+          role="status"
+          className="flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300"
+        >
+          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+          <span>{successMessage}</span>
+        </div>
+      ) : null}
+      <button type="submit" disabled={isSending} className={PRIMARY_BTN}>
+        {isSending ? (
+          <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
+        ) : (
+          <Send className="h-4 w-4" aria-hidden="true" />
+        )}
+        {isSending ? text.mailSending : text.mailSend}
+      </button>
+    </form>
   )
 }

@@ -1,12 +1,16 @@
 import { useState } from 'react'
+import { AlertCircle, Info, UserPlus } from 'lucide-react'
 import { API_BASE_URL } from '../api/http'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
 import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
-import {
-  getRegisterValidationError,
-  mapRegisterApiError,
-} from '../utils/authValidation'
+import { getRegisterValidationError, mapRegisterApiError } from '../utils/authValidation'
+
+const INPUT_CLASSES =
+  'h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+
+const LABEL_CLASSES =
+  'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 export function RegisterPage() {
   const { register } = useAuth()
@@ -24,10 +28,7 @@ export function RegisterPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target
-    setFormValues((current) => ({
-      ...current,
-      [name]: value,
-    }))
+    setFormValues((current) => ({ ...current, [name]: value }))
   }
 
   const handleSubmit = async (event) => {
@@ -35,24 +36,20 @@ export function RegisterPage() {
     setErrorMessage('')
     setInfoMessage('')
 
-    // We still pass formValues to getRegisterValidationError, but we need to ensure 
-    // it validates firstname and lastname if we added logic there, otherwise it's fine
-    const validationError = getRegisterValidationError({ 
-      ...formValues, 
-      fullName: `${formValues.firstname} ${formValues.lastname}`.trim() 
+    const validationError = getRegisterValidationError({
+      ...formValues,
+      fullName: `${formValues.firstname} ${formValues.lastname}`.trim(),
     })
     if (validationError) {
       setErrorMessage(validationError)
       return
     }
-
     if (!formValues.firstname.trim() || !formValues.lastname.trim()) {
       setErrorMessage('Veuillez renseigner votre prénom et votre nom.')
       return
     }
 
     setIsSubmitting(true)
-
     try {
       await register({
         email: formValues.email.trim(),
@@ -87,145 +84,144 @@ export function RegisterPage() {
       footerActionLabel={page.switchAction}
       footerActionTo="/login"
     >
-      <div className="mb-6">
-        <a className="btn btn-outline w-full gap-3 shadow-sm hover:bg-base-200 hover:text-base-content hover:border-base-300" href={`${API_BASE_URL}/login/google`} role="button">
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-          </svg>
-          {page.google}
-        </a>
+      <a
+        href={`${API_BASE_URL}/login/google`}
+        className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+      >
+        <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        {page.google}
+      </a>
+
+      <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        <span className="uppercase tracking-wider">{page.divider}</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="divider text-base-content/50 text-sm mb-6">
-        {page.divider}
-      </div>
-
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">Prénom</span>
+      <form onSubmit={handleSubmit} className="grid gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="register-firstname" className={LABEL_CLASSES}>
+              Prénom
             </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">badge</span>
-              <input 
-                type="text" 
-                name="firstname" 
-                placeholder="Jean"
-                className="input input-bordered w-full pl-10 focus:border-primary transition-colors" 
-                value={formValues.firstname} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
+            <input
+              id="register-firstname"
+              type="text"
+              name="firstname"
+              autoComplete="given-name"
+              placeholder="Jean"
+              value={formValues.firstname}
+              onChange={handleChange}
+              required
+              className={INPUT_CLASSES}
+            />
           </div>
-
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">Nom</span>
+          <div>
+            <label htmlFor="register-lastname" className={LABEL_CLASSES}>
+              Nom
             </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">badge</span>
-              <input 
-                type="text" 
-                name="lastname" 
-                placeholder="Dupont"
-                className="input input-bordered w-full pl-10 focus:border-primary transition-colors" 
-                value={formValues.lastname} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">{page.emailLabel}</span>
-          </label>
-          <div className="input-group relative flex items-center">
-            <span className="absolute left-3 material-symbols-outlined text-base-content/40">mail</span>
-            <input 
-              type="email" 
-              name="email" 
-              autoComplete="email" 
-              placeholder="votre@email.com"
-              className="input input-bordered w-full pl-10 focus:border-primary transition-colors" 
-              value={formValues.email} 
-              onChange={handleChange} 
-              required 
+            <input
+              id="register-lastname"
+              type="text"
+              name="lastname"
+              autoComplete="family-name"
+              placeholder="Dupont"
+              value={formValues.lastname}
+              onChange={handleChange}
+              required
+              className={INPUT_CLASSES}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">{page.passwordLabel}</span>
-            </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">lock</span>
-              <input
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="input input-bordered w-full pl-10 focus:border-primary transition-colors"
-                value={formValues.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+        <div>
+          <label htmlFor="register-email" className={LABEL_CLASSES}>
+            {page.emailLabel}
+          </label>
+          <input
+            id="register-email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="votre@email.com"
+            value={formValues.email}
+            onChange={handleChange}
+            required
+            className={INPUT_CLASSES}
+          />
+        </div>
 
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">{page.confirmPasswordLabel}</span>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="register-password" className={LABEL_CLASSES}>
+              {page.passwordLabel}
             </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">lock_reset</span>
-              <input
-                type="password"
-                name="confirmPassword"
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="input input-bordered w-full pl-10 focus:border-primary transition-colors"
-                value={formValues.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              id="register-password"
+              type="password"
+              name="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={formValues.password}
+              onChange={handleChange}
+              required
+              className={INPUT_CLASSES}
+            />
+          </div>
+          <div>
+            <label htmlFor="register-confirm" className={LABEL_CLASSES}>
+              {page.confirmPasswordLabel}
+            </label>
+            <input
+              id="register-confirm"
+              type="password"
+              name="confirmPassword"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={formValues.confirmPassword}
+              onChange={handleChange}
+              required
+              className={INPUT_CLASSES}
+            />
           </div>
         </div>
 
-        <p className="text-xs text-base-content/60 mt-1 mb-2 px-1 flex items-start gap-1">
-          <span className="material-symbols-outlined text-[14px]">info</span>
-          {page.passwordHelp}
+        <p className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground">
+          <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />
+          <span>{page.passwordHelp}</span>
         </p>
 
-        {errorMessage && (
-          <div className="alert alert-error shadow-sm rounded-xl py-3 text-sm">
-            <span className="material-symbols-outlined text-lg">error</span>
+        {errorMessage ? (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{errorMessage}</span>
           </div>
-        )}
-        
-        {infoMessage && (
-          <div className="alert alert-info shadow-sm rounded-xl py-3 text-sm bg-info/10 text-info">
-            <span className="material-symbols-outlined text-lg">info</span>
+        ) : null}
+
+        {infoMessage ? (
+          <div
+            role="status"
+            className="flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary"
+          >
+            <Info className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{infoMessage}</span>
           </div>
-        )}
+        ) : null}
 
-        <button className="btn btn-primary w-full shadow-md mt-2" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            <span className="material-symbols-outlined mr-2">person_add</span>
-          )}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-2 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+        >
+          <UserPlus className="h-4 w-4" aria-hidden="true" />
           {isSubmitting ? page.submitting : page.submit}
         </button>
       </form>

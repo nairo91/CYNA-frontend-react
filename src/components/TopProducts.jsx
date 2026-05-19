@@ -1,4 +1,6 @@
+/* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { siteText } from '../content/siteText'
 import { resolveMediaUrl } from '../utils/media'
 import { ResourceState } from './ResourceState'
@@ -8,67 +10,85 @@ function formatPrice(price) {
   if (price === null || price === undefined || price === '') {
     return siteText.home.products.fallbackPrice
   }
-
-  const numericPrice = Number(price)
-
-  if (Number.isNaN(numericPrice)) {
-    return price
-  }
-
+  const numeric = Number(price)
+  if (Number.isNaN(numeric)) return price
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2,
-  }).format(numericPrice)
+  }).format(numeric)
 }
 
 export function TopProducts({ products, isLoading, error }) {
   const section = siteText.home.products
 
   return (
-    <section className="py-16 bg-base-200" id="featured">
-      <div className="container mx-auto px-4">
+    <section className="bg-card py-16 lg:py-20" id="featured">
+      <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
         <SectionHeading
-          eyebrow="Selection du moment"
+          eyebrow="Sélection du moment"
           title={section.title}
           copy={section.copy}
-          meta={<Link to="/products" className="btn btn-ghost btn-sm gap-2">{section.meta} <span className="material-symbols-outlined text-sm">arrow_forward</span></Link>}
+          meta={
+            <Link
+              to="/products"
+              className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            >
+              {section.meta}
+              <ArrowRight
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
+          }
         />
 
         <ResourceState
           isLoading={isLoading}
           error={error}
           skeletonCount={4}
-          loadingClassName="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          loadingClassName="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
           errorMessage={section.error}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {products.map((product) => (
-              <article className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 hover:-translate-y-2 hover:border-primary/30 group" key={product.id ?? product.slug}>
-                <Link className="flex flex-col h-full" to="/products">
-                  <figure className="relative h-56 overflow-hidden bg-base-100 p-6 flex items-center justify-center border-b border-base-200">
+              <li key={product.id ?? product.slug}>
+                <Link
+                  to={`/products/${product.id}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                >
+                  <figure className="relative aspect-[4/3] overflow-hidden bg-card">
                     <img
                       src={resolveMediaUrl(product.image, product.name)}
-                      alt={`Illustration du produit ${product.name}`}
+                      alt=""
                       loading="lazy"
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-lg"
+                      className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute top-4 left-4">
-                      <span className="badge badge-accent badge-sm font-semibold shadow-sm">{product.category?.name ?? section.fallbackCategory}</span>
-                    </div>
+                    <span className="absolute start-3 top-3 inline-flex items-center rounded-full border border-border bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
+                      {product.category?.name ?? section.fallbackCategory}
+                    </span>
                   </figure>
-                  <div className="card-body p-6">
-                    <h3 className="card-title text-lg font-bold line-clamp-2 group-hover:text-primary transition-colors leading-tight mb-2">{product.name}</h3>
-                    <p className="text-sm text-base-content/70 line-clamp-3 mb-4 flex-grow">{product.description}</p>
-                    <div className="card-actions justify-between items-end mt-auto pt-4 border-t border-base-200/50">
-                      <div className="text-2xl font-black text-primary">{formatPrice(product.price)}</div>
-                      <div className="badge badge-ghost text-xs opacity-70">{section.status}</div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <h3 className="line-clamp-2 text-base font-semibold leading-tight tracking-tight text-foreground transition-colors group-hover:text-primary">
+                      {product.name}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      {product.description}
+                    </p>
+                    <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                      <div className="font-mono text-lg font-semibold tracking-tight tabular-nums text-primary">
+                        {formatPrice(product.price)}
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        <Sparkles className="h-3 w-3" aria-hidden="true" />
+                        {section.status}
+                      </span>
                     </div>
                   </div>
                 </Link>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </ResourceState>
       </div>
     </section>
