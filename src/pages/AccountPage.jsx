@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createAddress, deleteAddress, getMyAddresses } from '../api/addressApi'
+import { sendTestMail } from '../api/mailApi'
 import { getMyOrders } from '../api/orderApi'
 import { createPaymentMethod, deletePaymentMethod, getMyPaymentMethods } from '../api/paymentMethodApi'
 import SecuritySettings from '../components/account/SecuritySettings'
@@ -13,6 +14,7 @@ const TABS = [
   { id: 'addresses', labelKey: 'tabAddresses' },
   { id: 'payments', labelKey: 'tabPayments' },
   { id: 'security', labelKey: 'tabSecurity' },
+  { id: 'mail', labelKey: 'tabMail' },
 ]
 
 function formatPrice(value) {
@@ -73,9 +75,62 @@ export function AccountPage() {
           {activeTab === 'addresses' ? <AddressesTab text={text} user={user} /> : null}
           {activeTab === 'payments' ? <PaymentsTab text={text} /> : null}
           {activeTab === 'security' ? <SecuritySettings currentUser={user} onUserUpdate={checkAuth} /> : null}
+          {activeTab === 'mail' ? <MailTab text={text} user={user} /> : null}
         </div>
       </div>
     </section>
+  )
+}
+
+function MailTab({ text, user }) {
+  const [recipient, setRecipient] = useState('juliann.ploquin@gmail.com')
+  const [isSending, setIsSending] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setErrorMessage('')
+    setSuccessMessage('')
+    setIsSending(true)
+
+    try {
+      const result = await sendTestMail(recipient.trim())
+      setSuccessMessage(text.mailSuccess.replace('{email}', result.recipient ?? recipient.trim()))
+    } catch (err) {
+      setErrorMessage(err?.message ?? text.genericError)
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  return (
+    <form className="auth-form" onSubmit={handleSubmit}>
+      <p className="section-copy">{text.mailIntro}</p>
+      <div className="auth-form-grid">
+        <label className="auth-field">
+          <span>{text.mailRecipient}</span>
+          <input
+            type="email"
+            value={recipient}
+            onChange={(event) => setRecipient(event.target.value)}
+            autoComplete="email"
+            required
+          />
+        </label>
+        <label className="auth-field">
+          <span>{text.mailAccount}</span>
+          <input value={user?.email ?? ''} readOnly />
+        </label>
+      </div>
+      {errorMessage ? <div className="auth-feedback auth-feedback-error">{errorMessage}</div> : null}
+      {successMessage ? <div className="auth-feedback auth-feedback-success">{successMessage}</div> : null}
+      <div className="hero-actions">
+        <button type="submit" className="button-primary" disabled={isSending}>
+          {isSending ? text.mailSending : text.mailSend}
+        </button>
+      </div>
+    </form>
   )
 }
 
