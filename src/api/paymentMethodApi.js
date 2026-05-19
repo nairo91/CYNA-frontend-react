@@ -17,5 +17,6 @@ export function createPaymentMethod(payload) {
 }
 
 export function deletePaymentMethod(id) {
-  return apiDelete(`/api/payment_methods/${id}`)
+  const numericId = typeof id === 'string' && id.includes('/') ? id.split('/').pop() : id
+  return apiDelete(`/api/payment_methods/${numericId}`)
 }

@@ -336,6 +336,7 @@ function PaymentsTab({ text }) {
 
   return (
     <div>
+      {errorMessage && !showForm ? <div className="auth-feedback auth-feedback-error" style={{marginBottom: '1rem'}}>{errorMessage}</div> : null}
       {methods.length === 0 ? <p>{text.paymentsEmpty}</p> : (
         <ul className="account-list">
           {methods.map((pm) => (

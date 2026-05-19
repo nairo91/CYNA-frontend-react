@@ -14,6 +14,9 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
   const [testCode, setTestCode] = useState('')
   const [testSuccess, setTestSuccess] = useState('')
   const [testError, setTestError] = useState('')
+  const [emailCode, setEmailCode] = useState('')
+  const [emailSetupStarted, setEmailSetupStarted] = useState(false)
+  const [isEmailActionLoading, setIsEmailActionLoading] = useState(false)
 
   const startSetup = async () => {
     setError('')
@@ -87,6 +90,80 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
     }
   }
 
+  const startEmail2FASetup = async () => {
+    setError('')
+    setSuccess('')
+    setIsEmailActionLoading(true)
+    try {
+      await apiPost('/api/security/2fa/email/setup')
+      setEmailSetupStarted(true)
+      setSuccess('Un code a 6 chiffres vient d\'etre envoye a votre adresse e-mail.')
+    } catch (err) {
+      setError('Impossible d\'envoyer le code de securite par e-mail.')
+    } finally {
+      setIsEmailActionLoading(false)
+    }
+  }
+
+  const enableEmail2FA = async (event) => {
+    event.preventDefault()
+    setError('')
+    setSuccess('')
+    setIsEmailActionLoading(true)
+    try {
+      await apiPost('/api/security/2fa/email/enable', { code: emailCode })
+      setSuccess('Double authentification par e-mail activee.')
+      setEmailCode('')
+      setEmailSetupStarted(false)
+      if (onUserUpdate) onUserUpdate()
+    } catch (err) {
+      setError('Code e-mail invalide ou expire.')
+    } finally {
+      setIsEmailActionLoading(false)
+    }
+  }
+
+  const disableEmail2FA = async () => {
+    setError('')
+    setSuccess('')
+    setIsEmailActionLoading(true)
+    try {
+      await apiPost('/api/security/2fa/email/disable')
+      setSuccess('Double authentification par e-mail desactivee.')
+      setEmailCode('')
+      setEmailSetupStarted(false)
+      if (onUserUpdate) onUserUpdate()
+    } catch (err) {
+      setError('Impossible de desactiver la double authentification par e-mail.')
+    } finally {
+      setIsEmailActionLoading(false)
+    }
+  }
+
+  const toggleLoginNotifications = async () => {
+    setError('')
+    setSuccess('')
+    try {
+      const nextState = !currentUser.loginNotificationEnabled
+      await apiPost('/api/security/2fa/login-notifications/toggle', { enabled: nextState })
+      setSuccess(nextState ? 'Notifications de connexion activees.' : 'Notifications de connexion desactivees.')
+      if (onUserUpdate) onUserUpdate()
+    } catch (err) {
+      setError('Impossible de modifier les notifications de connexion.')
+    }
+  }
+
+  const sendLoginNotificationTest = async () => {
+    setError('')
+    setSuccess('')
+    try {
+      await apiPost('/api/security/2fa/login-notifications/test')
+      setSuccess('E-mail de test de notification de connexion envoye.')
+    } catch (err) {
+      setError('Impossible d\'envoyer le test de notification.')
+    }
+  }
+
   return (
     <div className="security-settings">
       <h3>Sécurité & Double Authentification (A2F)</h3>
@@ -96,6 +173,77 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       {success && <div className="auth-feedback auth-feedback-success">{success}</div>}
 
       <div className="security-card">
+        <h4>Code de connexion par e-mail</h4>
+        <p style={{ marginBottom: '1rem' }}>
+          Recevez un code aleatoire a 6 chiffres par e-mail apres validation du mot de passe.
+        </p>
+
+        <div className="security-status">
+          <strong>Statut e-mail : </strong>
+          {currentUser.emailTwoFactorEnabled ? (
+            <span className="text-success">Active</span>
+          ) : (
+            <span className="text-danger">Desactive</span>
+          )}
+        </div>
+
+        {!currentUser.emailTwoFactorEnabled ? (
+          <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+            <button className="button-primary" type="button" onClick={startEmail2FASetup} disabled={isEmailActionLoading}>
+              Envoyer un code de validation
+            </button>
+
+            {emailSetupStarted && (
+              <form onSubmit={enableEmail2FA} style={{ display: 'grid', gap: '0.8rem' }}>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength="6"
+                  placeholder="000000"
+                  value={emailCode}
+                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, ''))}
+                  className="verification-input"
+                  required
+                />
+                <button type="submit" className="button-primary" disabled={isEmailActionLoading}>
+                  Activer la 2FA e-mail
+                </button>
+              </form>
+            )}
+          </div>
+        ) : (
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="button-danger" type="button" onClick={disableEmail2FA} disabled={isEmailActionLoading}>
+              Desactiver la 2FA e-mail
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="security-card">
+        <h4>Alertes de connexion</h4>
+        <p style={{ marginBottom: '1rem' }}>
+          Recevez un e-mail apres chaque connexion avec l'adresse IP, le systeme, le navigateur et l'heure de connexion.
+        </p>
+
+        <label className="security-checkbox">
+          <input
+            type="checkbox"
+            checked={Boolean(currentUser.loginNotificationEnabled)}
+            onChange={toggleLoginNotifications}
+          />
+          <span>Envoyer un e-mail de securite apres chaque connexion</span>
+        </label>
+
+        <div className="actions" style={{ marginTop: '1rem' }}>
+          <button className="button-secondary" type="button" onClick={sendLoginNotificationTest}>
+            Envoyer un e-mail de test
+          </button>
+        </div>
+      </div>
+
+      <div className="security-card">
+        <h4>Application d'authentification</h4>
         <div className="security-status">
           <strong>Configuration : </strong>
           {currentUser.isTotpConfigured ? (
