@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { API_BASE_URL } from '../api/http'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
 import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
@@ -71,10 +72,9 @@ export function LoginPage() {
       footerActionTo="/register"
     >
       <div className="auth-provider-group">
-        <button className="auth-provider-button" type="button" disabled title={page.googleHint}>
+        <a className="auth-provider-button" href={`${API_BASE_URL}/login/google`} role="button">
           {page.google}
-        </button>
-        <p className="auth-provider-note">{page.googleStatus}</p>
+        </a>
       </div>
 
       <div className="auth-divider">

@@ -109,6 +109,26 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
+  /**
+   * Utilisé par le callback Google SSO :
+   * stocke un JWT déjà obtenu côté serveur puis hydrate le profil.
+   */
+  const loginWithToken = useCallback(async (token) => {
+    setIsAuthenticating(true)
+    try {
+      saveAuthToken(token, true)
+      const me = await hydrateUser()
+      if (!me) throw new Error('Impossible de récupérer le profil.')
+      return me
+    } catch (err) {
+      clearAuthToken()
+      if (mountedRef.current) setUser(null)
+      throw err
+    } finally {
+      setIsAuthenticating(false)
+    }
+  }, [hydrateUser])
+
   const value = useMemo(
     () => ({
       user,
@@ -116,13 +136,14 @@ export function AuthProvider({ children }) {
       isInitializing,
       isAuthenticating,
       login,
+      loginWithToken,
       verify2fa,
       register,
       logout,
       refresh: hydrateUser,
       checkAuth: hydrateUser,
     }),
-    [user, isInitializing, isAuthenticating, login, verify2fa, register, logout, hydrateUser],
+    [user, isInitializing, isAuthenticating, login, loginWithToken, verify2fa, register, logout, hydrateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

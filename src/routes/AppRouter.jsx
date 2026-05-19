@@ -17,6 +17,7 @@ import { ProductsPage } from '../pages/ProductsPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { ResetPasswordPage } from '../pages/ResetPasswordPage'
 import { VerifyEmailPage } from '../pages/VerifyEmailPage'
+import { GoogleCallbackPage } from '../pages/GoogleCallbackPage'
 import { ProtectedRoute } from './ProtectedRoute'
 
 export function AppRouter() {
@@ -39,6 +40,7 @@ export function AppRouter() {
               <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
 
               {/* Panier (accessible meme en invite) */}
               <Route path="/panier" element={<CartPage />} />
