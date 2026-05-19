@@ -9,7 +9,7 @@ import { getLoginValidationError, mapLoginApiError } from '../utils/authValidati
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login } = useAuth()
+  const { login, verify2fa } = useAuth()
   const page = siteText.auth.login
   const [formValues, setFormValues] = useState({
     email: '',
@@ -19,6 +19,8 @@ export function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState(null)
+  const [twoFactorCode, setTwoFactorCode] = useState('')
 
   // Si l'utilisateur a été redirigé par <ProtectedRoute>, on revient à la page d'origine.
   const redirectTo = location.state?.from?.pathname ?? '/espace-client'
@@ -45,9 +47,40 @@ export function LoginPage() {
     setIsSubmitting(true)
 
     try {
-      await login({
+      const result = await login({
         email: formValues.email.trim(),
         password: formValues.password,
+        rememberMe: formValues.rememberMe,
+      })
+      if (result?.requires2fa) {
+        setTwoFactorChallenge(result)
+        setSuccessMessage(
+          result.method === 'email'
+            ? page.twoFactorEmailSent
+            : page.twoFactorRequired,
+        )
+        return
+      }
+      setSuccessMessage(page.success)
+      window.setTimeout(() => navigate(redirectTo, { replace: true }), 500)
+    } catch (error) {
+      setErrorMessage(mapLoginApiError(error))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleTwoFactorSubmit = async (event) => {
+    event.preventDefault()
+    setErrorMessage('')
+    setSuccessMessage('')
+    setIsSubmitting(true)
+
+    try {
+      await verify2fa({
+        email: formValues.email.trim(),
+        password: formValues.password,
+        code: twoFactorCode,
         rememberMe: formValues.rememberMe,
       })
       setSuccessMessage(page.success)
@@ -81,7 +114,7 @@ export function LoginPage() {
         <span>{page.divider}</span>
       </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
+      <form className="auth-form" onSubmit={twoFactorChallenge ? handleTwoFactorSubmit : handleSubmit}>
         <label className="auth-field">
           <span>{page.emailLabel}</span>
           <input
@@ -94,17 +127,32 @@ export function LoginPage() {
           />
         </label>
 
-        <label className="auth-field">
-          <span>{page.passwordLabel}</span>
-          <input
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            value={formValues.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
+        {!twoFactorChallenge ? (
+          <label className="auth-field">
+            <span>{page.passwordLabel}</span>
+            <input
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              value={formValues.password}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        ) : (
+          <label className="auth-field">
+            <span>{page.twoFactorCodeLabel}</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              autoComplete="one-time-code"
+              value={twoFactorCode}
+              onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, ''))}
+              required
+            />
+          </label>
+        )}
 
         <div className="auth-meta-row">
           <label className="auth-checkbox">
@@ -126,7 +174,7 @@ export function LoginPage() {
         {successMessage ? <div className="auth-feedback auth-feedback-success">{successMessage}</div> : null}
 
         <button className="button-primary auth-submit" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? page.submitting : page.submit}
+          {isSubmitting ? page.submitting : twoFactorChallenge ? page.twoFactorSubmit : page.submit}
         </button>
       </form>
     </AuthPageLayout>
