@@ -152,6 +152,7 @@ export function CartProvider({ children }) {
       image: it.saasService?.image ?? null,
       quantity: it.quantity ?? 1,
       durationMonths: it.durationMonths ?? 1,
+      available: it.saasService?.available !== false,
     }))
   }
 
@@ -221,6 +222,26 @@ export function CartProvider({ children }) {
     [isAuthenticated, state.cartId, state.items],
   )
 
+  const updateDuration = useCallback(
+    async (itemKey, durationMonths) => {
+      const safeDuration = Math.max(1, Number(durationMonths) || 1)
+
+      if (!isAuthenticated) {
+        const items = state.items.map((it) =>
+          it.productId === itemKey ? { ...it, durationMonths: safeDuration } : it,
+        )
+        saveLocalCart({ items })
+        dispatch({ type: 'patch', payload: { items } })
+        return
+      }
+
+      await updateCartItem(itemKey, { durationMonths: safeDuration })
+      const fresh = await getCart(state.cartId)
+      dispatch({ type: 'patch', payload: { items: mapApiCartToItems(fresh) } })
+    },
+    [isAuthenticated, state.cartId, state.items],
+  )
+
   const removeItem = useCallback(
     async (itemKey) => {
       if (!isAuthenticated) {
@@ -275,10 +296,11 @@ export function CartProvider({ children }) {
       error: state.error,
       addItem,
       updateQuantity,
+      updateDuration,
       removeItem,
       clearCart,
     }),
-    [state, itemCount, subtotal, addItem, updateQuantity, removeItem, clearCart],
+    [state, itemCount, subtotal, addItem, updateQuantity, updateDuration, removeItem, clearCart],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

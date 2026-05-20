@@ -1,16 +1,25 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { AlertCircle, CheckCircle2, LogIn } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { API_BASE_URL } from '../api/http'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { getLoginValidationError, mapLoginApiError } from '../utils/authValidation'
+
+const INPUT_CLASSES =
+  'h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+
+const LABEL_CLASSES =
+  'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, verify2fa } = useAuth()
-  const page = siteText.auth.login
+  const { t } = useTranslation('auth')
+  const page = t('login', { returnObjects: true })
+  const loginBenefits = t('loginBenefits', { returnObjects: true })
   const [formValues, setFormValues] = useState({
     email: '',
     password: '',
@@ -22,7 +31,6 @@ export function LoginPage() {
   const [twoFactorChallenge, setTwoFactorChallenge] = useState(null)
   const [twoFactorCode, setTwoFactorCode] = useState('')
 
-  // Si l'utilisateur a été redirigé par <ProtectedRoute>, on revient à la page d'origine.
   const redirectTo = location.state?.from?.pathname ?? '/espace-client'
 
   const handleChange = (event) => {
@@ -45,7 +53,6 @@ export function LoginPage() {
     }
 
     setIsSubmitting(true)
-
     try {
       const result = await login({
         email: formValues.email.trim(),
@@ -55,9 +62,7 @@ export function LoginPage() {
       if (result?.requires2fa) {
         setTwoFactorChallenge(result)
         setSuccessMessage(
-          result.method === 'email'
-            ? page.twoFactorEmailSent
-            : page.twoFactorRequired,
+          result.method === 'email' ? page.twoFactorEmailSent : page.twoFactorRequired
         )
         return
       }
@@ -75,7 +80,6 @@ export function LoginPage() {
     setErrorMessage('')
     setSuccessMessage('')
     setIsSubmitting(true)
-
     try {
       await verify2fa({
         email: formValues.email.trim(),
@@ -97,130 +101,140 @@ export function LoginPage() {
       eyebrow={page.eyebrow}
       title={page.title}
       copy={page.copy}
-      benefits={siteText.auth.loginBenefits}
+      benefits={loginBenefits}
       cardTitle={page.cardTitle}
       cardCopy={page.cardCopy}
       footerPrompt={page.switchPrompt}
       footerActionLabel={page.switchAction}
       footerActionTo="/register"
     >
-      <div className="mb-6">
-        <a className="btn btn-outline w-full gap-3 shadow-sm hover:bg-base-200 hover:text-base-content hover:border-base-300" href={`${API_BASE_URL}/login/google`} role="button">
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-          </svg>
-          {page.google}
-        </a>
+      <a
+        href={`${API_BASE_URL}/login/google`}
+        className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+      >
+        <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+        </svg>
+        {page.google}
+      </a>
+
+      <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+        <span className="h-px flex-1 bg-border" />
+        <span className="uppercase tracking-wider">{page.divider}</span>
+        <span className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="divider text-base-content/50 text-sm mb-6">
-        {page.divider}
-      </div>
-
-      <form className="flex flex-col gap-4" onSubmit={twoFactorChallenge ? handleTwoFactorSubmit : handleSubmit}>
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">{page.emailLabel}</span>
+      <form
+        onSubmit={twoFactorChallenge ? handleTwoFactorSubmit : handleSubmit}
+        className="grid gap-4"
+      >
+        <div>
+          <label htmlFor="login-email" className={LABEL_CLASSES}>
+            {page.emailLabel}
           </label>
-          <div className="input-group relative flex items-center">
-            <span className="absolute left-3 material-symbols-outlined text-base-content/40">mail</span>
-            <input
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="votre@email.com"
-              className="input input-bordered w-full pl-10 focus:border-primary transition-colors"
-              value={formValues.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <input
+            id="login-email"
+            type="email"
+            name="email"
+            autoComplete="email"
+            placeholder="votre@email.com"
+            value={formValues.email}
+            onChange={handleChange}
+            required
+            className={INPUT_CLASSES}
+          />
         </div>
 
         {!twoFactorChallenge ? (
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium">{page.passwordLabel}</span>
+          <div>
+            <label htmlFor="login-password" className={LABEL_CLASSES}>
+              {page.passwordLabel}
             </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">lock</span>
-              <input
-                type="password"
-                name="password"
-                autoComplete="current-password"
-                placeholder="••••••••"
-                className="input input-bordered w-full pl-10 focus:border-primary transition-colors"
-                value={formValues.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
+            <input
+              id="login-password"
+              type="password"
+              name="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={formValues.password}
+              onChange={handleChange}
+              required
+              className={INPUT_CLASSES}
+            />
           </div>
         ) : (
-          <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text font-medium text-primary">{page.twoFactorCodeLabel}</span>
+          <div>
+            <label htmlFor="login-2fa" className={LABEL_CLASSES}>
+              {page.twoFactorCodeLabel}
             </label>
-            <div className="input-group relative flex items-center">
-              <span className="absolute left-3 material-symbols-outlined text-base-content/40">dialpad</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                autoComplete="one-time-code"
-                placeholder="123456"
-                className="input input-bordered w-full pl-10 font-mono text-center tracking-[0.5em] text-lg focus:border-primary transition-colors"
-                value={twoFactorCode}
-                onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, ''))}
-                required
-              />
-            </div>
+            <input
+              id="login-2fa"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              autoComplete="one-time-code"
+              placeholder="123456"
+              value={twoFactorCode}
+              onChange={(event) => setTwoFactorCode(event.target.value.replace(/\D/g, ''))}
+              required
+              className="h-12 w-full rounded-lg border border-border bg-background px-3 text-center font-mono text-lg tracking-[0.5em] text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+            />
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-2 mb-2">
-          <label className="label cursor-pointer justify-start gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <label className="inline-flex items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"
               name="rememberMe"
-              className="checkbox checkbox-sm checkbox-primary rounded"
               checked={formValues.rememberMe}
               onChange={handleChange}
+              className="h-4 w-4 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
-            <span className="label-text text-sm">{page.rememberMe}</span>
+            {page.rememberMe}
           </label>
-
-          <Link className="link link-hover text-sm text-base-content/70" to="/forgot-password">
+          <Link
+            to="/forgot-password"
+            className="rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             {page.forgotPassword}
           </Link>
         </div>
 
-        {errorMessage && (
-          <div className="alert alert-error shadow-sm rounded-xl py-3 text-sm">
-            <span className="material-symbols-outlined text-lg">error</span>
+        {errorMessage ? (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{errorMessage}</span>
           </div>
-        )}
-        
-        {successMessage && (
-          <div className="alert alert-success shadow-sm rounded-xl py-3 text-sm text-success-content">
-            <span className="material-symbols-outlined text-lg">check_circle</span>
+        ) : null}
+
+        {successMessage ? (
+          <div
+            role="status"
+            className="flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300"
+          >
+            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
             <span>{successMessage}</span>
           </div>
-        )}
+        ) : null}
 
-        <button className="btn btn-primary w-full shadow-md mt-2" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            <span className="material-symbols-outlined mr-2">
-              {twoFactorChallenge ? 'security' : 'login'}
-            </span>
-          )}
-          {isSubmitting ? page.submitting : twoFactorChallenge ? page.twoFactorSubmit : page.submit}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-2 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+        >
+          <LogIn className="h-4 w-4" aria-hidden="true" />
+          {isSubmitting
+            ? page.submitting
+            : twoFactorChallenge
+              ? page.twoFactorSubmit
+              : page.submit}
         </button>
       </form>
     </AuthPageLayout>

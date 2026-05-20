@@ -1,43 +1,62 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { siteText } from '../content/siteText'
+import { AlertTriangle, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import { cn } from '../lib/utils'
 import { resolveMediaUrl } from '../utils/media'
 
-function formatPrice(value) {
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return '—'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
-}
+const DURATION_OPTIONS = [1, 3, 6, 12]
 
 export function CartPage() {
-  const text = siteText.pages.cart
+  const { t, i18n } = useTranslation('cart')
   const navigate = useNavigate()
   const { isAuthenticated } = useAuth()
-  const { items, subtotal, isLoading, updateQuantity, removeItem } = useCart()
+  const { items, subtotal, isLoading, updateQuantity, updateDuration, removeItem } = useCart()
+
+  const formatPrice = (value) => {
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return '—'
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
 
   if (isLoading) {
-    return <section className="section"><div className="container"><div className="app-loading">{text.loading}</div></div></section>
+    return (
+      <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-16 lg:px-6">
+        <p className="text-center text-muted-foreground" role="status" aria-live="polite">
+          {t('loading')}
+        </p>
+      </div>
+    )
   }
 
   if (items.length === 0) {
     return (
-      <section className="section">
-        <div className="container">
-          <div className="placeholder-card panel">
-            <span className="eyebrow">{text.eyebrow}</span>
-            <h1 className="section-title">{text.emptyTitle}</h1>
-            <p className="section-copy">{text.emptyCopy}</p>
-            <div className="hero-actions">
-              <Link className="button-primary" to="/products">{text.browseCatalog}</Link>
-            </div>
+      <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-16 lg:px-6">
+        <div className="mx-auto max-w-md rounded-2xl border border-border bg-card p-8 text-center">
+          <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShoppingBag className="h-6 w-6" aria-hidden="true" />
           </div>
+          <span className="mt-4 inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('eyebrow')}
+          </span>
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
+            {t('emptyTitle')}
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground">{t('emptyCopy')}</p>
+          <Link
+            to="/products"
+            className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            {t('browseCatalog')}
+          </Link>
         </div>
-      </section>
+      </div>
     )
   }
 
@@ -49,67 +68,204 @@ export function CartPage() {
     navigate('/checkout')
   }
 
-  return (
-    <section className="section">
-      <div className="container">
-        <header className="section-heading">
-          <span className="eyebrow">{text.eyebrow}</span>
-          <h1 className="section-title">{text.title}</h1>
-          <p className="section-copy">{text.copy}</p>
-        </header>
+  const itemsCount = items.reduce((sum, it) => sum + (it.quantity ?? 0), 0)
+  const itemsCountLabel = t('itemsCount', { count: itemsCount })
 
-        <div className="cart-list">
+  const hasUnavailable = items.some((it) => it.available === false)
+
+  return (
+    <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-12 lg:px-6 lg:py-16">
+      <header className="mb-10">
+        <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {t('eyebrow')}
+        </span>
+        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+          {t('title')}
+        </h1>
+        <p className="mt-3 text-base leading-relaxed text-muted-foreground lg:text-lg">
+          {t('copy')}
+        </p>
+        <p className="mt-2 font-mono text-sm tabular-nums text-muted-foreground">
+          {itemsCountLabel}
+        </p>
+      </header>
+
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-10">
+        <ul className="space-y-4">
           {items.map((it) => {
             const lineKey = it.id ?? it.productId
-            const linePrice = Number(it.price) * (it.quantity ?? 0) * (it.durationMonths ?? 1)
+            const lineTotal = Number(it.price) * (it.quantity ?? 0) * (it.durationMonths ?? 1)
+            const available = it.available !== false
             return (
-              <article className="cart-line panel" key={lineKey}>
-                <div className="cart-line-media">
-                  <img src={resolveMediaUrl(it.image, it.name)} alt="" loading="lazy" />
-                </div>
-                <div className="cart-line-body">
-                  <strong>{it.name}</strong>
-                  <p className="section-copy">{text.duration}: {it.durationMonths} {it.durationMonths > 1 ? text.months : text.month}</p>
-                  <p className="cart-line-price">{formatPrice(it.price)}</p>
-                </div>
-                <div className="cart-line-controls">
-                  <label className="auth-field">
-                    <span>{text.quantity}</span>
-                    <input
-                      type="number"
-                      min={1}
-                      value={it.quantity}
-                      onChange={(e) => updateQuantity(lineKey, Number(e.target.value) || 1)}
+              <li
+                key={lineKey}
+                className={cn(
+                  'overflow-hidden rounded-2xl border border-border bg-card',
+                  !available && 'border-destructive/40'
+                )}
+              >
+                <article className="grid gap-4 p-4 sm:grid-cols-[6rem_1fr] sm:p-5 lg:gap-6 lg:p-6">
+                  <div className="aspect-square overflow-hidden rounded-lg border border-border bg-background">
+                    <img
+                      src={resolveMediaUrl(it.image, it.name)}
+                      alt=""
+                      loading="lazy"
+                      className={cn(
+                        'h-full w-full object-cover',
+                        !available && 'opacity-60'
+                      )}
                     />
-                  </label>
-                  <div className="cart-line-total">{formatPrice(linePrice)}</div>
-                  <button
-                    type="button"
-                    className="button-secondary"
-                    onClick={() => removeItem(lineKey)}
-                  >
-                    {text.remove}
-                  </button>
-                </div>
-              </article>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h2 className="text-base font-semibold tracking-tight text-foreground">
+                          {it.name}
+                        </h2>
+                        <p className="mt-1 font-mono text-sm tabular-nums text-muted-foreground">
+                          {formatPrice(it.price)}
+                          <span className="text-muted-foreground/70"> {t('perUnitMonth')}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(lineKey)}
+                        aria-label={`${t('remove')} : ${it.name}`}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </div>
+
+                    {!available ? (
+                      <div
+                        role="alert"
+                        className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                      >
+                        <AlertTriangle
+                          className="mt-0.5 h-4 w-4 flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>{t('alertUnavailable')}</span>
+                      </div>
+                    ) : null}
+
+                    <div className="flex flex-wrap items-end gap-4">
+                      <div>
+                        <label
+                          htmlFor={`qty-${lineKey}`}
+                          className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        >
+                          {t('quantity')}
+                        </label>
+                        <div className="inline-flex h-9 items-center rounded-lg border border-border bg-background">
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(lineKey, Math.max(1, (it.quantity ?? 1) - 1))}
+                            disabled={!available || (it.quantity ?? 1) <= 1}
+                            aria-label={t('quantityDecrease')}
+                            className="inline-flex h-full w-9 items-center justify-center rounded-s-lg text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <Minus className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                          <input
+                            id={`qty-${lineKey}`}
+                            type="number"
+                            min={1}
+                            value={it.quantity ?? 1}
+                            onChange={(event) =>
+                              updateQuantity(lineKey, Number(event.target.value) || 1)
+                            }
+                            disabled={!available}
+                            className="h-full w-14 border-x border-border bg-transparent text-center font-mono text-sm tabular-nums text-foreground focus:outline-none disabled:opacity-50"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => updateQuantity(lineKey, (it.quantity ?? 1) + 1)}
+                            disabled={!available}
+                            aria-label={t('quantityIncrease')}
+                            className="inline-flex h-full w-9 items-center justify-center rounded-e-lg text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <Plus className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor={`dur-${lineKey}`}
+                          className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+                        >
+                          {t('duration')}
+                        </label>
+                        <select
+                          id={`dur-${lineKey}`}
+                          value={it.durationMonths ?? 1}
+                          onChange={(event) =>
+                            updateDuration(lineKey, Number(event.target.value) || 1)
+                          }
+                          disabled={!available}
+                          className="h-9 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
+                        >
+                          {DURATION_OPTIONS.map((value) => (
+                            <option key={value} value={value}>
+                              {value} {value === 1 ? t('month') : t('months')}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="ms-auto text-end">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          {t('lineTotal')}
+                        </p>
+                        <p className="font-mono text-lg font-semibold tabular-nums text-primary">
+                          {formatPrice(lineTotal)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </li>
             )
           })}
-        </div>
+        </ul>
 
-        <aside className="cart-summary panel">
-          <div className="cart-summary-row">
-            <span>{text.subtotal}</span>
-            <strong>{formatPrice(subtotal)}</strong>
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              {t('subtotal')}
+            </h2>
+            <div className="mt-4 flex items-baseline justify-between gap-3 border-b border-border pb-4">
+              <span className="text-sm text-muted-foreground">{t('subtotal')}</span>
+              <span className="font-mono text-2xl font-semibold tabular-nums text-primary">
+                {formatPrice(subtotal)}
+              </span>
+            </div>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              {t('taxesNote')}
+            </p>
+            {hasUnavailable ? (
+              <p className="mt-3 text-xs leading-relaxed text-destructive">
+                {t('alertUnavailable')}
+              </p>
+            ) : null}
+            <button
+              type="button"
+              onClick={handleCheckout}
+              className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            >
+              {t('checkout')}
+            </button>
+            {!isAuthenticated ? (
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                {t('loginNeeded')}
+              </p>
+            ) : null}
           </div>
-          <p className="section-copy">{text.taxesNote}</p>
-          <button type="button" className="button-primary" onClick={handleCheckout}>
-            {text.checkout}
-          </button>
-          {!isAuthenticated ? (
-            <p className="auth-feedback auth-feedback-info">{text.loginNeeded}</p>
-          ) : null}
         </aside>
       </div>
-    </section>
+    </div>
   )
 }

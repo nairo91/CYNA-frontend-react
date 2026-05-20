@@ -1,5 +1,6 @@
+/* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom'
-import cynaLogo from '../../assets/logo-icon-transparent.png'
+import { Check, Shield } from 'lucide-react'
 
 export function AuthPageLayout({
   eyebrow,
@@ -14,65 +15,67 @@ export function AuthPageLayout({
   children,
 }) {
   return (
-    <section className="min-h-[calc(100vh-100px)] py-12 lg:py-20 flex items-center justify-center bg-base-100 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-accent/10 blur-[100px] rounded-full pointer-events-none"></div>
-
-      <div className="container mx-auto px-4 max-w-6xl relative z-10">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center justify-between">
-          
-          <aside className="lg:w-1/2 flex flex-col justify-center text-center lg:text-left">
-            <Link className="flex items-center justify-center lg:justify-start gap-3 mb-8 w-full" to="/">
-              <img src={cynaLogo} alt="CYNA Logo" className="w-12 h-12" />
-              <span className="font-extrabold text-3xl tracking-widest text-primary">CYNA</span>
+    <section className="min-h-[calc(100vh-4rem)] bg-background py-12 lg:py-20">
+      <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
+        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-16">
+          <aside className="flex flex-col">
+            <Link
+              to="/"
+              className="inline-flex w-fit items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              aria-label="CYNA, retour à l'accueil"
+            >
+              <Shield className="h-7 w-7 text-primary" aria-hidden="true" />
+              <span className="text-xl font-semibold tracking-tight text-foreground">
+                CYNA
+              </span>
             </Link>
 
-            <div className="mb-6">
-              <span className="badge badge-accent badge-lg font-bold shadow-sm">{eyebrow}</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight text-base-content">
+            <span className="mt-8 inline-flex w-fit items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {eyebrow}
+            </span>
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-5xl">
               {title}
             </h1>
-            <p className="text-lg md:text-xl text-base-content/70 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground lg:text-lg">
               {copy}
             </p>
 
-            <div className="flex flex-col gap-5 max-w-md mx-auto lg:mx-0">
-              {benefits.map((benefit, index) => (
-                <div className="flex items-start gap-4 text-left" key={index}>
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm border border-primary/10">
-                    <span className="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
-                  </div>
-                  <p className="text-base-content/80 text-lg font-medium leading-snug">{benefit}</p>
-                </div>
-              ))}
-            </div>
+            {benefits?.length ? (
+              <ul className="mt-8 space-y-3">
+                {benefits.map((benefit, index) => (
+                  <li key={index} className="flex items-start gap-3 text-sm text-foreground/80">
+                    <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
+                    <span className="leading-relaxed">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </aside>
 
-          <div className="lg:w-[45%] w-full max-w-lg lg:max-w-none">
-            <div className="card bg-base-100/80 backdrop-blur-xl shadow-2xl border border-base-200/60 w-full relative">
-              <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-2xl pointer-events-none"></div>
-              
-              <div className="card-body p-8 sm:p-10 relative z-10">
-                <div className="mb-8 text-center">
-                  <h2 className="text-2xl font-bold mb-2">{cardTitle}</h2>
-                  <p className="text-base-content/60">{cardCopy}</p>
-                </div>
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm lg:p-8">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                {cardTitle}
+              </h2>
+              {cardCopy ? (
+                <p className="mt-2 text-sm text-muted-foreground">{cardCopy}</p>
+              ) : null}
+            </div>
 
-                {children}
+            {children}
 
-                <div className="mt-8 text-center text-sm text-base-content/70 border-t border-base-200/50 pt-6">
-                  {footerPrompt}{' '}
-                  <Link to={footerActionTo} className="link link-primary font-bold hover:text-primary-focus transition-colors">
-                    {footerActionLabel}
-                  </Link>
-                </div>
-              </div>
+            <div className="mt-6 border-t border-border pt-4 text-center text-sm text-muted-foreground">
+              {footerPrompt}{' '}
+              <Link
+                to={footerActionTo}
+                className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:underline"
+              >
+                {footerActionLabel}
+              </Link>
             </div>
           </div>
-          
         </div>
       </div>
     </section>
