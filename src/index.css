@@ -1087,7 +1087,7 @@ main {
 
 .chatbot {
   position: fixed;
-  right: 1rem;
+  inset-inline-end: 1rem;
   bottom: 92px;
   z-index: 60;
   display: flex;
@@ -1387,7 +1387,7 @@ main {
 
 .chatbot-support-popover {
   position: absolute;
-  right: calc(100% + 0.75rem);
+  inset-inline-end: calc(100% + 0.75rem);
   bottom: 0;
   z-index: 5;
   width: 320px;
@@ -1434,7 +1434,7 @@ main {
 
 @media (max-width: 520px) {
 .chatbot {
-    right: 0.75rem;
+    inset-inline-end: 0.75rem;
     bottom: 4.5rem;
     width: min(calc(100vw - 1.5rem), 22rem);
     height: calc(100vh - 8rem);
@@ -1985,4 +1985,24 @@ main {
   .checkout-summary {
     position: static;
   }
+}
+
+/* ==========================================================================
+   RTL: flip directional icons (chevrons, arrows) horizontally.
+   Lucide-react v1.x emits `<svg class="lucide lucide-arrow-left">` etc.,
+   so we can target every directional icon globally instead of decorating
+   each component. For an icon that should NOT flip (rare — e.g. an arrow
+   used as a non-directional decorative element), add `.icon-no-flip`.
+   ========================================================================== */
+[dir="rtl"] svg.lucide-arrow-left,
+[dir="rtl"] svg.lucide-arrow-right,
+[dir="rtl"] svg.lucide-arrow-up-right,
+[dir="rtl"] svg.lucide-chevron-left,
+[dir="rtl"] svg.lucide-chevron-right,
+[dir="rtl"] .icon-rotate-rtl {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] svg.lucide.icon-no-flip {
+  transform: none;
 }

@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "brand": "CYNA",
+    "brandLabel": "الصفحة الرئيسية CYNA",
+    "skipLink": "الانتقال إلى المحتوى الرئيسي",
+    "menu": "القائمة",
+    "menuOpen": "فتح القائمة",
+    "menuClose": "إغلاق القائمة",
+    "primaryAriaLabel": "التنقل الرئيسي",
+    "searchPlaceholder": "ابحث عن حل أو خدمة أو احتياج",
+    "searchAriaLabel": "البحث في CYNA",
+    "searchLandmark": "بحث CYNA",
+    "searchLandmarkShort": "بحث",
+    "searchButton": "بحث",
+    "searchHint": "البحث في الكتالوج متاح قريبًا",
+    "cartLabel": "السلة",
+    "cartHint": "عرض سلتك",
+    "cartArticles_one": "{{count}} عنصر",
+    "cartArticles_other": "{{count}} عناصر",
+    "langSwitch": "تغيير اللغة",
+    "langSoon": "قريبًا",
+    "themeToLight": "التبديل إلى الوضع الفاتح",
+    "themeToDark": "التبديل إلى الوضع الداكن",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "accountAriaLabel": "الحساب",
+    "accountMenuOpen": "فتح قائمة الحساب",
+    "accountSection": "حسابي",
+    "areaSection": "مساحتي",
+    "accountLabel": "مساحتي",
+    "accountHint": "الوصول إلى مساحة العميل",
+    "logoutLabel": "تسجيل الخروج",
+    "greetingFallback": "مرحبًا",
+    "primaryLinks": [
+      { "label": "الرئيسية", "to": "/" },
+      { "label": "الفئات", "to": "/categories" },
+      { "label": "المنتجات", "to": "/products" },
+      { "label": "اتصل بنا", "to": "/contact" }
+    ],
+    "authLinks": [
+      { "label": "تسجيل الدخول", "to": "/login" },
+      { "label": "إنشاء حساب", "to": "/register" }
+    ],
+    "mobileLinksGuest": [
+      { "label": "تسجيل الدخول", "to": "/login" },
+      { "label": "إنشاء حساب", "to": "/register" },
+      { "label": "اتصل بنا", "to": "/contact" },
+      { "label": "شروط الاستخدام", "to": "/cgu" },
+      { "label": "الإشعار القانوني", "to": "/mentions-legales" },
+      { "label": "حول CYNA", "to": "/a-propos" }
+    ],
+    "mobileLinksAuth": [
+      { "label": "مساحة العميل", "to": "/espace-client" },
+      { "label": "طلباتي", "to": "/espace-client", "state": { "tab": "orders" } },
+      { "label": "اتصل بنا", "to": "/contact" },
+      { "label": "شروط الاستخدام", "to": "/cgu" },
+      { "label": "الإشعار القانوني", "to": "/mentions-legales" },
+      { "label": "حول CYNA", "to": "/a-propos" },
+      { "label": "تسجيل الخروج", "action": "logout" }
+    ]
+  },
+  "footer": {
+    "title": "CYNA",
+    "brandHome": "CYNA، العودة إلى الرئيسية",
+    "copy": "ترافق CYNA الشركات في اختيار حلول الأمن السيبراني الواضحة.",
+    "solutionsTitle": "الحلول",
+    "companyTitle": "الشركة",
+    "legalTitle": "روابط قانونية",
+    "followTitle": "تابعنا",
+    "followAriaLabel": "تابعنا على الشبكات الاجتماعية",
+    "links": {
+      "allProducts": "جميع المنتجات",
+      "categories": "الفئات",
+      "about": "حول",
+      "contact": "اتصل بنا",
+      "legalNotice": "الإشعار القانوني",
+      "cgu": "شروط الاستخدام"
+    },
+    "trust": {
+      "gdpr": "متوافق مع RGPD",
+      "pci": "PCI-DSS عبر Stripe",
+      "hosting": "استضافة OVHcloud، فرنسا"
+    },
+    "contactInfo": {
+      "email": "contact@cyna-it.fr",
+      "phone": "+33 1 80 00 00 00",
+      "phoneTel": "+33180000000",
+      "address": "12 شارع الأمن السيبراني، 75011 باريس، فرنسا"
+    },
+    "socialLinks": [
+      { "label": "LinkedIn", "href": "https://www.linkedin.com", "external": true },
+      { "label": "YouTube", "href": "https://www.youtube.com", "external": true },
+      { "label": "X", "href": "https://x.com", "external": true }
+    ],
+    "copyright": "© {{year}} CYNA-IT — جميع الحقوق محفوظة."
+  }
+}

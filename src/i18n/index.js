@@ -21,7 +21,27 @@ import enAccount from './locales/en/account.json'
 import enLegal from './locales/en/legal.json'
 import enContact from './locales/en/contact.json'
 
-export const SUPPORTED_LOCALES = ['fr', 'en']
+import arCommon from './locales/ar/common.json'
+import arHome from './locales/ar/home.json'
+import arCatalog from './locales/ar/catalog.json'
+import arCart from './locales/ar/cart.json'
+import arCheckout from './locales/ar/checkout.json'
+import arAuth from './locales/ar/auth.json'
+import arAccount from './locales/ar/account.json'
+import arLegal from './locales/ar/legal.json'
+import arContact from './locales/ar/contact.json'
+
+import heCommon from './locales/he/common.json'
+import heHome from './locales/he/home.json'
+import heCatalog from './locales/he/catalog.json'
+import heCart from './locales/he/cart.json'
+import heCheckout from './locales/he/checkout.json'
+import heAuth from './locales/he/auth.json'
+import heAccount from './locales/he/account.json'
+import heLegal from './locales/he/legal.json'
+import heContact from './locales/he/contact.json'
+
+export const SUPPORTED_LOCALES = ['fr', 'en', 'ar', 'he']
 export const DEFAULT_LOCALE = 'fr'
 export const LOCALE_STORAGE_KEY = 'cyna-locale'
 
@@ -71,6 +91,28 @@ const resources = {
     account: enAccount,
     legal: enLegal,
     contact: enContact,
+  },
+  ar: {
+    common: arCommon,
+    home: arHome,
+    catalog: arCatalog,
+    cart: arCart,
+    checkout: arCheckout,
+    auth: arAuth,
+    account: arAccount,
+    legal: arLegal,
+    contact: arContact,
+  },
+  he: {
+    common: heCommon,
+    home: heHome,
+    catalog: heCatalog,
+    cart: heCart,
+    checkout: heCheckout,
+    auth: heAuth,
+    account: heAccount,
+    legal: heLegal,
+    contact: heContact,
   },
 }
 

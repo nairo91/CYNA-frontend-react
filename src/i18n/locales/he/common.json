@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "brand": "CYNA",
+    "brandLabel": "דף הבית CYNA",
+    "skipLink": "דלג לתוכן הראשי",
+    "menu": "תפריט",
+    "menuOpen": "פתח תפריט",
+    "menuClose": "סגור תפריט",
+    "primaryAriaLabel": "ניווט ראשי",
+    "searchPlaceholder": "חפש פתרון, שירות או צורך",
+    "searchAriaLabel": "חיפוש ב-CYNA",
+    "searchLandmark": "חיפוש CYNA",
+    "searchLandmarkShort": "חיפוש",
+    "searchButton": "חפש",
+    "searchHint": "חיפוש בקטלוג זמין בקרוב",
+    "cartLabel": "עגלה",
+    "cartHint": "צפה בעגלה שלך",
+    "cartArticles_one": "פריט {{count}}",
+    "cartArticles_other": "{{count}} פריטים",
+    "langSwitch": "שנה שפה",
+    "langSoon": "בקרוב",
+    "themeToLight": "עבור למצב בהיר",
+    "themeToDark": "עבור למצב כהה",
+    "themeLight": "בהיר",
+    "themeDark": "כהה",
+    "accountAriaLabel": "חשבון",
+    "accountMenuOpen": "פתח תפריט חשבון",
+    "accountSection": "החשבון שלי",
+    "areaSection": "האזור שלי",
+    "accountLabel": "האזור שלי",
+    "accountHint": "גש לאזור הלקוח שלך",
+    "logoutLabel": "התנתק",
+    "greetingFallback": "ברוך הבא",
+    "primaryLinks": [
+      { "label": "דף הבית", "to": "/" },
+      { "label": "קטגוריות", "to": "/categories" },
+      { "label": "מוצרים", "to": "/products" },
+      { "label": "צור קשר", "to": "/contact" }
+    ],
+    "authLinks": [
+      { "label": "התחברות", "to": "/login" },
+      { "label": "הרשמה", "to": "/register" }
+    ],
+    "mobileLinksGuest": [
+      { "label": "התחברות", "to": "/login" },
+      { "label": "הרשמה", "to": "/register" },
+      { "label": "צור קשר", "to": "/contact" },
+      { "label": "תנאי שימוש", "to": "/cgu" },
+      { "label": "הודעה משפטית", "to": "/mentions-legales" },
+      { "label": "אודות CYNA", "to": "/a-propos" }
+    ],
+    "mobileLinksAuth": [
+      { "label": "אזור הלקוח שלי", "to": "/espace-client" },
+      { "label": "ההזמנות שלי", "to": "/espace-client", "state": { "tab": "orders" } },
+      { "label": "צור קשר", "to": "/contact" },
+      { "label": "תנאי שימוש", "to": "/cgu" },
+      { "label": "הודעה משפטית", "to": "/mentions-legales" },
+      { "label": "אודות CYNA", "to": "/a-propos" },
+      { "label": "התנתק", "action": "logout" }
+    ]
+  },
+  "footer": {
+    "title": "CYNA",
+    "brandHome": "CYNA, חזרה לדף הבית",
+    "copy": "CYNA מלווה חברות בבחירת פתרונות סייבר ברורים וניתנים ליישום.",
+    "solutionsTitle": "פתרונות",
+    "companyTitle": "החברה",
+    "legalTitle": "קישורים משפטיים",
+    "followTitle": "עקבו אחרינו",
+    "followAriaLabel": "עקבו אחרינו ברשתות החברתיות",
+    "links": {
+      "allProducts": "כל המוצרים",
+      "categories": "קטגוריות",
+      "about": "אודות",
+      "contact": "צור קשר",
+      "legalNotice": "הודעה משפטית",
+      "cgu": "תנאי שימוש"
+    },
+    "trust": {
+      "gdpr": "תואם RGPD",
+      "pci": "PCI-DSS דרך Stripe",
+      "hosting": "אירוח ב-OVHcloud, צרפת"
+    },
+    "contactInfo": {
+      "email": "contact@cyna-it.fr",
+      "phone": "+33 1 80 00 00 00",
+      "phoneTel": "+33180000000",
+      "address": "12 rue de la Cybersécurité, 75011 פריז, צרפת"
+    },
+    "socialLinks": [
+      { "label": "LinkedIn", "href": "https://www.linkedin.com", "external": true },
+      { "label": "YouTube", "href": "https://www.youtube.com", "external": true },
+      { "label": "X", "href": "https://x.com", "external": true }
+    ],
+    "copyright": "© {{year}} CYNA-IT — כל הזכויות שמורות."
+  }
+}
