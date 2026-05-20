@@ -11,6 +11,8 @@ import { cn } from '../lib/utils'
 const LANGUAGES = [
   { code: 'fr', label: 'Français' },
   { code: 'en', label: 'English' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'he', label: 'עברית' },
 ]
 
 const DARK_THEMES = new Set(['dark', 'night', 'luxury'])
@@ -26,7 +28,7 @@ export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth()
   const { itemCount } = useCart()
   const { t } = useTranslation('common')
-  const { locale, setLocale } = useLocale()
+  const { locale, dir, setLocale } = useLocale()
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
@@ -343,7 +345,10 @@ export function Navbar() {
             role="dialog"
             aria-modal="true"
             aria-label={t('nav.menu')}
-            className="animate-in slide-in-from-right fixed inset-y-0 end-0 z-50 flex w-full max-w-sm flex-col gap-6 overflow-y-auto border-s border-border bg-card p-6 text-card-foreground shadow-xl duration-300 ease-out lg:hidden"
+            className={cn(
+              'animate-in fixed inset-y-0 end-0 z-50 flex w-full max-w-sm flex-col gap-6 overflow-y-auto border-s border-border bg-card p-6 text-card-foreground shadow-xl duration-300 ease-out lg:hidden',
+              dir === 'rtl' ? 'slide-in-from-left' : 'slide-in-from-right'
+            )}
           >
             <div className="flex items-center justify-between">
               <Link

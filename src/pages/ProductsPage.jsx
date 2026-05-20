@@ -213,7 +213,7 @@ export function ProductsPage() {
         aria-label={t('filtersHeading')}
         className="mb-8 rounded-2xl border border-border bg-card p-4 lg:p-6"
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1.2fr_1.2fr_repeat(2,minmax(0,7rem))]">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('searchLabel')}

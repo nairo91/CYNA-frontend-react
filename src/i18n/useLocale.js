@@ -12,12 +12,13 @@ function dirFor(locale) {
 export function useLocale() {
   const { i18n } = useTranslation()
   const locale = i18n.resolvedLanguage || i18n.language || 'fr'
+  const dir = dirFor(locale)
 
   useEffect(() => {
     const root = document.documentElement
     root.setAttribute('lang', locale)
-    root.setAttribute('dir', dirFor(locale))
-  }, [locale])
+    root.setAttribute('dir', dir)
+  }, [locale, dir])
 
   const setLocale = useCallback(
     (next) => {
@@ -32,5 +33,5 @@ export function useLocale() {
     [i18n, locale]
   )
 
-  return { locale, setLocale, supported: SUPPORTED_LOCALES }
+  return { locale, dir, setLocale, supported: SUPPORTED_LOCALES }
 }

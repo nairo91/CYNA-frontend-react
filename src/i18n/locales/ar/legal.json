@@ -1,0 +1,142 @@
+{
+  "notFound": {
+    "eyebrow": "Page introuvable",
+    "title": "Cette page n'existe pas.",
+    "copy": "Revenez à l'accueil pour poursuivre.",
+    "cta": "Retour à l'accueil"
+  },
+  "cgu": {
+    "eyebrow": "Conditions générales",
+    "title": "Conditions Générales d'Utilisation",
+    "copy": "Ces conditions encadrent l'utilisation de la plateforme CYNA-IT et de ses services. En naviguant sur le site, vous acceptez les règles décrites ci-dessous.",
+    "lastUpdate": "Dernière mise à jour : 19 mai 2026",
+    "tocTitle": "Sommaire",
+    "articles": [
+      {
+        "number": "Article 1",
+        "title": "Objet et champ d'application",
+        "paragraphs": [
+          "Les présentes Conditions Générales d'Utilisation (CGU) ont pour objet de définir les modalités et conditions dans lesquelles CYNA-IT met à disposition de ses utilisateurs la plateforme accessible à l'adresse cyna-it.fr ainsi que les services de cybersécurité associés.",
+          "Toute utilisation du site implique l'acceptation pleine et entière des présentes CGU. CYNA-IT se réserve le droit de les modifier à tout moment pour les adapter aux évolutions de la plateforme ou de la législation en vigueur."
+        ]
+      },
+      {
+        "number": "Article 2",
+        "title": "Accès au site et aux services",
+        "paragraphs": [
+          "L'accès au site est ouvert à tout utilisateur disposant d'une connexion Internet. Certaines fonctionnalités nécessitent la création d'un compte client sécurisé via une adresse e-mail valide et un mot de passe robuste.",
+          "CYNA-IT met tout en œuvre pour assurer une disponibilité continue du service, mais ne peut être tenue responsable des interruptions liées à la maintenance, aux attaques tierces ou à des cas de force majeure.",
+          "L'utilisateur s'engage à protéger ses identifiants et à signaler sans délai toute utilisation frauduleuse de son compte auprès du support CYNA-IT."
+        ]
+      },
+      {
+        "number": "Article 3",
+        "title": "Responsabilités",
+        "paragraphs": [
+          "L'utilisateur s'engage à utiliser la plateforme conformément aux lois en vigueur et à ne pas porter atteinte à la sécurité des systèmes d'information de CYNA-IT ou de tiers.",
+          "Toute tentative d'intrusion, d'analyse non autorisée, de rétro-ingénierie ou de déni de service fera l'objet de poursuites judiciaires conformément aux articles 323-1 et suivants du Code pénal.",
+          "CYNA-IT ne saurait être tenue responsable d'un mauvais usage des solutions de cybersécurité proposées ni des dommages indirects pouvant résulter d'une exploitation hors spécifications."
+        ]
+      },
+      {
+        "number": "Article 4",
+        "title": "Propriété intellectuelle",
+        "paragraphs": [
+          "L'ensemble des contenus présents sur le site (textes, logos, marques, graphismes, code source, illustrations) est la propriété exclusive de CYNA-IT ou de ses partenaires éditeurs.",
+          "Toute reproduction, représentation, modification ou diffusion totale ou partielle des contenus, sans autorisation écrite préalable, est strictement interdite et constitue un acte de contrefaçon sanctionné par les articles L.335-2 et suivants du Code de la propriété intellectuelle."
+        ]
+      },
+      {
+        "number": "Article 5",
+        "title": "Droit applicable et juridiction",
+        "paragraphs": [
+          "Les présentes CGU sont régies par le droit français. Toute réclamation peut être adressée au support CYNA-IT à l'adresse contact@cyna-it.fr.",
+          "À défaut de résolution amiable, tout litige relatif à l'interprétation ou à l'exécution des présentes sera soumis aux tribunaux compétents du ressort de la Cour d'appel de Paris."
+        ]
+      }
+    ]
+  },
+  "legal": {
+    "eyebrow": "Mentions légales",
+    "title": "Mentions légales",
+    "copy": "Informations relatives à l'éditeur du site CYNA-IT, conformément à la loi n°2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique.",
+    "lastUpdate": "Dernière mise à jour : 19 mai 2026",
+    "tocTitle": "Sommaire",
+    "sections": [
+      {
+        "title": "Éditeur du site",
+        "items": [
+          { "label": "Raison sociale", "value": "CYNA-IT SAS" },
+          { "label": "Capital social", "value": "100 000 EUR" },
+          { "label": "Siège social", "value": "12 rue de la Cybersécurité, 75011 Paris, France" },
+          { "label": "RCS", "value": "Paris B 902 481 376" },
+          { "label": "TVA intracommunautaire", "value": "FR 32 902481376" },
+          { "label": "Directeur de la publication", "value": "M. Alexandre Vidal, Président" },
+          { "label": "Contact", "value": "contact@cyna-it.fr — 01 80 00 00 00" }
+        ]
+      },
+      {
+        "title": "Hébergeur",
+        "items": [
+          { "label": "Raison sociale", "value": "OVH SAS" },
+          { "label": "Siège social", "value": "2 rue Kellermann, 59100 Roubaix, France" },
+          { "label": "Téléphone", "value": "+33 9 72 10 10 07" },
+          { "label": "Site web", "value": "www.ovhcloud.com" }
+        ]
+      },
+      {
+        "title": "Propriété intellectuelle",
+        "paragraphs": [
+          "L'ensemble du contenu de ce site (architecture, textes, illustrations, photographies, marques, logos, charte graphique) est la propriété exclusive de CYNA-IT ou de ses ayants droit.",
+          "Toute reproduction intégrale ou partielle de ces éléments, par quelque procédé que ce soit, sans autorisation expresse de CYNA-IT, est interdite et constituerait une contrefaçon sanctionnée par les articles L.335-2 et suivants du Code de la propriété intellectuelle."
+        ]
+      },
+      {
+        "title": "Données personnelles",
+        "paragraphs": [
+          "CYNA-IT collecte et traite des données personnelles dans le respect du Règlement Général sur la Protection des Données (RGPD) et de la loi Informatique et Libertés du 6 janvier 1978 modifiée.",
+          "Les données collectées sont strictement nécessaires à la gestion de votre compte, au traitement de vos commandes et à l'amélioration de nos services. Elles sont conservées pour la durée légale applicable.",
+          "Conformément à la réglementation, vous disposez d'un droit d'accès, de rectification, d'opposition, de portabilité et de suppression sur vos données. Ces droits peuvent être exercés à l'adresse dpo@cyna-it.fr.",
+          "En cas de litige, vous avez la possibilité d'introduire une réclamation auprès de la CNIL (Commission Nationale de l'Informatique et des Libertés)."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "paragraphs": [
+          "Le site cyna-it.fr utilise des cookies strictement nécessaires à son fonctionnement (authentification, panier) ainsi que des cookies de mesure d'audience anonymisés.",
+          "Vous pouvez à tout moment ajuster vos préférences via le bandeau de gestion des cookies ou les paramètres de votre navigateur."
+        ]
+      }
+    ]
+  },
+  "about": {
+    "eyebrow": "À propos",
+    "title": "CYNA-IT, la cybersécurité plus claire pour les entreprises",
+    "copy": "Depuis 2018, CYNA-IT accompagne les directions IT et métiers dans la sélection, le déploiement et la supervision de solutions de cybersécurité adaptées à leurs enjeux réels.",
+    "missionEyebrow": "Notre mission",
+    "valuesEyebrow": "Valeurs",
+    "ctaEyebrow": "Contact",
+    "missionTitle": "Notre mission",
+    "missionParagraphs": [
+      "Rendre la cybersécurité lisible, accessible et actionnable pour toutes les entreprises françaises, des PME industrielles aux ETI à forte exposition réglementaire.",
+      "Notre conviction : un bon outil ne sert à rien sans un cadre clair. Chaque service CYNA-IT est pensé pour s'intégrer dans la réalité opérationnelle de nos clients, sans alourdir leurs équipes."
+    ],
+    "stats": [
+      { "value": "+180", "label": "Clients accompagnés" },
+      { "value": "24/7", "label": "Supervision SOC" },
+      { "value": "15 ans", "label": "D'expérience cyber cumulée" },
+      { "value": "100%", "label": "Équipe basée en France" }
+    ],
+    "valuesTitle": "Nos valeurs",
+    "values": [
+      { "title": "Clarté", "copy": "Nous expliquons ce que nous proposons. Pas de jargon inutile, pas de promesses floues : des livrables concrets et mesurables." },
+      { "title": "Indépendance", "copy": "Nous restons libres dans notre conseil. Nos recommandations sont guidées par votre contexte, pas par un éditeur partenaire." },
+      { "title": "Proximité", "copy": "Un interlocuteur dédié, des points réguliers, une équipe joignable. La relation prime sur le contrat." },
+      { "title": "Exigence", "copy": "La cybersécurité ne tolère pas l'à-peu-près. Nous appliquons à nos livrables le même niveau d'exigence que nous attendons de nos outils." }
+    ],
+    "ctaTitle": "Discutons de votre projet",
+    "ctaCopy": "Une question, un audit à planifier, un besoin urgent ? Notre équipe est joignable rapidement.",
+    "ctaPrimary": "Nous contacter",
+    "ctaSecondary": "Voir nos solutions"
+  }
+}

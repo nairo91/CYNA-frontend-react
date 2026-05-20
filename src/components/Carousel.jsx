@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check, Pause, Play } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useLocale } from '../i18n/useLocale'
 import { cn } from '../lib/utils'
 
 const AUTOPLAY_INTERVAL_MS = 6000
 
 export function Carousel() {
   const { t } = useTranslation('home')
+  const { dir } = useLocale()
   const slides = t('slides', { returnObjects: true })
   const totalSlides = slides.length
+  const translateSign = dir === 'rtl' ? '' : '-'
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
@@ -67,7 +70,7 @@ export function Carousel() {
         >
           <div
             className="flex motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out"
-            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            style={{ transform: `translateX(${translateSign}${activeIndex * 100}%)` }}
           >
             {slides.map((slide, index) => {
               const isActive = index === activeIndex
