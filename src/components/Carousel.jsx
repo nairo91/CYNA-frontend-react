@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check, Pause, Play } from 'lucide-react'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../lib/utils'
 
 const AUTOPLAY_INTERVAL_MS = 6000
 
 export function Carousel() {
-  const slides = siteText.home.slides
+  const { t } = useTranslation('home')
+  const slides = t('slides', { returnObjects: true })
   const totalSlides = slides.length
 
   const [activeIndex, setActiveIndex] = useState(0)
@@ -48,14 +49,14 @@ export function Carousel() {
   return (
     <section
       className="bg-background py-10 lg:py-14"
-      aria-label="Carrousel d'accueil CYNA"
+      aria-label={t('carousel.ariaLabel')}
     >
       <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
         <div
           ref={containerRef}
           role="region"
           aria-roledescription="carrousel"
-          aria-label="Slides d'introduction CYNA"
+          aria-label={t('carousel.regionLabel')}
           tabIndex={0}
           className="relative overflow-hidden rounded-3xl border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           onMouseEnter={() => setIsHovering(true)}
@@ -75,7 +76,10 @@ export function Carousel() {
                   key={slide.title}
                   className="w-full flex-shrink-0"
                   aria-roledescription="slide"
-                  aria-label={`${index + 1} sur ${totalSlides}`}
+                  aria-label={t('carousel.slideAriaLabel', {
+                    current: index + 1,
+                    total: totalSlides,
+                  })}
                   aria-hidden={!isActive}
                 >
                   <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-12 lg:p-12 lg:py-16">
@@ -142,7 +146,7 @@ export function Carousel() {
             <button
               type="button"
               onClick={goToPrevious}
-              aria-label="Slide précédente"
+              aria-label={t('carousel.previousSlide')}
               className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -151,7 +155,7 @@ export function Carousel() {
             <div
               className="flex items-center gap-2"
               role="tablist"
-              aria-label="Indicateurs de slide"
+              aria-label={t('carousel.indicatorsAriaLabel')}
             >
               {slides.map((slide, index) => (
                 <button
@@ -159,7 +163,7 @@ export function Carousel() {
                   type="button"
                   role="tab"
                   aria-selected={index === activeIndex}
-                  aria-label={`Aller à la slide ${index + 1}`}
+                  aria-label={t('carousel.goToSlide', { n: index + 1 })}
                   onClick={() => setActiveIndex(index)}
                   className={cn(
                     'h-2 rounded-full transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -174,7 +178,7 @@ export function Carousel() {
             <button
               type="button"
               onClick={goToNext}
-              aria-label="Slide suivante"
+              aria-label={t('carousel.nextSlide')}
               className="inline-flex h-9 w-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -183,7 +187,7 @@ export function Carousel() {
             <button
               type="button"
               onClick={() => setIsPaused((value) => !value)}
-              aria-label={isPaused ? 'Reprendre la lecture' : 'Mettre en pause'}
+              aria-label={isPaused ? t('carousel.play') : t('carousel.pause')}
               aria-pressed={isPaused}
               className="absolute end-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >

@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getOrder } from '../api/orderApi'
-import { siteText } from '../content/siteText'
-
-function formatPrice(value) {
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return '—'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
-}
 
 export function OrderConfirmationPage() {
   const { id } = useParams()
-  const text = siteText.pages.orderConfirmation
+  const { t, i18n } = useTranslation('checkout')
+  const text = t('orderConfirmation', { returnObjects: true })
+
+  const formatPrice = (value) => {
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return '—'
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
+
   const [order, setOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -86,7 +89,7 @@ export function OrderConfirmationPage() {
           {text.title}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground lg:text-base">
-          {text.copy.replace('{ref}', orderRef)}
+          {t('orderConfirmation.copy', { ref: orderRef })}
         </p>
 
         <dl className="mt-8 grid gap-3 text-start sm:grid-cols-3">

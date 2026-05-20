@@ -1,10 +1,11 @@
 import { ArrowUpRight, Compass, Layers } from 'lucide-react'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 
 const POINT_ICONS = [Compass, Layers, ArrowUpRight]
 
 export function Hero() {
-  const intro = siteText.home.intro
+  const { t } = useTranslation('home')
+  const points = t('intro.points', { returnObjects: true })
 
   return (
     <section
@@ -14,24 +15,24 @@ export function Hero() {
       <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
         <div className="max-w-3xl">
           <span className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {intro.eyebrow}
+            {t('intro.eyebrow')}
           </span>
           <h2
             id="intro-title"
             className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl"
           >
-            {intro.title}
+            {t('intro.title')}
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground lg:text-lg">
-            {intro.copy}
+            {t('intro.copy')}
           </p>
         </div>
 
         <ul
           className="mt-10 grid gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-6"
-          aria-label="Points clés CYNA"
+          aria-label={t('intro.pointsAriaLabel')}
         >
-          {intro.points.map((point, index) => {
+          {points.map((point, index) => {
             const Icon = POINT_ICONS[index] ?? Compass
             return (
               <li

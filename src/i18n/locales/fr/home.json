@@ -1,0 +1,72 @@
+{
+  "slides": [
+    {
+      "eyebrow": "SOC managé",
+      "title": "Gardez la maîtrise de votre sécurité sans alourdir vos équipes.",
+      "copy": "CYNA combine supervision, analyse et accompagnement.",
+      "cta": "Découvrir nos offres",
+      "to": "/products",
+      "visualTitle": "Un pilotage clair",
+      "visualItems": ["Surveillance 24/7", "Analystes dédiés", "Alertes prioritaires"]
+    },
+    {
+      "eyebrow": "Protection postes",
+      "title": "Détectez plus vite, contenez mieux.",
+      "copy": "Nos solutions endpoint protègent les usages réels.",
+      "cta": "Voir les catégories",
+      "to": "/categories",
+      "visualTitle": "Une réponse adaptée",
+      "visualItems": ["Détection comportementale", "Aide remédiation", "Mise en œuvre progressive"]
+    },
+    {
+      "eyebrow": "Cloud & XDR",
+      "title": "Un catalogue cyber conçu pour structurer vos priorités.",
+      "copy": "CYNA aide les directions IT à choisir.",
+      "cta": "Voir top produits",
+      "to": "/products",
+      "visualTitle": "Des parcours simples",
+      "visualItems": ["Comparaison claire", "Accompagnement", "Vision multi-besoins"]
+    }
+  ],
+  "intro": {
+    "eyebrow": "La cybersécurité, plus simple",
+    "title": "Des solutions cyber claires et actionnables.",
+    "copy": "CYNA construit une expérience plus lisible.",
+    "pointsAriaLabel": "Points clés CYNA",
+    "points": [
+      { "title": "Choisir sans se perdre", "copy": "Une présentation plus claire des offres." },
+      { "title": "Structurer vos priorités", "copy": "Des catégories lisibles." },
+      { "title": "Avancer progressivement", "copy": "Une base SPA propre." }
+    ]
+  },
+  "carousel": {
+    "ariaLabel": "Carrousel d'accueil CYNA",
+    "regionLabel": "Slides d'introduction CYNA",
+    "slideAriaLabel": "{{current}} sur {{total}}",
+    "previousSlide": "Slide précédente",
+    "nextSlide": "Slide suivante",
+    "indicatorsAriaLabel": "Indicateurs de slide",
+    "goToSlide": "Aller à la slide {{n}}",
+    "play": "Reprendre la lecture",
+    "pause": "Mettre en pause"
+  },
+  "categories": {
+    "eyebrow": "Catalogue CYNA",
+    "title": "Nos catégories",
+    "copy": "Explorez les grandes familles de solutions CYNA.",
+    "meta": "Voir toutes les catégories",
+    "error": "Les catégories sont temporairement indisponibles.",
+    "fallbackDescription": "Une catégorie CYNA pour structurer votre démarche cyber.",
+    "chip": "Voir la catégorie"
+  },
+  "products": {
+    "eyebrow": "Sélection du moment",
+    "title": "Top Produits",
+    "copy": "Une sélection courte des offres les plus visibles.",
+    "meta": "Voir tous les produits",
+    "error": "Les top produits sont temporairement indisponibles.",
+    "fallbackPrice": "Sur devis",
+    "fallbackCategory": "Sélection CYNA",
+    "status": "Mis en avant"
+  }
+}

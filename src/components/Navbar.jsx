@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { Globe, LogOut, Menu, Moon, Search, ShoppingCart, Sun, User, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import cynaLogo from '../assets/logo-icon-transparent.png'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
+import { useLocale } from '../i18n/useLocale'
 import { cn } from '../lib/utils'
 
 const LANGUAGES = [
-  { code: 'fr', label: 'Français', available: true },
-  { code: 'en', label: 'English', available: false },
+  { code: 'fr', label: 'Français' },
+  { code: 'en', label: 'English' },
 ]
 
 const DARK_THEMES = new Set(['dark', 'night', 'luxury'])
@@ -24,12 +25,13 @@ export function Navbar() {
   const navigate = useNavigate()
   const { isAuthenticated, user, logout } = useAuth()
   const { itemCount } = useCart()
+  const { t } = useTranslation('common')
+  const { locale, setLocale } = useLocale()
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [theme, setTheme] = useState(readInitialTheme)
-  const [lang, setLang] = useState('fr')
 
   const sheetRef = useRef(null)
   const triggerRef = useRef(null)
@@ -93,12 +95,13 @@ export function Navbar() {
     setTheme((current) => (DARK_THEMES.has(current) ? 'light' : 'dark'))
   }
 
-  const greetingName =
-    user?.firstname || user?.email || siteText.nav.greetingFallback
+  const greetingName = user?.firstname || user?.email || t('nav.greetingFallback')
   const isDark = DARK_THEMES.has(theme)
+  const primaryLinks = t('nav.primaryLinks', { returnObjects: true })
+  const authLinks = t('nav.authLinks', { returnObjects: true })
   const mobileLinks = isAuthenticated
-    ? siteText.nav.mobileLinksAuth
-    : siteText.nav.mobileLinksGuest
+    ? t('nav.mobileLinksAuth', { returnObjects: true })
+    : t('nav.mobileLinksGuest', { returnObjects: true })
 
   return (
     <>
@@ -108,7 +111,7 @@ export function Navbar() {
             ref={triggerRef}
             type="button"
             onClick={() => setMobileOpen(true)}
-            aria-label="Ouvrir le menu"
+            aria-label={t('nav.menuOpen')}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
             className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
@@ -119,17 +122,17 @@ export function Navbar() {
           <Link
             to="/"
             className="inline-flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={siteText.nav.brandLabel}
+            aria-label={t('nav.brandLabel')}
           >
             <img src={cynaLogo} alt="" className="h-8 w-8 object-contain" />
             <span className="text-base font-semibold tracking-tight text-foreground sm:text-lg">
-              {siteText.nav.brand}
+              {t('nav.brand')}
             </span>
           </Link>
 
-          <nav className="ms-2 hidden lg:block" aria-label="Navigation principale">
+          <nav className="ms-2 hidden lg:block" aria-label={t('nav.primaryAriaLabel')}>
             <ul className="flex items-center gap-1">
-              {siteText.nav.primaryLinks.map((link) => (
+              {primaryLinks.map((link) => (
                 <li key={link.to}>
                   <NavLink
                     to={link.to}
@@ -153,7 +156,7 @@ export function Navbar() {
           <form
             onSubmit={handleSearch}
             role="search"
-            aria-label="Recherche CYNA"
+            aria-label={t('nav.searchLandmark')}
             className="ms-auto hidden max-w-sm flex-1 lg:block"
           >
             <div className="relative">
@@ -164,8 +167,8 @@ export function Navbar() {
               <input
                 type="search"
                 name="q"
-                placeholder={siteText.nav.searchPlaceholder}
-                aria-label="Rechercher sur CYNA"
+                placeholder={t('nav.searchPlaceholder')}
+                aria-label={t('nav.searchAriaLabel')}
                 className="h-10 w-full rounded-lg border border-border bg-background ps-10 pe-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
               />
             </div>
@@ -181,10 +184,11 @@ export function Navbar() {
                 }}
                 aria-expanded={langOpen}
                 aria-haspopup="menu"
+                aria-label={t('nav.langSwitch')}
                 className="inline-flex h-10 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Globe className="h-4 w-4" aria-hidden="true" />
-                <span className="uppercase">{lang}</span>
+                <span className="uppercase">{locale}</span>
               </button>
               {langOpen ? (
                 <ul
@@ -196,27 +200,20 @@ export function Navbar() {
                       <button
                         type="button"
                         role="menuitemradio"
-                        aria-checked={lang === language.code}
-                        aria-disabled={!language.available}
-                        disabled={!language.available}
+                        aria-checked={locale === language.code}
                         onClick={() => {
-                          if (language.available) {
-                            setLang(language.code)
-                            setLangOpen(false)
-                          }
+                          setLocale(language.code)
+                          setLangOpen(false)
                         }}
                         className={cn(
-                          'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors focus:outline-none',
-                          language.available
-                            ? 'hover:bg-accent focus:bg-accent'
-                            : 'cursor-not-allowed text-muted-foreground',
-                          lang === language.code && 'font-medium text-foreground'
+                          'flex w-full items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-accent focus:bg-accent focus:outline-none',
+                          locale === language.code && 'font-medium text-foreground'
                         )}
                       >
                         <span>{language.label}</span>
-                        {!language.available ? (
-                          <span className="text-xs">bientôt</span>
-                        ) : null}
+                        <span className="text-xs uppercase text-muted-foreground">
+                          {language.code}
+                        </span>
                       </button>
                     </li>
                   ))}
@@ -227,7 +224,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={toggleTheme}
-              aria-label={isDark ? 'Passer en thème clair' : 'Passer en thème sombre'}
+              aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
               className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {isDark ? (
@@ -250,7 +247,7 @@ export function Navbar() {
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-sm font-semibold uppercase text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span aria-hidden="true">{greetingName.charAt(0)}</span>
-                  <span className="sr-only">Ouvrir le menu compte</span>
+                  <span className="sr-only">{t('nav.accountMenuOpen')}</span>
                 </button>
                 {accountOpen ? (
                   <ul
@@ -268,7 +265,7 @@ export function Navbar() {
                         className="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-accent focus:bg-accent focus:outline-none"
                       >
                         <User className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-                        {siteText.nav.accountLabel}
+                        {t('nav.accountLabel')}
                       </Link>
                     </li>
                     <li className="my-1 h-px bg-border" role="separator" />
@@ -280,7 +277,7 @@ export function Navbar() {
                         className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 focus:bg-destructive/10 focus:outline-none"
                       >
                         <LogOut className="h-4 w-4" aria-hidden="true" />
-                        {siteText.nav.logoutLabel}
+                        {t('nav.logoutLabel')}
                       </button>
                     </li>
                   </ul>
@@ -288,11 +285,11 @@ export function Navbar() {
               </div>
             ) : (
               <div className="hidden items-center gap-2 md:flex">
-                {siteText.nav.authLinks.map((link) => {
-                  const isPrimary = link.label.toLowerCase().includes('inscri')
+                {authLinks.map((link, index) => {
+                  const isPrimary = index === authLinks.length - 1
                   return (
                     <Link
-                      key={link.label}
+                      key={link.to}
                       to={link.to}
                       className={cn(
                         'inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-medium transition-all duration-150 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
@@ -310,9 +307,11 @@ export function Navbar() {
 
             <Link
               to="/panier"
-              aria-label={`${siteText.nav.cartHint}${
-                itemCount > 0 ? `, ${itemCount} article${itemCount > 1 ? 's' : ''}` : ''
-              }`}
+              aria-label={
+                itemCount > 0
+                  ? `${t('nav.cartHint')}, ${t('nav.cartArticles', { count: itemCount })}`
+                  : t('nav.cartHint')
+              }
               className="relative inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ShoppingCart className="h-5 w-5" aria-hidden="true" />
@@ -333,7 +332,7 @@ export function Navbar() {
         <>
           <button
             type="button"
-            aria-label="Fermer le menu"
+            aria-label={t('nav.menuClose')}
             tabIndex={-1}
             onClick={() => setMobileOpen(false)}
             className="animate-in fade-in-0 fixed inset-0 z-40 cursor-default bg-background/80 backdrop-blur-sm duration-200 ease-out lg:hidden"
@@ -343,32 +342,32 @@ export function Navbar() {
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
-            aria-label="Menu de navigation"
+            aria-label={t('nav.menu')}
             className="animate-in slide-in-from-right fixed inset-y-0 end-0 z-50 flex w-full max-w-sm flex-col gap-6 overflow-y-auto border-s border-border bg-card p-6 text-card-foreground shadow-xl duration-300 ease-out lg:hidden"
           >
             <div className="flex items-center justify-between">
               <Link
                 to="/"
                 className="inline-flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={siteText.nav.brandLabel}
+                aria-label={t('nav.brandLabel')}
                 onClick={() => setMobileOpen(false)}
               >
                 <img src={cynaLogo} alt="" className="h-7 w-7 object-contain" />
                 <span className="text-lg font-semibold tracking-tight">
-                  {siteText.nav.brand}
+                  {t('nav.brand')}
                 </span>
               </Link>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                aria-label="Fermer le menu"
+                aria-label={t('nav.menuClose')}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
-            <form onSubmit={handleSearch} role="search" aria-label="Recherche">
+            <form onSubmit={handleSearch} role="search" aria-label={t('nav.searchLandmarkShort')}>
               <div className="relative">
                 <Search
                   className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -377,19 +376,19 @@ export function Navbar() {
                 <input
                   type="search"
                   name="q"
-                  placeholder={siteText.nav.searchPlaceholder}
-                  aria-label="Rechercher sur CYNA"
+                  placeholder={t('nav.searchPlaceholder')}
+                  aria-label={t('nav.searchAriaLabel')}
                   className="h-11 w-full rounded-lg border border-border bg-background ps-10 pe-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
                 />
               </div>
             </form>
 
-            <nav aria-label="Navigation principale">
+            <nav aria-label={t('nav.primaryAriaLabel')}>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Menu
+                {t('nav.menu')}
               </p>
               <ul className="space-y-1">
-                {siteText.nav.primaryLinks.map((link) => (
+                {primaryLinks.map((link) => (
                   <li key={link.to}>
                     <NavLink
                       to={link.to}
@@ -410,9 +409,9 @@ export function Navbar() {
               </ul>
             </nav>
 
-            <nav aria-label="Compte">
+            <nav aria-label={t('nav.accountAriaLabel')}>
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {isAuthenticated ? 'Mon compte' : 'Mon espace'}
+                {isAuthenticated ? t('nav.accountSection') : t('nav.areaSection')}
               </p>
               <ul className="space-y-1">
                 {mobileLinks.map((link) => {
@@ -452,13 +451,13 @@ export function Navbar() {
               <div className="inline-flex items-center gap-2">
                 <Globe className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {lang}
+                  {locale}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={toggleTheme}
-                aria-label={isDark ? 'Passer en thème clair' : 'Passer en thème sombre'}
+                aria-label={isDark ? t('nav.themeToLight') : t('nav.themeToDark')}
                 className="inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {isDark ? (
@@ -466,7 +465,7 @@ export function Navbar() {
                 ) : (
                   <Moon className="h-4 w-4" aria-hidden="true" />
                 )}
-                <span>{isDark ? 'Clair' : 'Sombre'}</span>
+                <span>{isDark ? t('nav.themeLight') : t('nav.themeDark')}</span>
               </button>
             </div>
           </div>

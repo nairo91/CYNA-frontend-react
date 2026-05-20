@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 
 export function AboutPage() {
-  const page = siteText.pages.about
+  const { t } = useTranslation('legal')
+  const page = t('about', { returnObjects: true })
 
   return (
     <div className="mx-auto w-full max-w-[var(--page-max-width)] px-5 py-12 lg:px-6 lg:py-16">
@@ -20,7 +21,7 @@ export function AboutPage() {
 
       <section className="mb-8 rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm lg:mb-12 lg:p-10">
         <span className="font-mono text-xs font-medium uppercase tracking-wider text-primary">
-          Notre mission
+          {page.missionEyebrow}
         </span>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
           {page.missionTitle}
@@ -50,7 +51,7 @@ export function AboutPage() {
 
       <section className="mb-8 rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm lg:mb-12 lg:p-10">
         <span className="font-mono text-xs font-medium uppercase tracking-wider text-primary">
-          Valeurs
+          {page.valuesEyebrow}
         </span>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
           {page.valuesTitle}
@@ -75,7 +76,7 @@ export function AboutPage() {
 
       <section className="rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm lg:p-10">
         <span className="font-mono text-xs font-medium uppercase tracking-wider text-primary">
-          Contact
+          {page.ctaEyebrow}
         </span>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground lg:text-3xl">
           {page.ctaTitle}

@@ -1,0 +1,142 @@
+{
+  "notFound": {
+    "eyebrow": "Page not found",
+    "title": "This page does not exist.",
+    "copy": "Head back home to continue.",
+    "cta": "Back to home"
+  },
+  "cgu": {
+    "eyebrow": "General terms",
+    "title": "Terms of Use",
+    "copy": "These terms govern the use of the CYNA-IT platform and its services. By browsing the site, you accept the rules described below.",
+    "lastUpdate": "Last updated: May 19, 2026",
+    "tocTitle": "Contents",
+    "articles": [
+      {
+        "number": "Article 1",
+        "title": "Purpose and scope",
+        "paragraphs": [
+          "These Terms of Use (ToU) set out the conditions under which CYNA-IT makes its platform — accessible at cyna-it.fr — and its cybersecurity services available to its users.",
+          "Any use of the site implies full acceptance of these ToU. CYNA-IT reserves the right to amend them at any time to reflect platform or legal changes."
+        ]
+      },
+      {
+        "number": "Article 2",
+        "title": "Access to the site and services",
+        "paragraphs": [
+          "Access to the site is open to any user with an Internet connection. Some features require a secure client account with a valid email address and a strong password.",
+          "CYNA-IT does its best to ensure continuous service availability, but cannot be held liable for interruptions linked to maintenance, third-party attacks, or force majeure.",
+          "Users undertake to protect their credentials and to report any fraudulent use of their account to CYNA-IT support without delay."
+        ]
+      },
+      {
+        "number": "Article 3",
+        "title": "Responsibilities",
+        "paragraphs": [
+          "Users undertake to use the platform in accordance with applicable law and not to harm the security of CYNA-IT or third-party information systems.",
+          "Any attempt at intrusion, unauthorized analysis, reverse engineering or denial of service will be prosecuted in accordance with articles 323-1 et seq. of the French Penal Code.",
+          "CYNA-IT cannot be held liable for misuse of the cybersecurity solutions provided, nor for indirect damages arising from out-of-spec exploitation."
+        ]
+      },
+      {
+        "number": "Article 4",
+        "title": "Intellectual property",
+        "paragraphs": [
+          "All content on this site (texts, logos, brands, graphics, source code, illustrations) is the exclusive property of CYNA-IT or its publishing partners.",
+          "Any reproduction, representation, modification or distribution, in whole or in part, without prior written authorization, is strictly forbidden and constitutes an act of infringement punishable under articles L.335-2 et seq. of the French Intellectual Property Code."
+        ]
+      },
+      {
+        "number": "Article 5",
+        "title": "Governing law and jurisdiction",
+        "paragraphs": [
+          "These ToU are governed by French law. Any complaint may be addressed to CYNA-IT support at contact@cyna-it.fr.",
+          "Failing an amicable resolution, any dispute relating to the interpretation or execution of these ToU shall be submitted to the courts within the jurisdiction of the Paris Court of Appeal."
+        ]
+      }
+    ]
+  },
+  "legal": {
+    "eyebrow": "Legal notice",
+    "title": "Legal notice",
+    "copy": "Information about the publisher of the CYNA-IT site, in accordance with French law n°2004-575 of June 21, 2004 on trust in the digital economy.",
+    "lastUpdate": "Last updated: May 19, 2026",
+    "tocTitle": "Contents",
+    "sections": [
+      {
+        "title": "Site publisher",
+        "items": [
+          { "label": "Company name", "value": "CYNA-IT SAS" },
+          { "label": "Share capital", "value": "EUR 100,000" },
+          { "label": "Registered office", "value": "12 rue de la Cybersécurité, 75011 Paris, France" },
+          { "label": "Trade register", "value": "Paris B 902 481 376" },
+          { "label": "EU VAT", "value": "FR 32 902481376" },
+          { "label": "Publishing director", "value": "Mr Alexandre Vidal, President" },
+          { "label": "Contact", "value": "contact@cyna-it.fr — +33 1 80 00 00 00" }
+        ]
+      },
+      {
+        "title": "Host",
+        "items": [
+          { "label": "Company name", "value": "OVH SAS" },
+          { "label": "Registered office", "value": "2 rue Kellermann, 59100 Roubaix, France" },
+          { "label": "Phone", "value": "+33 9 72 10 10 07" },
+          { "label": "Website", "value": "www.ovhcloud.com" }
+        ]
+      },
+      {
+        "title": "Intellectual property",
+        "paragraphs": [
+          "All content on this site (architecture, texts, illustrations, photographs, brands, logos, graphic identity) is the exclusive property of CYNA-IT or its rights holders.",
+          "Any full or partial reproduction of these elements, by any means, without the express authorization of CYNA-IT, is forbidden and constitutes an infringement punishable under articles L.335-2 et seq. of the French Intellectual Property Code."
+        ]
+      },
+      {
+        "title": "Personal data",
+        "paragraphs": [
+          "CYNA-IT collects and processes personal data in accordance with the General Data Protection Regulation (GDPR) and the French Data Protection Act of January 6, 1978 as amended.",
+          "The data collected is strictly necessary to manage your account, process your orders and improve our services. It is kept for the applicable legal period.",
+          "In accordance with the regulations, you have a right to access, rectify, object to, port, and delete your data. These rights can be exercised at dpo@cyna-it.fr.",
+          "In the event of a dispute, you may also lodge a complaint with the CNIL (French Data Protection Authority)."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "paragraphs": [
+          "The cyna-it.fr site uses cookies strictly necessary for its operation (authentication, cart) and anonymized audience-measurement cookies.",
+          "You can adjust your preferences at any time via the cookie banner or your browser settings."
+        ]
+      }
+    ]
+  },
+  "about": {
+    "eyebrow": "About",
+    "title": "CYNA-IT, clearer cybersecurity for companies",
+    "copy": "Since 2018, CYNA-IT has helped IT and business leaders pick, deploy and monitor cybersecurity solutions tailored to their real stakes.",
+    "missionEyebrow": "Our mission",
+    "valuesEyebrow": "Values",
+    "ctaEyebrow": "Contact",
+    "missionTitle": "Our mission",
+    "missionParagraphs": [
+      "Make cybersecurity readable, accessible and actionable for every French company — from industrial SMEs to mid-caps with high regulatory exposure.",
+      "Our conviction: a good tool is worth nothing without a clear framework. Every CYNA-IT service is designed to fit our clients' operational reality without overloading their teams."
+    ],
+    "stats": [
+      { "value": "+180", "label": "Clients supported" },
+      { "value": "24/7", "label": "SOC monitoring" },
+      { "value": "15 years", "label": "Of combined cyber experience" },
+      { "value": "100%", "label": "Team based in France" }
+    ],
+    "valuesTitle": "Our values",
+    "values": [
+      { "title": "Clarity", "copy": "We explain what we offer. No jargon, no vague promises: concrete, measurable deliverables." },
+      { "title": "Independence", "copy": "We stay free in our advice. Our recommendations are driven by your context, not by a vendor partner." },
+      { "title": "Proximity", "copy": "A dedicated contact, regular check-ins, a reachable team. Relationship over contract." },
+      { "title": "Rigor", "copy": "Cybersecurity does not tolerate approximation. We hold our deliverables to the same standard we expect from our tools." }
+    ],
+    "ctaTitle": "Let's talk about your project",
+    "ctaCopy": "A question, an audit to plan, an urgent need? Our team is quick to reach.",
+    "ctaPrimary": "Contact us",
+    "ctaSecondary": "See our solutions"
+  }
+}

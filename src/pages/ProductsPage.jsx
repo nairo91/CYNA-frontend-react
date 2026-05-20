@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, ShieldOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getCategories, searchCatalog } from '../api/catalogApi'
 import { ResourceState } from '../components/ResourceState'
-import { siteText } from '../content/siteText'
 import { cn } from '../lib/utils'
 import { resolveMediaUrl } from '../utils/media'
 
@@ -26,25 +26,27 @@ const DEFAULT_DRAFT = {
   availableOnly: false,
 }
 
-function formatPrice(price) {
-  if (price === null || price === undefined || price === '') {
-    return siteText.pages.products.fallbackPrice
-  }
-  const numeric = Number(price)
-  if (Number.isNaN(numeric)) return price
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
-}
-
 function isAvailable(product) {
   return product.available !== false
 }
 
 export function ProductsPage() {
-  const page = siteText.pages.products
+  const { t, i18n } = useTranslation('catalog', { keyPrefix: 'products' })
+
+  const formatPrice = (price) => {
+    if (price === null || price === undefined || price === '') {
+      return t('fallbackPrice')
+    }
+    const numeric = Number(price)
+    if (Number.isNaN(numeric)) return price
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
+
   const [searchParams, setSearchParams] = useSearchParams()
 
   const q = searchParams.get('q') ?? ''
@@ -183,51 +185,51 @@ export function ProductsPage() {
   }
 
   const pageInfo = useMemo(
-    () => page.pageInfo.replace('{current}', currentPage).replace('{total}', totalPages),
-    [page.pageInfo, currentPage, totalPages]
+    () => t('pageInfo', { current: currentPage, total: totalPages }),
+    [t, currentPage, totalPages]
   )
 
-  const resultsCount = useMemo(() => {
-    const tpl = results.total > 1 ? page.resultsCountPlural : page.resultsCountSingular
-    return tpl.replace('{total}', String(results.total))
-  }, [results.total, page.resultsCountPlural, page.resultsCountSingular])
+  const resultsCount = useMemo(
+    () => t('resultsCount', { count: results.total }),
+    [t, results.total]
+  )
 
   return (
     <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-12 lg:px-6 lg:py-16">
       <header className="mb-10 lg:mb-12">
         <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {page.eyebrow}
+          {t('eyebrow')}
         </span>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-5xl">
-          {page.title}
+          {t('title')}
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground lg:text-lg">
-          {page.copy}
+          {t('copy')}
         </p>
       </header>
 
       <form
         onSubmit={handleSubmit}
-        aria-label={page.filtersHeading}
+        aria-label={t('filtersHeading')}
         className="mb-8 rounded-2xl border border-border bg-card p-4 lg:p-6"
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1.2fr_1.2fr_repeat(2,minmax(0,7rem))]">
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {page.searchLabel}
+              {t('searchLabel')}
             </span>
             <input
               type="search"
               value={draft.q}
               onChange={(event) => setDraft((current) => ({ ...current, q: event.target.value }))}
-              placeholder={page.searchPlaceholder}
+              placeholder={t('searchPlaceholder')}
               className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
 
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {page.categoryLabel}
+              {t('categoryLabel')}
             </span>
             <select
               value={draft.category}
@@ -236,7 +238,7 @@ export function ProductsPage() {
               }
               className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             >
-              <option value="">{page.categoryAll}</option>
+              <option value="">{t('categoryAll')}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -247,7 +249,7 @@ export function ProductsPage() {
 
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {page.sortLabel}
+              {t('sortLabel')}
             </span>
             <select
               value={draft.sortValue}
@@ -258,7 +260,7 @@ export function ProductsPage() {
             >
               {SORT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {page[opt.labelKey]}
+                  {t(opt.labelKey)}
                 </option>
               ))}
             </select>
@@ -266,7 +268,7 @@ export function ProductsPage() {
 
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {page.minPriceLabel}
+              {t('minPriceLabel')}
             </span>
             <input
               type="number"
@@ -276,14 +278,14 @@ export function ProductsPage() {
               onChange={(event) =>
                 setDraft((current) => ({ ...current, minPrice: event.target.value }))
               }
-              placeholder={page.pricePlaceholderMin}
+              placeholder={t('pricePlaceholderMin')}
               className="h-10 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
 
           <label className="grid gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {page.maxPriceLabel}
+              {t('maxPriceLabel')}
             </span>
             <input
               type="number"
@@ -293,7 +295,7 @@ export function ProductsPage() {
               onChange={(event) =>
                 setDraft((current) => ({ ...current, maxPrice: event.target.value }))
               }
-              placeholder={page.pricePlaceholderMax}
+              placeholder={t('pricePlaceholderMax')}
               className="h-10 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
@@ -312,7 +314,7 @@ export function ProductsPage() {
               }
               className="h-4 w-4 rounded border-border accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
-            {page.availableOnlyLabel}
+            {t('availableOnlyLabel')}
           </label>
 
           <div className="flex items-center gap-2">
@@ -321,13 +323,13 @@ export function ProductsPage() {
               onClick={handleReset}
               className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             >
-              {page.reset}
+              {t('reset')}
             </button>
             <button
               type="submit"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             >
-              {page.submit}
+              {t('submit')}
             </button>
           </div>
         </div>
@@ -344,14 +346,14 @@ export function ProductsPage() {
         error={error}
         skeletonCount={PAGE_SIZE}
         loadingClassName="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
-        errorMessage={page.error}
+        errorMessage={t('error')}
       >
         {results.items.length === 0 ? (
           <div
             role="status"
             className="rounded-2xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground"
           >
-            {page.empty}
+            {t('empty')}
           </div>
         ) : (
           <>
@@ -362,7 +364,7 @@ export function ProductsPage() {
                   <li key={product.id ?? product.slug}>
                     <Link
                       to={`/products/${product.id}`}
-                      aria-label={`${product.name}${available ? '' : `, ${page.unavailableLabel}`}`}
+                      aria-label={`${product.name}${available ? '' : `, ${t('unavailableLabel')}`}`}
                       className={cn(
                         'group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                         !available && 'opacity-60 hover:opacity-80'
@@ -376,12 +378,12 @@ export function ProductsPage() {
                           className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-105"
                         />
                         <span className="absolute start-3 top-3 inline-flex items-center rounded-full border border-border bg-card/90 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-                          {product.category?.name ?? page.fallbackCategory}
+                          {product.category?.name ?? t('fallbackCategory')}
                         </span>
                         {!available ? (
                           <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/15 px-2.5 py-1 text-xs font-semibold text-destructive backdrop-blur-sm">
                             <ShieldOff className="h-3 w-3" aria-hidden="true" />
-                            {page.unavailableLabel}
+                            {t('unavailableLabel')}
                           </span>
                         ) : null}
                       </figure>
@@ -397,7 +399,7 @@ export function ProductsPage() {
                             {formatPrice(product.price)}
                           </div>
                           <span className="text-xs font-medium text-muted-foreground">
-                            {page.detail}
+                            {t('detail')}
                           </span>
                         </div>
                       </div>
@@ -409,7 +411,7 @@ export function ProductsPage() {
 
             {totalPages > 1 ? (
               <nav
-                aria-label="Pagination"
+                aria-label={t('paginationAriaLabel')}
                 className="mt-10 flex flex-wrap items-center justify-center gap-3"
               >
                 <button
@@ -419,7 +421,7 @@ export function ProductsPage() {
                   className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                  {page.previous}
+                  {t('previous')}
                 </button>
                 <span className="px-2 font-mono text-sm tabular-nums text-muted-foreground">
                   {pageInfo}
@@ -430,7 +432,7 @@ export function ProductsPage() {
                   disabled={currentPage >= totalPages}
                   className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-card active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  {page.next}
+                  {t('next')}
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </button>
               </nav>

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
 import { Compass } from 'lucide-react'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 
 export function NotFoundPage() {
-  const page = siteText.pages.notFound
+  const { t } = useTranslation('legal')
+  const page = t('notFound', { returnObjects: true })
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center px-4 py-12">

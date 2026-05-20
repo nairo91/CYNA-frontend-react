@@ -10,28 +10,15 @@ import {
   ShieldOff,
   ShoppingCart,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getService, getServices } from '../api/catalogApi'
 import { ResourceState } from '../components/ResourceState'
-import { siteText } from '../content/siteText'
 import { useCart } from '../context/CartContext'
 import { cn } from '../lib/utils'
 import { resolveMediaUrl } from '../utils/media'
 
 const DURATION_OPTIONS = [1, 3, 6, 12]
 const SIMILAR_LIMIT = 6
-
-function formatPrice(price) {
-  if (price === null || price === undefined || price === '') {
-    return siteText.pages.products.fallbackPrice
-  }
-  const numeric = Number(price)
-  if (Number.isNaN(numeric)) return price
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
-}
 
 function isAvailable(product) {
   return product && product.available !== false
@@ -41,8 +28,21 @@ export function ProductDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addItem } = useCart()
-  const text = siteText.pages.productDetail
-  const productsText = siteText.pages.products
+  const { t, i18n } = useTranslation('catalog')
+
+  const formatPrice = (price) => {
+    if (price === null || price === undefined || price === '') {
+      return t('products.fallbackPrice')
+    }
+    const numeric = Number(price)
+    if (Number.isNaN(numeric)) return price
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
 
   const [product, setProduct] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -107,11 +107,11 @@ export function ProductDetailPage() {
     setFeedback(null)
     try {
       await addItem(product, { quantity, durationMonths: duration })
-      setFeedback({ kind: 'success', message: text.addedToCart })
+      setFeedback({ kind: 'success', message: t('productDetail.addedToCart') })
     } catch (err) {
       setFeedback({
         kind: 'error',
-        message: text.addError + (err?.message ? ` (${err.message})` : ''),
+        message: t('productDetail.addError') + (err?.message ? ` (${err.message})` : ''),
       })
     }
   }
@@ -124,7 +124,7 @@ export function ProductDetailPage() {
         className="mb-6 inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-        {text.back}
+        {t('productDetail.back')}
       </button>
 
       <ResourceState
@@ -132,7 +132,7 @@ export function ProductDetailPage() {
         error={error}
         skeletonCount={1}
         loadingClassName="grid grid-cols-1 gap-6 lg:grid-cols-2"
-        errorMessage={text.error}
+        errorMessage={t('productDetail.error')}
       >
         {product ? (
           <>
@@ -140,7 +140,7 @@ export function ProductDetailPage() {
               <figure className="relative overflow-hidden rounded-2xl border border-border bg-card">
                 <img
                   src={resolveMediaUrl(product.image, product.name)}
-                  alt={`Illustration de ${product.name}`}
+                  alt={t('productDetail.imageAlt', { name: product.name })}
                   loading="lazy"
                   className={cn(
                     'aspect-[4/3] w-full object-cover lg:aspect-[5/4]',
@@ -150,14 +150,14 @@ export function ProductDetailPage() {
                 {!available ? (
                   <span className="absolute start-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/15 px-3 py-1 text-xs font-semibold text-destructive backdrop-blur-sm">
                     <ShieldOff className="h-3.5 w-3.5" aria-hidden="true" />
-                    {text.unavailable}
+                    {t('productDetail.unavailable')}
                   </span>
                 ) : null}
               </figure>
 
               <div className="flex flex-col">
                 <span className="inline-flex w-fit items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  {product.category?.name ?? text.fallbackCategory}
+                  {product.category?.name ?? t('productDetail.fallbackCategory')}
                 </span>
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
                   {product.name}
@@ -173,7 +173,7 @@ export function ProductDetailPage() {
                   {available ? (
                     <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
                       <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                      Disponible
+                      {t('productDetail.available')}
                     </span>
                   ) : null}
                 </div>
@@ -185,13 +185,13 @@ export function ProductDetailPage() {
                         htmlFor="quantity"
                         className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >
-                        {text.quantityLabel}
+                        {t('productDetail.quantityLabel')}
                       </label>
                       <div className="inline-flex h-10 items-center rounded-lg border border-border bg-background">
                         <button
                           type="button"
                           onClick={() => setQuantity((current) => Math.max(1, current - 1))}
-                          aria-label="Diminuer la quantité"
+                          aria-label={t('productDetail.quantityDecrease')}
                           className="inline-flex h-full w-10 items-center justify-center rounded-s-lg text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <Minus className="h-4 w-4" aria-hidden="true" />
@@ -209,7 +209,7 @@ export function ProductDetailPage() {
                         <button
                           type="button"
                           onClick={() => setQuantity((current) => current + 1)}
-                          aria-label="Augmenter la quantité"
+                          aria-label={t('productDetail.quantityIncrease')}
                           className="inline-flex h-full w-10 items-center justify-center rounded-e-lg text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                         >
                           <Plus className="h-4 w-4" aria-hidden="true" />
@@ -222,7 +222,7 @@ export function ProductDetailPage() {
                         htmlFor="duration"
                         className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground"
                       >
-                        {text.durationLabel}
+                        {t('productDetail.durationLabel')}
                       </label>
                       <select
                         id="duration"
@@ -232,7 +232,7 @@ export function ProductDetailPage() {
                       >
                         {DURATION_OPTIONS.map((value) => (
                           <option key={value} value={value}>
-                            {value} {value === 1 ? text.month : text.months}
+                            {value} {value === 1 ? t('productDetail.month') : t('productDetail.months')}
                           </option>
                         ))}
                       </select>
@@ -248,7 +248,7 @@ export function ProductDetailPage() {
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <ShoppingCart className="h-4 w-4" aria-hidden="true" />
-                      {text.addToCart}
+                      {t('productDetail.addToCart')}
                     </button>
                   ) : (
                     <button
@@ -258,20 +258,20 @@ export function ProductDetailPage() {
                       className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-muted px-5 text-sm font-medium text-muted-foreground"
                     >
                       <ShieldOff className="h-4 w-4" aria-hidden="true" />
-                      {text.unavailable}
+                      {t('productDetail.unavailable')}
                     </button>
                   )}
                   <Link
                     to="/products"
                     className="inline-flex h-11 items-center justify-center rounded-lg border border-border bg-transparent px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
-                    {text.continue}
+                    {t('productDetail.continue')}
                   </Link>
                 </div>
 
                 {!available ? (
                   <p className="mt-4 text-sm text-muted-foreground">
-                    {text.unavailableHint}
+                    {t('productDetail.unavailableHint')}
                   </p>
                 ) : null}
 
@@ -303,16 +303,16 @@ export function ProductDetailPage() {
               <div className="mb-8 flex items-end justify-between gap-4">
                 <div>
                   <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    {product.category?.name ?? text.fallbackCategory}
+                    {product.category?.name ?? t('productDetail.fallbackCategory')}
                   </span>
                   <h2
                     id="similar-title"
                     className="mt-3 text-2xl font-semibold tracking-tight text-foreground lg:text-3xl"
                   >
-                    {text.similarTitle}
+                    {t('productDetail.similarTitle')}
                   </h2>
                   <p className="mt-2 text-sm text-muted-foreground lg:text-base">
-                    {text.similarSubtitle}
+                    {t('productDetail.similarSubtitle')}
                   </p>
                 </div>
               </div>
@@ -332,7 +332,7 @@ export function ProductDetailPage() {
                 </div>
               ) : similar.length === 0 ? (
                 <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-center text-sm text-muted-foreground">
-                  {text.similarEmpty}
+                  {t('productDetail.similarEmpty')}
                 </p>
               ) : (
                 <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
@@ -357,7 +357,7 @@ export function ProductDetailPage() {
                             {!itemAvailable ? (
                               <span className="absolute end-3 top-3 inline-flex items-center gap-1 rounded-full border border-destructive/30 bg-destructive/15 px-2.5 py-1 text-xs font-semibold text-destructive backdrop-blur-sm">
                                 <ShieldOff className="h-3 w-3" aria-hidden="true" />
-                                {productsText.unavailableLabel}
+                                {t('products.unavailableLabel')}
                               </span>
                             ) : null}
                           </figure>

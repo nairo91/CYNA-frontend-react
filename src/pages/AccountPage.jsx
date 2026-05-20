@@ -21,6 +21,7 @@ import {
   User,
   X,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { updateMyProfile } from '../api/authApi'
 import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
 import { sendTestMail } from '../api/mailApi'
@@ -31,7 +32,6 @@ import {
   getMyPaymentMethods,
 } from '../api/paymentMethodApi'
 import SecuritySettings from '../components/account/SecuritySettings'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { cn } from '../lib/utils'
 
@@ -56,20 +56,20 @@ const TABS = [
   { id: 'mail', labelKey: 'tabMail', Icon: Mail },
 ]
 
-function formatPrice(value) {
+function formatPrice(value, locale) {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return '—'
-  return new Intl.NumberFormat('fr-FR', {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2,
   }).format(numeric)
 }
 
-function formatDate(iso) {
+function formatDate(iso, locale) {
   if (!iso) return '—'
   try {
-    return new Date(iso).toLocaleDateString('fr-FR', {
+    return new Date(iso).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -77,6 +77,10 @@ function formatDate(iso) {
   } catch {
     return iso
   }
+}
+
+function resolveLocale(i18nResolved) {
+  return i18nResolved === 'en' ? 'en-GB' : 'fr-FR'
 }
 
 function LoadingSpinner() {
@@ -119,7 +123,8 @@ function Field({ label, value, onChange, type = 'text', required, className, rea
 }
 
 export function AccountPage() {
-  const text = siteText.pages.account
+  const { t } = useTranslation('account')
+  const text = t('account', { returnObjects: true })
   const navigate = useNavigate()
   const { user, logout, checkAuth } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
@@ -145,7 +150,7 @@ export function AccountPage() {
 
       <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
         <aside>
-          <nav aria-label="Sections du compte" className="lg:sticky lg:top-24">
+          <nav aria-label={text.sectionsAriaLabel} className="lg:sticky lg:top-24">
             <ul className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1.5 lg:flex-col lg:overflow-visible">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id
@@ -352,6 +357,8 @@ function ProfileTab({ user, text, onUpdated }) {
 }
 
 function OrdersTab({ text }) {
+  const { t, i18n } = useTranslation('account')
+  const locale = resolveLocale(i18n.resolvedLanguage)
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [yearFilter, setYearFilter] = useState('all')
@@ -426,7 +433,7 @@ function OrdersTab({ text }) {
         label={text.ordersEmpty}
         action={
           <Link to="/products" className={cn(PRIMARY_BTN, 'mt-6')}>
-            Découvrir nos solutions
+            {t('account.ordersDiscover')}
           </Link>
         }
       />
@@ -498,15 +505,15 @@ function OrdersTab({ text }) {
 
       {filtered.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center text-sm text-muted-foreground">
-          Aucune commande ne correspond à la recherche.
+          {t('account.ordersNoMatch')}
         </p>
       ) : (
         grouped.map(([year, list]) => (
-          <section key={year} aria-label={`Commandes ${year}`}>
+          <section key={year} aria-label={t('account.ordersYearAriaLabel', { year })}>
             <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {year}{' '}
               <span className="text-foreground/40">·</span>{' '}
-              {list.length} {list.length > 1 ? 'commandes' : 'commande'}
+              {t('account.ordersCount', { count: list.length })}
             </h3>
             <ul className="grid gap-2">
               {list.map((order) => (
@@ -517,7 +524,7 @@ function OrdersTab({ text }) {
                         {order.reference ?? `#${order.id}`}
                       </span>
                       <span className="font-mono text-xs tabular-nums text-muted-foreground">
-                        {formatDate(order.createdAt)}
+                        {formatDate(order.createdAt, locale)}
                       </span>
                     </div>
                     <span
@@ -529,7 +536,7 @@ function OrdersTab({ text }) {
                       {statusLabel(order.status)}
                     </span>
                     <span className="font-mono text-base font-semibold tabular-nums text-primary">
-                      {formatPrice(order.totalPrice)}
+                      {formatPrice(order.totalPrice, locale)}
                     </span>
                     <Link
                       to={`/checkout/confirmation/${order.id}`}
@@ -550,6 +557,7 @@ function OrdersTab({ text }) {
 }
 
 function AddressesTab({ text, user }) {
+  const { t } = useTranslation('account')
   const initialForm = () => ({
     firstname: user?.firstname ?? '',
     lastname: user?.lastname ?? '',
@@ -631,7 +639,7 @@ function AddressesTab({ text, user }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette adresse ?')) return
+    if (!window.confirm(t('account.deleteAddressConfirm'))) return
     try {
       await deleteAddress(id)
       reload()
@@ -651,7 +659,7 @@ function AddressesTab({ text, user }) {
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Gérez vos adresses de facturation et de livraison.
+              {t('account.addressesIntro')}
             </p>
             <button
               type="button"
@@ -720,7 +728,7 @@ function AddressesTab({ text, user }) {
         <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-background p-5 lg:p-6">
           <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
             <h3 className="text-base font-semibold text-foreground">
-              {editingId ? 'Modifier l\'adresse' : 'Nouvelle adresse'}
+              {editingId ? t('account.editAddressTitle') : t('account.newAddressTitle')}
             </h3>
             <button
               type="button"
@@ -766,6 +774,7 @@ function AddressesTab({ text, user }) {
 }
 
 function PaymentsTab({ text }) {
+  const { t } = useTranslation('account')
   const [methods, setMethods] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -815,7 +824,7 @@ function PaymentsTab({ text }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce moyen de paiement ?')) return
+    if (!window.confirm(t('account.deletePaymentConfirm'))) return
     try {
       await deletePaymentMethod(id)
       reload()
@@ -832,7 +841,7 @@ function PaymentsTab({ text }) {
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Gérez vos cartes bancaires enregistrées.
+              {t('account.paymentsIntro')}
             </p>
             <button type="button" onClick={() => setShowForm(true)} className={PRIMARY_BTN}>
               <Plus className="h-4 w-4" aria-hidden="true" />
@@ -879,7 +888,7 @@ function PaymentsTab({ text }) {
         >
           <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
             <h3 className="text-base font-semibold text-foreground">
-              Nouveau moyen de paiement
+              {t('account.newPaymentTitle')}
             </h3>
             <button
               type="button"
@@ -970,6 +979,7 @@ function PaymentsTab({ text }) {
 }
 
 function MailTab({ text, user }) {
+  const { t } = useTranslation('account')
   const [recipient, setRecipient] = useState('juliann.ploquin@gmail.com')
   const [isSending, setIsSending] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -982,7 +992,7 @@ function MailTab({ text, user }) {
     setIsSending(true)
     try {
       const result = await sendTestMail(recipient.trim())
-      setSuccessMessage(text.mailSuccess.replace('{email}', result.recipient ?? recipient.trim()))
+      setSuccessMessage(t('account.mailSuccess', { email: result.recipient ?? recipient.trim() }))
     } catch (err) {
       setErrorMessage(err?.message ?? text.genericError)
     } finally {

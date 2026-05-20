@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, KeyRound } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { resetPassword } from '../api/authApi'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
-import { siteText } from '../content/siteText'
 import { isStrongPassword, PASSWORD_MIN_LENGTH } from '../utils/authValidation'
 
 const INPUT_CLASSES =
@@ -13,7 +13,8 @@ const LABEL_CLASSES =
   'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 export function ResetPasswordPage() {
-  const text = siteText.pages.resetPassword
+  const { t } = useTranslation('auth')
+  const text = t('resetPassword', { returnObjects: true })
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const token = params.get('token') ?? ''
@@ -32,7 +33,7 @@ export function ResetPasswordPage() {
       return
     }
     if (!isStrongPassword(password)) {
-      setErrorMessage(text.weakPassword.replace('{n}', PASSWORD_MIN_LENGTH))
+      setErrorMessage(t('resetPassword.weakPassword', { n: PASSWORD_MIN_LENGTH }))
       return
     }
     if (password !== confirm) {
@@ -102,7 +103,7 @@ export function ResetPasswordPage() {
             />
           </div>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            {text.helper.replace('{n}', PASSWORD_MIN_LENGTH)}
+            {t('resetPassword.helper', { n: PASSWORD_MIN_LENGTH })}
           </p>
           {errorMessage ? (
             <div

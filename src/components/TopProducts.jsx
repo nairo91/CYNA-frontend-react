@@ -1,40 +1,41 @@
 /* eslint-disable react/prop-types */
 import { Link } from 'react-router-dom'
 import { ArrowRight, Sparkles } from 'lucide-react'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 import { resolveMediaUrl } from '../utils/media'
 import { ResourceState } from './ResourceState'
 import { SectionHeading } from './SectionHeading'
 
-function formatPrice(price) {
-  if (price === null || price === undefined || price === '') {
-    return siteText.home.products.fallbackPrice
-  }
-  const numeric = Number(price)
-  if (Number.isNaN(numeric)) return price
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
-}
-
 export function TopProducts({ products, isLoading, error }) {
-  const section = siteText.home.products
+  const { t, i18n } = useTranslation('home')
+
+  const formatPrice = (price) => {
+    if (price === null || price === undefined || price === '') {
+      return t('products.fallbackPrice')
+    }
+    const numeric = Number(price)
+    if (Number.isNaN(numeric)) return price
+    const locale = i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
 
   return (
     <section className="bg-card py-16 lg:py-20" id="featured">
       <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 lg:px-6">
         <SectionHeading
-          eyebrow="Sélection du moment"
-          title={section.title}
-          copy={section.copy}
+          eyebrow={t('products.eyebrow')}
+          title={t('products.title')}
+          copy={t('products.copy')}
           meta={
             <Link
               to="/products"
               className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             >
-              {section.meta}
+              {t('products.meta')}
               <ArrowRight
                 className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                 aria-hidden="true"
@@ -48,7 +49,7 @@ export function TopProducts({ products, isLoading, error }) {
           error={error}
           skeletonCount={4}
           loadingClassName="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
-          errorMessage={section.error}
+          errorMessage={t('products.error')}
         >
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {products.map((product) => (
@@ -65,7 +66,7 @@ export function TopProducts({ products, isLoading, error }) {
                       className="h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-500 group-hover:scale-105"
                     />
                     <span className="absolute start-3 top-3 inline-flex items-center rounded-full border border-border bg-background/90 px-2.5 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-                      {product.category?.name ?? section.fallbackCategory}
+                      {product.category?.name ?? t('products.fallbackCategory')}
                     </span>
                   </figure>
                   <div className="flex flex-1 flex-col p-5">
@@ -81,7 +82,7 @@ export function TopProducts({ products, isLoading, error }) {
                       </div>
                       <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
                         <Sparkles className="h-3 w-3" aria-hidden="true" />
-                        {section.status}
+                        {t('products.status')}
                       </span>
                     </div>
                   </div>

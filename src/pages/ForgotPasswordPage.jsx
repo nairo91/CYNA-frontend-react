@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, Mail } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { requestPasswordReset } from '../api/authApi'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
-import { siteText } from '../content/siteText'
 import { isValidEmail } from '../utils/authValidation'
 
 const INPUT_CLASSES =
@@ -13,7 +13,8 @@ const LABEL_CLASSES =
   'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 export function ForgotPasswordPage() {
-  const text = siteText.pages.forgotPassword
+  const { t } = useTranslation('auth')
+  const text = t('forgotPassword', { returnObjects: true })
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')

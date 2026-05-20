@@ -12,9 +12,9 @@ import {
   MapPin,
   ShoppingBag,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { createAddress, getMyAddresses } from '../api/addressApi'
 import { createCheckoutPaymentIntent } from '../api/checkoutApi'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { cn } from '../lib/utils'
@@ -25,14 +25,16 @@ const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 
 const STEPS = ['address', 'summary', 'payment', 'confirmation']
 
-function formatPrice(value) {
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return '—'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 2,
-  }).format(numeric)
+function makeFormatPrice(locale) {
+  return (value) => {
+    const numeric = Number(value)
+    if (!Number.isFinite(numeric)) return '—'
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+    }).format(numeric)
+  }
 }
 
 function Stepper({ currentStep, text }) {
@@ -47,7 +49,7 @@ function Stepper({ currentStep, text }) {
   return (
     <ol
       className="mb-10 flex items-start gap-2 overflow-x-auto"
-      aria-label="Progression du tunnel de commande"
+      aria-label={text.stepperAriaLabel}
     >
       {labels.map((stepInfo, index) => {
         const isCurrent = index === currentIdx
@@ -156,7 +158,9 @@ function StripePaymentForm({ checkoutIntent, text, onPaid }) {
 }
 
 export function CheckoutPage() {
-  const text = siteText.pages.checkout
+  const { t, i18n } = useTranslation('checkout')
+  const text = t('checkout', { returnObjects: true })
+  const formatPrice = makeFormatPrice(i18n.resolvedLanguage === 'en' ? 'en-GB' : 'fr-FR')
   const navigate = useNavigate()
   const { user } = useAuth()
   const { cartId, items, subtotal, clearCart } = useCart()

@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 
 export function PrivateAreaPage() {
-  const page = siteText.pages.privateArea
+  const { t } = useTranslation('account')
+  const page = t('privateArea', { returnObjects: true })
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 

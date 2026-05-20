@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AlertCircle, CheckCircle2, LogIn } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { API_BASE_URL } from '../api/http'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { getLoginValidationError, mapLoginApiError } from '../utils/authValidation'
 
@@ -17,7 +17,9 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, verify2fa } = useAuth()
-  const page = siteText.auth.login
+  const { t } = useTranslation('auth')
+  const page = t('login', { returnObjects: true })
+  const loginBenefits = t('loginBenefits', { returnObjects: true })
   const [formValues, setFormValues] = useState({
     email: '',
     password: '',
@@ -99,7 +101,7 @@ export function LoginPage() {
       eyebrow={page.eyebrow}
       title={page.title}
       copy={page.copy}
-      benefits={siteText.auth.loginBenefits}
+      benefits={loginBenefits}
       cardTitle={page.cardTitle}
       cardCopy={page.cardCopy}
       footerPrompt={page.switchPrompt}

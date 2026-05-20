@@ -1,0 +1,72 @@
+{
+  "slides": [
+    {
+      "eyebrow": "Managed SOC",
+      "title": "Stay in control of your security without overloading your teams.",
+      "copy": "CYNA combines monitoring, analysis and ongoing support.",
+      "cta": "Discover our offers",
+      "to": "/products",
+      "visualTitle": "Clear oversight",
+      "visualItems": ["24/7 monitoring", "Dedicated analysts", "Priority alerts"]
+    },
+    {
+      "eyebrow": "Endpoint protection",
+      "title": "Detect faster, contain better.",
+      "copy": "Our endpoint solutions protect real-world usage.",
+      "cta": "Browse categories",
+      "to": "/categories",
+      "visualTitle": "A tailored response",
+      "visualItems": ["Behavioral detection", "Remediation support", "Progressive rollout"]
+    },
+    {
+      "eyebrow": "Cloud & XDR",
+      "title": "A cyber catalog built to structure your priorities.",
+      "copy": "CYNA helps IT leaders choose with confidence.",
+      "cta": "View top products",
+      "to": "/products",
+      "visualTitle": "Simple journeys",
+      "visualItems": ["Clear comparison", "Onboarding support", "Multi-need view"]
+    }
+  ],
+  "intro": {
+    "eyebrow": "Cybersecurity, made simpler",
+    "title": "Clear, actionable cyber solutions.",
+    "copy": "CYNA builds an experience that reads at a glance.",
+    "pointsAriaLabel": "CYNA key points",
+    "points": [
+      { "title": "Choose without getting lost", "copy": "Clearer presentation of every offer." },
+      { "title": "Structure your priorities", "copy": "Readable categories." },
+      { "title": "Move forward step by step", "copy": "A clean SPA foundation." }
+    ]
+  },
+  "carousel": {
+    "ariaLabel": "CYNA welcome carousel",
+    "regionLabel": "CYNA introduction slides",
+    "slideAriaLabel": "{{current}} of {{total}}",
+    "previousSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "indicatorsAriaLabel": "Slide indicators",
+    "goToSlide": "Go to slide {{n}}",
+    "play": "Resume autoplay",
+    "pause": "Pause autoplay"
+  },
+  "categories": {
+    "eyebrow": "CYNA catalog",
+    "title": "Our categories",
+    "copy": "Explore the main families of CYNA solutions.",
+    "meta": "See all categories",
+    "error": "Categories are temporarily unavailable.",
+    "fallbackDescription": "A CYNA category to structure your cyber approach.",
+    "chip": "Open category"
+  },
+  "products": {
+    "eyebrow": "Current selection",
+    "title": "Top products",
+    "copy": "A short selection of our most prominent offers.",
+    "meta": "See all products",
+    "error": "Top products are temporarily unavailable.",
+    "fallbackPrice": "On request",
+    "fallbackCategory": "CYNA selection",
+    "status": "Featured"
+  }
+}

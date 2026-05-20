@@ -1,4 +1,4 @@
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 
 function slugify(text) {
   return text
@@ -10,7 +10,8 @@ function slugify(text) {
 }
 
 export function LegalPage() {
-  const page = siteText.pages.legal
+  const { t } = useTranslation('legal')
+  const page = t('legal', { returnObjects: true })
 
   return (
     <div className="mx-auto w-full max-w-[var(--page-max-width)] px-5 py-12 lg:px-6 lg:py-16">
@@ -31,9 +32,9 @@ export function LegalPage() {
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-12">
         <aside className="hidden lg:block">
-          <nav aria-label="Sommaire" className="sticky top-24">
+          <nav aria-label={page.tocTitle} className="sticky top-24">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Sommaire
+              {page.tocTitle}
             </p>
             <ol className="space-y-1">
               {page.sections.map((section) => (

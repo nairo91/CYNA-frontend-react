@@ -8,14 +8,15 @@ import {
   Send,
   ShieldCheck,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { resendVerificationEmail, verifyEmail } from '../api/authApi'
-import { siteText } from '../content/siteText'
 
 const INPUT_CLASSES =
   'h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
 
 export function VerifyEmailPage() {
-  const text = siteText.pages.verifyEmail
+  const { t } = useTranslation('auth')
+  const text = t('verifyEmail', { returnObjects: true })
   const [params] = useSearchParams()
   const token = params.get('token')
   const emailFromUrl = params.get('email')

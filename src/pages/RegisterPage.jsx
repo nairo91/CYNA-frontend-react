@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AlertCircle, Info, UserPlus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { API_BASE_URL } from '../api/http'
 import { AuthPageLayout } from '../components/auth/AuthPageLayout'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { getRegisterValidationError, mapRegisterApiError } from '../utils/authValidation'
 
@@ -14,7 +14,9 @@ const LABEL_CLASSES =
 
 export function RegisterPage() {
   const { register } = useAuth()
-  const page = siteText.auth.register
+  const { t } = useTranslation('auth')
+  const page = t('register', { returnObjects: true })
+  const registerBenefits = t('registerBenefits', { returnObjects: true })
   const [formValues, setFormValues] = useState({
     firstname: '',
     lastname: '',
@@ -45,7 +47,7 @@ export function RegisterPage() {
       return
     }
     if (!formValues.firstname.trim() || !formValues.lastname.trim()) {
-      setErrorMessage('Veuillez renseigner votre prénom et votre nom.')
+      setErrorMessage(t('register.bothNamesRequired'))
       return
     }
 
@@ -77,7 +79,7 @@ export function RegisterPage() {
       eyebrow={page.eyebrow}
       title={page.title}
       copy={page.copy}
-      benefits={siteText.auth.registerBenefits}
+      benefits={registerBenefits}
       cardTitle={page.cardTitle}
       cardCopy={page.cardCopy}
       footerPrompt={page.switchPrompt}
@@ -107,7 +109,7 @@ export function RegisterPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label htmlFor="register-firstname" className={LABEL_CLASSES}>
-              Prénom
+              {page.firstnameLabel}
             </label>
             <input
               id="register-firstname"
@@ -123,7 +125,7 @@ export function RegisterPage() {
           </div>
           <div>
             <label htmlFor="register-lastname" className={LABEL_CLASSES}>
-              Nom
+              {page.lastnameLabel}
             </label>
             <input
               id="register-lastname"

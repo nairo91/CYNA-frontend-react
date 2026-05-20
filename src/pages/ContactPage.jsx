@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AlertCircle, CheckCircle2, Send, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { sendContactMessage } from '../api/contactApi'
-import { siteText } from '../content/siteText'
 import { useAuth } from '../context/AuthContext'
 import { isValidEmail } from '../utils/authValidation'
 import { cn } from '../lib/utils'
@@ -13,7 +13,8 @@ const LABEL_CLASSES =
   'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 export function ContactPage() {
-  const text = siteText.pages.contact
+  const { t } = useTranslation('contact')
+  const text = t('', { returnObjects: true })
   const { user } = useAuth()
   const [form, setForm] = useState({
     name: user ? `${user.firstname ?? ''} ${user.lastname ?? ''}`.trim() : '',
@@ -95,7 +96,7 @@ export function ContactPage() {
                 <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
               </div>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-                Message envoyé
+                {text.successTitle}
               </h2>
               <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                 {text.success}
@@ -105,7 +106,7 @@ export function ContactPage() {
                 onClick={() => setStatus('idle')}
                 className="mt-4 inline-flex h-10 items-center justify-center rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
               >
-                Envoyer un autre message
+                {text.sendAnother}
               </button>
             </div>
           ) : (

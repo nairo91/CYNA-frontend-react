@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Mail, MapPin, Phone, Shield, ShieldCheck } from 'lucide-react'
-import { siteText } from '../content/siteText'
+import { useTranslation } from 'react-i18next'
 
 /* Brand icons inlined: lucide v1.x removed branded icons (LinkedIn / GitHub /
    YouTube / Twitter) for trademark reasons. Stroke paths kept faithful to the
@@ -92,12 +92,12 @@ const FOOTER_LINK_CLASSES =
   'rounded-sm text-foreground/80 transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 export function Footer() {
-  const footer = siteText.footer
+  const { t } = useTranslation('common')
   const year = new Date().getFullYear()
-  const copyright = (footer.copyright ?? '').replace('{year}', String(year))
-  const socialLinks = (footer.socialLinks ?? footer.followLinks ?? []).filter(
+  const socialLinks = t('footer.socialLinks', { returnObjects: true }).filter(
     (link) => link.href && link.href !== '#'
   )
+  const contactInfo = t('footer.contactInfo', { returnObjects: true })
 
   return (
     <footer id="footer" className="mt-auto border-t border-border bg-card text-card-foreground">
@@ -107,20 +107,20 @@ export function Footer() {
             <Link
               to="/"
               className="inline-flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-              aria-label="CYNA, retour à l'accueil"
+              aria-label={t('footer.brandHome')}
             >
               <Shield className="h-6 w-6 text-primary" aria-hidden="true" />
               <span className="text-lg font-semibold tracking-tight text-foreground">
-                {footer.title}
+                {t('footer.title')}
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              {footer.copy}
+              {t('footer.copy')}
             </p>
             {socialLinks.length > 0 ? (
               <ul
                 className="mt-6 flex flex-wrap gap-2"
-                aria-label="Nous suivre sur les réseaux sociaux"
+                aria-label={t('footer.followAriaLabel')}
               >
                 {socialLinks.map((link) => {
                   const Icon = getSocialIcon(link.label)
@@ -142,55 +142,55 @@ export function Footer() {
             ) : null}
           </div>
 
-          <nav aria-label="Solutions">
+          <nav aria-label={t('footer.solutionsTitle')}>
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Solutions
+              {t('footer.solutionsTitle')}
             </h2>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/products" className={FOOTER_LINK_CLASSES}>
-                  Tous les produits
+                  {t('footer.links.allProducts')}
                 </Link>
               </li>
               <li>
                 <Link to="/categories" className={FOOTER_LINK_CLASSES}>
-                  Catégories
+                  {t('footer.links.categories')}
                 </Link>
               </li>
             </ul>
           </nav>
 
-          <nav aria-label="Société">
+          <nav aria-label={t('footer.companyTitle')}>
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Société
+              {t('footer.companyTitle')}
             </h2>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/a-propos" className={FOOTER_LINK_CLASSES}>
-                  À propos
+                  {t('footer.links.about')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className={FOOTER_LINK_CLASSES}>
-                  Contact
+                  {t('footer.links.contact')}
                 </Link>
               </li>
             </ul>
           </nav>
 
-          <nav aria-label={footer.legalTitle}>
+          <nav aria-label={t('footer.legalTitle')}>
             <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {footer.legalTitle}
+              {t('footer.legalTitle')}
             </h2>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link to="/mentions-legales" className={FOOTER_LINK_CLASSES}>
-                  Mentions légales
+                  {t('footer.links.legalNotice')}
                 </Link>
               </li>
               <li>
                 <Link to="/cgu" className={FOOTER_LINK_CLASSES}>
-                  CGU
+                  {t('footer.links.cgu')}
                 </Link>
               </li>
             </ul>
@@ -199,43 +199,43 @@ export function Footer() {
 
         <div className="mt-12 grid gap-6 border-t border-border pt-8 sm:grid-cols-2 lg:grid-cols-3">
           <a
-            href="mailto:contact@cyna-it.fr"
+            href={`mailto:${contactInfo.email}`}
             className="group inline-flex items-center gap-3 rounded-sm text-sm text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Mail
               className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary"
               aria-hidden="true"
             />
-            <span>contact@cyna-it.fr</span>
+            <span>{contactInfo.email}</span>
           </a>
           <a
-            href="tel:+33180000000"
+            href={`tel:${contactInfo.phoneTel}`}
             className="group inline-flex items-center gap-3 rounded-sm text-sm text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Phone
               className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary"
               aria-hidden="true"
             />
-            <span className="font-mono tabular-nums">01 80 00 00 00</span>
+            <span className="font-mono tabular-nums">{contactInfo.phone}</span>
           </a>
           <div className="inline-flex items-center gap-3 text-sm text-muted-foreground">
             <MapPin className="h-4 w-4" aria-hidden="true" />
-            <span>12 rue de la Cybersécurité, 75011 Paris</span>
+            <span>{contactInfo.address}</span>
           </div>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-6">
           <span className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-primary/80" aria-hidden="true" />
-            Conforme RGPD
+            {t('footer.trust.gdpr')}
           </span>
           <span className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-primary/80" aria-hidden="true" />
-            PCI-DSS via Stripe
+            {t('footer.trust.pci')}
           </span>
           <span className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5 text-primary/80" aria-hidden="true" />
-            Hébergement OVHcloud, France
+            {t('footer.trust.hosting')}
           </span>
         </div>
       </div>
@@ -243,7 +243,7 @@ export function Footer() {
       <div className="border-t border-border bg-background/40">
         <div className="mx-auto w-full max-w-[var(--page-max-width)] px-5 py-4 lg:px-6">
           <p className="text-center text-xs text-muted-foreground sm:text-start">
-            {copyright}
+            {t('footer.copyright', { year })}
           </p>
         </div>
       </div>

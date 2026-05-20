@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "brand": "CYNA",
+    "brandLabel": "CYNA home",
+    "skipLink": "Skip to main content",
+    "menu": "Menu",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "primaryAriaLabel": "Primary navigation",
+    "searchPlaceholder": "Search a solution, service or need",
+    "searchAriaLabel": "Search CYNA",
+    "searchLandmark": "CYNA search",
+    "searchLandmarkShort": "Search",
+    "searchButton": "Search",
+    "searchHint": "Catalog search coming soon",
+    "cartLabel": "Cart",
+    "cartHint": "View your cart",
+    "cartArticles_one": "{{count}} item",
+    "cartArticles_other": "{{count}} items",
+    "langSwitch": "Change language",
+    "langSoon": "soon",
+    "themeToLight": "Switch to light theme",
+    "themeToDark": "Switch to dark theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "accountAriaLabel": "Account",
+    "accountMenuOpen": "Open account menu",
+    "accountSection": "My account",
+    "areaSection": "My area",
+    "accountLabel": "My area",
+    "accountHint": "Open your client area",
+    "logoutLabel": "Sign out",
+    "greetingFallback": "Welcome",
+    "primaryLinks": [
+      { "label": "Home", "to": "/" },
+      { "label": "Categories", "to": "/categories" },
+      { "label": "Products", "to": "/products" },
+      { "label": "Contact", "to": "/contact" }
+    ],
+    "authLinks": [
+      { "label": "Sign in", "to": "/login" },
+      { "label": "Sign up", "to": "/register" }
+    ],
+    "mobileLinksGuest": [
+      { "label": "Sign in", "to": "/login" },
+      { "label": "Sign up", "to": "/register" },
+      { "label": "Contact", "to": "/contact" },
+      { "label": "Terms of Use", "to": "/cgu" },
+      { "label": "Legal notice", "to": "/mentions-legales" },
+      { "label": "About CYNA", "to": "/a-propos" }
+    ],
+    "mobileLinksAuth": [
+      { "label": "My client area", "to": "/espace-client" },
+      { "label": "My orders", "to": "/espace-client", "state": { "tab": "orders" } },
+      { "label": "Contact", "to": "/contact" },
+      { "label": "Terms of Use", "to": "/cgu" },
+      { "label": "Legal notice", "to": "/mentions-legales" },
+      { "label": "About CYNA", "to": "/a-propos" },
+      { "label": "Sign out", "action": "logout" }
+    ]
+  },
+  "footer": {
+    "title": "CYNA",
+    "brandHome": "CYNA, back to home",
+    "copy": "CYNA helps companies pick clear, actionable cybersecurity solutions.",
+    "solutionsTitle": "Solutions",
+    "companyTitle": "Company",
+    "legalTitle": "Legal",
+    "followTitle": "Follow us",
+    "followAriaLabel": "Follow us on social media",
+    "links": {
+      "allProducts": "All products",
+      "categories": "Categories",
+      "about": "About",
+      "contact": "Contact",
+      "legalNotice": "Legal notice",
+      "cgu": "Terms of Use"
+    },
+    "trust": {
+      "gdpr": "GDPR compliant",
+      "pci": "PCI-DSS via Stripe",
+      "hosting": "Hosted on OVHcloud, France"
+    },
+    "contactInfo": {
+      "email": "contact@cyna-it.fr",
+      "phone": "+33 1 80 00 00 00",
+      "phoneTel": "+33180000000",
+      "address": "12 rue de la Cybersécurité, 75011 Paris, France"
+    },
+    "socialLinks": [
+      { "label": "LinkedIn", "href": "https://www.linkedin.com", "external": true },
+      { "label": "YouTube", "href": "https://www.youtube.com", "external": true },
+      { "label": "X", "href": "https://x.com", "external": true }
+    ],
+    "copyright": "© {{year}} CYNA-IT — All rights reserved."
+  }
+}
