@@ -1,8 +1,9 @@
 # Audit Frontend — CYNA-IT
 
-> **Date :** 18 mai 2026  
+> **Date :** 18 mai 2026 — **Mis à jour :** 20 mai 2026 (soir)  
 > **Projet :** CYNA-IT — plateforme e-commerce SaaS de cybersécurité  
-> **Analysé par :** Claude Code (assistant senior L3)
+> **Analysé par :** Claude Code (assistant senior L3)  
+> **Branche analysée :** `main`
 
 ---
 
@@ -10,34 +11,39 @@
 
 | Indicateur | Valeur |
 |---|---|
-| **Avancement frontend estimé** | **~58 %** |
+| **Avancement frontend estimé** | **~78 %** *(était 58 % au 2026-05-18)* |
 | **Framework** | React 18.3.1 |
 | **Routeur** | React Router v6.28.1 |
 | **Bundler** | Vite 5.4.1 |
-| **Design system** | CSS custom (classes utilitaires maison) — aucune librairie externe |
+| **Design system** | Tailwind CSS v4 (via plugin Vite) + embryon shadcn/ui (`button`, `dropdown-menu`, `sheet`) + lucide-react + class-variance-authority |
 | **Gestion d'état** | React Context API (AuthContext + CartContext) |
-| **i18n** | Aucune librairie — texte centralisé en FR dans `siteText.js` ; chatbot bilingue FR/EN |
+| **i18n** | **`i18next 23.16` + `react-i18next 14.1` — 4 locales (FR / EN / AR / HE) avec support RTL**, 9 namespaces JSON |
+| **Paiement** | **`@stripe/stripe-js 9.6` + `@stripe/react-stripe-js 6.4` — `PaymentElement` intégré au checkout** |
+| **2FA** | **TOTP (via `qrcode.react`) + email — composant `SecuritySettings`** |
 | **TypeScript** | ❌ Non (JSX uniquement) |
 | **Tests** | ❌ Aucun (ni unitaires, ni E2E) |
 | **App mobile** | ❌ Non commencée |
 
 ### Ce qui fonctionne bien
 
-- Authentification complète (login, register, reset mot de passe, vérification email)
-- Panier dual-mode invité (localStorage) + connecté (API) avec migration automatique
+- **Authentification complète** : login + register + reset + vérif email + Google SSO + **2FA TOTP** + **2FA email** + notifications de connexion
+- **Checkout en 4 étapes (stepper)** : Address → Summary → Payment Stripe → Confirmation
+- **Stripe Elements** : `PaymentElement` rendu avec thème dark personnalisé, `stripe.confirmPayment()` avec redirection conditionnelle
+- **i18n mature** : 4 locales (FR / EN / arabe / hébreu) + RTL via hook `useLocale()`
+- **Pages statiques** : CGU, mentions légales, à propos — toutes présentes avec i18n
+- **Espace client complet** : 6 onglets (Profile, Orders, Addresses, Payments, Security, Mail) avec CRUD adresses + méthodes paiement, historique commandes filtrable
+- Panier dual-mode invité (localStorage) + connecté (API)
 - Catalogue avec recherche, filtres et pagination
-- Intégration API propre via un client `fetch` centralisé
-- Composant `ResourceState` pour les états de chargement / erreur
-- Chatbot IA intégré avec escalade vers support humain
+- Chatbot IA intégré avec escalade
 - Routing protégé par rôle
 
 ### Ce qui manque le plus
 
-- **Backoffice admin** (0 % — aucune page admin existante)
-- **Pages statiques** CGU / Mentions légales / À propos (0 %)
-- **i18n réelle** avec support RTL (0 %)
-- **Application mobile** Android / iOS (0 %)
-- Plusieurs pages nécessitent une complétion (fiche produit, historique, compte)
+- **Backoffice admin SPA** (0 % — volontairement, EasyAdmin v5 côté backend `/admin` remplit ce rôle)
+- **Téléchargement facture PDF** (bouton + endpoint backend manquants)
+- **Tests** (Vitest/Jest non configurés, 0 fichier)
+- **App mobile** Android / iOS (0 %)
+- Quelques finitions (alerte produit indisponible dans panier, error boundary, nettoyage `siteText.js` legacy)
 
 ---
 
@@ -128,19 +134,19 @@
 ---
 
 #### Checkout `/checkout`
-**Statut : 🟡 Partiel (55 %)**
+**Statut : ✅ Fait (95 %)** *(était 55 %)*
 
 | Élément | État | Détail |
 |---|---|---|
-| Sélection adresse de facturation | ✅ Fait | Radio buttons + formulaire nouvelle adresse |
-| Création nouvelle adresse | ✅ Fait | Inline dans le checkout |
-| Affichage méthodes de paiement | ✅ Fait | Radio buttons |
-| Récapitulatif + total | ✅ Fait | Aside avec les lignes |
-| Création commande API | ✅ Fait | `createOrder()` + redirect |
-| **Tunnel en 4 étapes distinctes** | ❌ Manquant | Tout est sur une seule page — pas d'étapes (stepper) |
+| **Tunnel en 4 étapes (stepper)** | ✅ Fait | Composant `Stepper()` avec icônes + progression : Address → Summary → Payment → Confirmation |
+| Sélection adresse de facturation | ✅ Fait | Radio buttons + formulaire nouvelle adresse inline |
+| Création nouvelle adresse | ✅ Fait | Form `Field()` réutilisable avec validation |
+| Récapitulatif + total | ✅ Fait | Aside sticky avec lignes détaillées (qty × prix × durée) |
+| **Intégration Stripe Elements** | ✅ Fait | `loadStripe(VITE_STRIPE_PUBLISHABLE_KEY)`, `<Elements>` + `<PaymentElement>`, apparence dark personnalisée (cyan/rouge) |
+| **Création PaymentIntent backend** | ✅ Fait | `POST /api/checkout/payment-intent` via `checkoutApi.js`, récupère `clientSecret` |
+| **Confirmation paiement** | ✅ Fait | `stripe.confirmPayment()` avec `return_url` vers `/checkout/confirmation/:id` |
+| Paiement obligatoire avant commande | ✅ Fait | Le statut Order passe à PAID uniquement via webhook Stripe |
 | **Étape connexion / inscription / invité** | ❌ Manquant | Le redirect login est géré depuis le panier mais pas dans le tunnel |
-| **Formulaire de paiement saisi** | ❌ Manquant | Les méthodes s'affichent mais aucune intégration Stripe / autre |
-| Paiement obligatoire avant commande | ❌ Manquant | La commande passe même sans méthode de paiement |
 
 ---
 
@@ -186,33 +192,36 @@ La page existe et appelle l'API. Manque : gestion du cas "lien expiré" et renvo
 ---
 
 #### Compte utilisateur `/espace-client`
-**Statut : 🟡 Partiel (60 %)**
+**Statut : ✅ Fait (85 %)** *(était 60 %)* — `AccountPage.jsx` 1043 lignes, 6 onglets
 
 | Élément | État | Détail |
 |---|---|---|
 | Affichage infos perso | ✅ Fait | Prénom, nom, email, rôles, vérification |
-| **Modification infos perso** | ❌ Manquant | Lecture seule — pas de formulaire d'édition |
-| Carnet d'adresses — Créer | ✅ Fait | |
-| Carnet d'adresses — **Modifier** | ❌ Manquant | Seule la suppression est disponible |
+| **Modification infos perso** | ✅ Fait | Onglet Profile — édition firstname/lastname en place (email read-only) |
+| Carnet d'adresses — Créer | ✅ Fait | Onglet Addresses |
+| Carnet d'adresses — **Modifier** | ✅ Fait | Bouton edit pré-remplit le formulaire |
 | Carnet d'adresses — Supprimer | ✅ Fait | |
-| Méthodes de paiement CRUD | ✅ Fait | Création (mock) + suppression |
-| Liste des commandes | ✅ Fait | Avec lien vers détail |
-| **Gestion abonnements** (renouvellement / résiliation) | ❌ Manquant | Onglet absent |
+| Méthodes de paiement CRUD | ✅ Fait | Onglet Payments — affichage masqué `•••• XXXX`, form avec validation |
+| Liste des commandes | ✅ Fait | Onglet Orders — historique groupé par année, filtres recherche + année, statuts colorisés, bouton print |
+| **Onglet Security (2FA)** | ✅ Fait | `SecuritySettings.jsx` — TOTP setup avec QR code, 2FA email, toggle notifications login |
+| **Onglet Mail** | ✅ Fait | Test envoi mail vers endpoint backend |
+| **Gestion abonnements** (renouvellement / résiliation) | ❌ Manquant | Onglet absent — dépend de `/api/me/subscriptions` côté backend |
 | Déconnexion | ✅ Fait | |
 
 ---
 
 #### Historique commandes (dans `/espace-client`, onglet Commandes)
-**Statut : 🟡 Partiel (40 %)**
+**Statut : 🟡 Partiel (75 %)** *(était 40 %)*
 
 | Élément | État | Détail |
 |---|---|---|
 | Liste des commandes | ✅ Fait | Triées par date desc depuis l'API |
 | Lien vers le détail | ✅ Fait | |
-| **Regroupement par année** | ❌ Manquant | Liste plate |
-| **Filtres année / type** | ❌ Manquant | Aucun filtre |
-| **Barre de recherche** | ❌ Manquant | Absente |
-| **Télécharger facture PDF** | ❌ Manquant | Absent |
+| **Regroupement par année** | ✅ Fait | Groupes calculés depuis les dates |
+| **Filtres année / statut** | ✅ Fait | Select année + statut |
+| **Barre de recherche** | ✅ Fait | Filtre par référence/produit |
+| Bouton impression | ✅ Fait | Icône Printer |
+| **Télécharger facture PDF** | ❌ Manquant | Couplé à la génération PDF côté backend (absente) |
 
 ---
 
@@ -223,29 +232,21 @@ Formulaire email/sujet/message + chatbot IA intégré avec escalade vers support
 
 ---
 
-#### Backoffice admin
-**Statut : ❌ Manquant (0 %)**
+#### Backoffice admin SPA
+**Statut : ❌ Volontairement absent (0 %)**
 
-Aucune page ou composant admin n'existe dans le projet. Tout est à construire :
-
-- Tableau produits triable + sélection multiple
-- Formulaires CRUD produits (créer, modifier, supprimer)
-- Dashboard avec histogramme ventes 7 j / 5 semaines
-- Histogramme multi-couches paniers moyens par catégorie
-- Camembert ventes par catégorie
+Pas de pages admin dans le SPA React. Le backoffice est désormais assuré par **EasyAdmin v5 côté backend** (`/admin` — branche `feature/easyadmin-backoffice` mergée). 10 CRUDs complets + dashboard KPI + login dédié. Ce choix simplifie l'architecture (un seul code admin à maintenir, partage de la session Symfony).
 
 ---
 
 #### Pages statiques
-**Statut : ❌ Manquant (0 %)**
+**Statut : ✅ Fait (100 %)** *(était 0 %)*
 
-| Page | État |
-|---|---|
-| CGU | ❌ Manquante |
-| Mentions légales | ❌ Manquante |
-| À propos | ❌ Manquante |
-
-Les liens du footer et du menu burger pointent vers des ancres `#footer-legal` et `#footer-about` qui n'existent pas.
+| Page | État | Détail |
+|---|---|---|
+| `/cgu` (CGUPage) | ✅ Fait | Avec i18n (`legal.json`), table des matières, date de mise à jour |
+| `/mentions-legales` (LegalPage) | ✅ Fait | Avec i18n, slugification des titres |
+| `/a-propos` (AboutPage) | ✅ Fait | Avec i18n, missions, paragraphes |
 
 ---
 
@@ -292,16 +293,17 @@ Présente uniquement sur le catalogue `/products`. Absente sur toutes les autres
 
 | Exigence | Statut | Détail |
 |---|---|---|
-| **Mobile-first responsive** | 🟡 Partiel | CSS custom avec nav burger, mais pas de breakpoints formels ni de tests vérifiés |
-| **Design system cohérent** | 🟡 Partiel | Classes CSS maison cohérentes (`button-primary`, `panel`, `section-title`…), mais pas de design system documenté ni de tokens de design |
-| **i18n multilingue** | ❌ Manquant | Texte FR uniquement dans `siteText.js`. Chatbot a FR/EN. Pas de `i18next` ni équivalent |
-| **Support RTL** (arabe, hébreu) | ❌ Manquant | Zéro prise en charge RTL |
-| **Bouton changement de langue** | ❌ Manquant | Absent |
-| **Accessibilité clavier** | 🟡 Partiel | `aria-label` sur Navbar et recherche. Reste du site non audité |
-| **Contrastes suffisants** | 🟡 Partiel | Non vérifié formellement (pas d'audit WCAG) |
-| **États de chargement** | ✅ Fait | Composant `ResourceState` utilisé sur toutes les pages catalogue |
-| **Gestion des erreurs** | ✅ Fait | Messages d'erreur sur chaque formulaire et page |
-| **Protection XSS** | 🟡 Partiel | Pas de `dangerouslySetInnerHTML`, mais pas de librairie de sanitisation dédiée |
+| **Mobile-first responsive** | ✅ Fait | Tailwind v4 avec breakpoints standards, design 360 px first |
+| **Design system cohérent** | 🟡 Partiel | Tailwind tokens + embryon shadcn (`button`, `dropdown-menu`, `sheet`) — `DESIGN.md` documente la direction esthétique |
+| **i18n multilingue** | ✅ Fait | `i18next` + `react-i18next`, 4 locales (FR/EN/AR/HE), 9 namespaces |
+| **Support RTL** (arabe, hébreu) | ✅ Fait | Locales AR + HE présentes, hook `useLocale()` gère `dir` HTML |
+| **Bouton changement de langue** | ✅ Fait | Dans le menu (sélecteur de locale) |
+| **Accessibilité clavier** | 🟡 Partiel | `aria-label` étendus, focus rings, mais pas d'audit WCAG complet |
+| **Contrastes suffisants** | 🟡 Partiel | Tokens Tailwind cohérents, non audité formellement |
+| **États de chargement** | ✅ Fait | Composant `ResourceState` |
+| **Gestion des erreurs** | ✅ Fait | Messages sur chaque formulaire et page |
+| **Protection XSS** | 🟡 Partiel | Pas de `dangerouslySetInnerHTML`, sanitisation via React par défaut |
+| **Paiement PCI-DSS** | ✅ Fait | Stripe Elements — aucune donnée carte ne transite par notre code |
 | **Application mobile Android / iOS** | ❌ Manquant | Non commencée |
 
 ---
@@ -342,11 +344,11 @@ Présente uniquement sur le catalogue `/products`. Absente sur toutes les autres
 
 ## Plan d'action frontend recommandé
 
-Voici les tâches dans l'ordre du plus bloquant au moins urgent, avec une explication simple pour chaque point.
+> **Mise à jour 2026-05-20 (soir) :** les points 1, 2, 3, 4, 7, 8 et 13 du plan initial sont désormais réalisés (Stripe, i18n RTL, stepper 4 étapes, pages statiques, espace client complet, header refactorisé). Le reste reste pertinent.
 
 ---
 
-### 1. 🔴 Pages statiques : CGU, Mentions légales, À propos
+### 1. ✅ ~~Pages statiques : CGU, Mentions légales, À propos~~ — FAIT
 **Pourquoi en premier ?** Sans ces pages, tous les liens du menu burger et du footer sont cassés. C'est aussi une obligation légale.  
 **Comment ?** Créer 3 fichiers simples (ex. `CGUPage.jsx`, `LegalPage.jsx`, `AboutPage.jsx`) avec du texte statique, les ajouter dans le routeur, et mettre à jour les `href` dans `siteText.js`.  
 **Difficulté :** Facile — 2 à 3 heures.
@@ -360,21 +362,13 @@ Voici les tâches dans l'ordre du plus bloquant au moins urgent, avec une explic
 
 ---
 
-### 3. 🔴 Backoffice — CRUD produits
-**Pourquoi ?** Sans interface admin, impossible de gérer le catalogue sans toucher directement à la base de données. C'est bloquant pour l'utilisation réelle de la plateforme.  
-**Comment ?**  
-  1. Créer une route `/admin` protégée par rôle `ROLE_ADMIN`  
-  2. Tableau de produits avec `<table>` triable et cases à cocher  
-  3. Formulaire CRUD (créer / modifier / supprimer) en utilisant les endpoints existants de l'API  
-  4. Ajouter les fonctions API `createService()`, `updateService()`, `deleteService()` dans `catalogApi.js`  
-**Difficulté :** Difficile — 1 à 2 semaines.
+### 3. ✅ ~~Backoffice — CRUD produits~~ — COUVERT par EasyAdmin v5 backend (`/admin`)
+
+Décision d'architecture : pas de SPA admin. Le backoffice est géré côté Symfony via EasyAdmin v5. Si un besoin d'admin spécifique apparaît (ex : opérations bulk côté mobile), réévaluer.
 
 ---
 
-### 4. 🔴 Backoffice — Dashboard avec graphiques
-**Pourquoi ?** Requis par le cahier des charges pour le pilotage business.  
-**Comment ?** Installer une librairie de graphiques simple (recommandé : **Recharts** — facile à prendre en main en React). Créer un onglet ou une section Dashboard dans le backoffice avec : histogramme ventes 7 j, histogramme multi-couches paniers par catégorie, camembert répartition par catégorie. Les données viennent d'une API `/api/stats` à créer côté backend.  
-**Difficulté :** Difficile — 1 semaine.
+### 4. ✅ ~~Backoffice — Dashboard avec graphiques~~ — COUVERT par EasyAdmin (dashboard KPI + endpoints `/api/admin/dashboard/*`)
 
 ---
 
@@ -398,20 +392,14 @@ Voici les tâches dans l'ordre du plus bloquant au moins urgent, avec une explic
 
 ---
 
-### 7. 🟠 Checkout : tunnel en 4 étapes (stepper)
-**Pourquoi ?** Le cahier des charges demande explicitement 4 étapes : connexion → adresse → paiement → confirmation. Le checkout actuel est une seule page.  
-**Comment ?** Ajouter un état local `step` (1 à 4) dans `CheckoutPage.jsx` et afficher un composant par étape. Ajouter un composant visuel `Stepper` (simple liste avec `is-active`). La logique API existante reste la même, il faut juste réorganiser l'UI.  
-**Difficulté :** Moyen — 1 journée.
+### 7. ✅ ~~Checkout : tunnel en 4 étapes (stepper)~~ — FAIT (avec Stripe Elements en plus)
 
 ---
 
-### 8. 🟠 Compte utilisateur : édition profil, update adresse, gestion abonnements
-**Pourquoi ?** L'espace client est en lecture seule pour le profil — l'utilisateur ne peut pas modifier son prénom, son nom ou son mot de passe. L'adresse ne peut pas être modifiée (seulement supprimée).  
-**Comment ?**  
-  - Profil : ajouter une section "Modifier" avec formulaire + appel `PATCH /api/me`  
-  - Adresses : ajouter un bouton "Modifier" qui pré-remplit le formulaire existant + appel `updateAddress()`  
-  - Abonnements : si le backend expose `/api/subscriptions`, ajouter un onglet avec renouvellement / résiliation  
-**Difficulté :** Moyen — 1 à 2 jours.
+### 8. 🟠 Compte utilisateur : gestion abonnements
+**Pourquoi ?** L'espace client est désormais 85 % complet (édition profil + CRUD adresses + 2FA + commandes). Reste : gestion des abonnements (renouvellement / résiliation).  
+**Comment ?** Dépend du backend (`/api/me/subscriptions` n'existe pas encore). Voir backlog backend ticket 36.  
+**Difficulté :** Moyen — 1 journée *après* que le backend expose les endpoints.
 
 ---
 
@@ -448,15 +436,9 @@ Voici les tâches dans l'ordre du plus bloquant au moins urgent, avec une explic
 
 ---
 
-### 13. 🟡 i18n multilingue avec support RTL
-**Pourquoi ?** Exigence non-fonctionnelle du cahier des charges. Permet d'ajouter l'arabe et l'hébreu.  
-**Comment ?**  
-  1. Installer **i18next** + **react-i18next** (`npm install i18next react-i18next`)  
-  2. Déplacer le contenu de `siteText.js` dans des fichiers JSON par langue (`fr.json`, `en.json`, `ar.json`)  
-  3. Ajouter `dir="rtl"` sur `<html>` selon la langue active  
-  4. Ajouter un bouton de sélection de langue dans le menu  
-> **Note :** Cette tâche est transversale à toute l'application. La faire avant d'ajouter de nouvelles pages évite de devoir tout retranscrire après. C'est un investissement de 2 à 3 jours mais qui simplifie la suite.  
-**Difficulté :** Difficile — 2 à 3 jours.
+### 13. ✅ ~~i18n multilingue avec support RTL~~ — FAIT
+
+`i18next` + `react-i18next` installés, **4 locales** (FR / EN / AR / HE) en place via 9 fichiers JSON par namespace, hook `useLocale()` gère la direction `dir`. Reste à finir de migrer le contenu legacy de `src/content/siteText.js` (~1 h).
 
 ---
 
@@ -494,4 +476,29 @@ Voici les tâches dans l'ordre du plus bloquant au moins urgent, avec une explic
 
 ---
 
-*Rapport généré automatiquement par analyse statique du code source le 18 mai 2026.*
+*Rapport généré automatiquement par analyse statique du code source le 18 mai 2026, mis à jour le 20 mai 2026.*
+
+---
+
+## Changelog des implémentations
+
+### 2026-05-20 (soir) — Stripe + 2FA + i18n + pages statiques
+
+| Fichier | Action | Détail |
+|---------|--------|--------|
+| `package.json` | ✅ Modifié | Ajout `@stripe/stripe-js 9.6`, `@stripe/react-stripe-js 6.4`, `i18next 23.16`, `react-i18next 14.1`, `qrcode.react 4.2`, `lucide-react`, `class-variance-authority`, `@radix-ui/react-slot`, `daisyui`, `tailwindcss v4` (via `@tailwindcss/vite`) |
+| `src/pages/CheckoutPage.jsx` | ✅ Refondu | 604 lignes — stepper 4 étapes, `<Elements>` + `<PaymentElement>` Stripe avec thème dark, `stripe.confirmPayment()` |
+| `src/api/checkoutApi.js` | ✅ Créé | `POST /api/checkout/payment-intent` |
+| `src/pages/AccountPage.jsx` | ✅ Refondu | 1043 lignes — 6 onglets (Profile/Orders/Addresses/Payments/Security/Mail), CRUD complet, filtres commandes |
+| `src/components/account/SecuritySettings.jsx` | ✅ Créé | Setup TOTP avec `qrcode.react` + 2FA email + toggle notifications login |
+| `src/pages/CGUPage.jsx`, `LegalPage.jsx`, `AboutPage.jsx` | ✅ Créés | Pages statiques avec i18n |
+| `src/i18n/index.js` + `src/i18n/locales/{fr,en,ar,he}/*.json` | ✅ Créés | 4 locales × 9 namespaces = 36 fichiers JSON |
+| `src/components/ui/{button,dropdown-menu,sheet}.jsx` | ✅ Créés | Embryon shadcn/ui |
+| `src/components/Navbar.jsx` | ✅ Refondu | Header refactorisé (commit `4c41c35`), navigation logique RTL-compatible |
+| `src/pages/LoginPage.jsx` | ✅ Modifié | Gère `requires2fa.method` (`email` vs `totp`) et appelle `verify2fa` |
+| `vite.config.js` | ✅ Modifié | Plugin `@tailwindcss/vite` (Tailwind v4 sans `tailwind.config.js`) |
+| `src/content/siteText.js` | 🟡 Legacy | Coexiste avec i18n — à migrer complètement |
+
+### 2026-05-19 — Google SSO + 2FA frontend (cf. audit backend)
+
+Voir `CYNA-Web/AUDIT_BACK_CYNA.md` section "Changelog 2026-05-19".
