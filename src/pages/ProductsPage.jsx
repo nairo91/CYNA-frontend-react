@@ -213,8 +213,8 @@ export function ProductsPage() {
         aria-label={t('filtersHeading')}
         className="mb-8 rounded-2xl border border-border bg-card p-4 lg:p-6"
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-          <label className="grid gap-1.5">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <label className="grid min-w-0 gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('searchLabel')}
             </span>
@@ -223,11 +223,11 @@ export function ProductsPage() {
               value={draft.q}
               onChange={(event) => setDraft((current) => ({ ...current, q: event.target.value }))}
               placeholder={t('searchPlaceholder')}
-              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
 
-          <label className="grid gap-1.5">
+          <label className="grid min-w-0 gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('categoryLabel')}
             </span>
@@ -236,7 +236,7 @@ export function ProductsPage() {
               onChange={(event) =>
                 setDraft((current) => ({ ...current, category: event.target.value }))
               }
-              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             >
               <option value="">{t('categoryAll')}</option>
               {categories.map((cat) => (
@@ -247,7 +247,7 @@ export function ProductsPage() {
             </select>
           </label>
 
-          <label className="grid gap-1.5">
+          <label className="grid min-w-0 gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('sortLabel')}
             </span>
@@ -256,7 +256,7 @@ export function ProductsPage() {
               onChange={(event) =>
                 setDraft((current) => ({ ...current, sortValue: event.target.value }))
               }
-              className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             >
               {SORT_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -266,7 +266,7 @@ export function ProductsPage() {
             </select>
           </label>
 
-          <label className="grid gap-1.5">
+          <label className="grid min-w-0 gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('minPriceLabel')}
             </span>
@@ -279,11 +279,11 @@ export function ProductsPage() {
                 setDraft((current) => ({ ...current, minPrice: event.target.value }))
               }
               placeholder={t('pricePlaceholderMin')}
-              className="h-10 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full min-w-0 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
 
-          <label className="grid gap-1.5">
+          <label className="grid min-w-0 gap-1.5">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {t('maxPriceLabel')}
             </span>
@@ -296,7 +296,7 @@ export function ProductsPage() {
                 setDraft((current) => ({ ...current, maxPrice: event.target.value }))
               }
               placeholder={t('pricePlaceholderMax')}
-              className="h-10 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full min-w-0 rounded-lg border border-border bg-background px-3 font-mono text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
             />
           </label>
         </div>
