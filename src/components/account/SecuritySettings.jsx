@@ -1,105 +1,190 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import {
+  AlertCircle,
+  CheckCircle2,
+  KeyRound,
+  Mail,
+  Shield,
+  ShieldCheck,
+  ShieldOff,
+  Smartphone,
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { apiPost } from '../../api/http'
+import { cn } from '../../lib/utils'
+
+const PRIMARY_BTN =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+
+const GHOST_BTN =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+
+const DANGER_BTN =
+  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-destructive px-4 text-sm font-medium text-destructive-foreground shadow-sm transition-all duration-150 hover:bg-destructive/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+
+const CODE_INPUT =
+  'h-12 w-full max-w-[12rem] rounded-lg border border-border bg-background px-4 text-center font-mono text-xl font-semibold tracking-[0.4em] tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+
+function Feedback({ tone, children }) {
+  if (!children) return null
+  const Icon = tone === 'success' ? CheckCircle2 : AlertCircle
+  return (
+    <div
+      role={tone === 'success' ? 'status' : 'alert'}
+      className={cn(
+        'flex items-start gap-2 rounded-lg border px-3 py-2 text-sm',
+        tone === 'success'
+          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+          : 'border-destructive/30 bg-destructive/10 text-destructive'
+      )}
+    >
+      <Icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+      <span>{children}</span>
+    </div>
+  )
+}
+
+function StatusPill({ active, activeLabel, inactiveLabel }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        active
+          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+          : 'border-border bg-background text-muted-foreground'
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          'h-1.5 w-1.5 rounded-full',
+          active ? 'bg-emerald-400' : 'bg-muted-foreground/40'
+        )}
+      />
+      {active ? activeLabel : inactiveLabel}
+    </span>
+  )
+}
+
+function SectionCard({ icon: Icon, title, status, children }) {
+  return (
+    <section className="rounded-2xl border border-border bg-background p-5 lg:p-6">
+      <header className="mb-4 flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <h3 className="text-base font-semibold tracking-tight text-foreground">
+            {title}
+          </h3>
+        </div>
+        {status ? <div className="flex-shrink-0">{status}</div> : null}
+      </header>
+      <div className="space-y-4">{children}</div>
+    </section>
+  )
+}
 
 export default function SecuritySettings({ currentUser, onUserUpdate }) {
-  const [isEnabling, setIsEnabling] = useState(false)
-  const [setupData, setSetupData] = useState(null)
-  const [verificationCode, setVerificationCode] = useState('')
+  const { t } = useTranslation('account')
+  const text = t('security', { returnObjects: true })
+
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // États pour le panneau de test de la 2FA
+  const [isEnabling, setIsEnabling] = useState(false)
+  const [setupData, setSetupData] = useState(null)
+  const [verificationCode, setVerificationCode] = useState('')
+
   const [isTesting, setIsTesting] = useState(false)
   const [testCode, setTestCode] = useState('')
   const [testSuccess, setTestSuccess] = useState('')
   const [testError, setTestError] = useState('')
+
   const [emailCode, setEmailCode] = useState('')
   const [emailSetupStarted, setEmailSetupStarted] = useState(false)
   const [isEmailActionLoading, setIsEmailActionLoading] = useState(false)
 
-  const startSetup = async () => {
+  const resetGlobalFeedback = () => {
     setError('')
     setSuccess('')
+  }
+
+  const startSetup = async () => {
+    resetGlobalFeedback()
     try {
       const data = await apiPost('/api/security/2fa/setup')
       setSetupData(data)
       setIsEnabling(true)
     } catch (err) {
-      setError('Erreur lors de la configuration de la 2FA.')
+      setError(text.totpSetupError)
     }
   }
 
-  const confirmEnable = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
+  const confirmEnable = async (event) => {
+    event.preventDefault()
+    resetGlobalFeedback()
     try {
       await apiPost('/api/security/2fa/enable', { code: verificationCode })
-      setSuccess('Authentification à deux facteurs configurée et activée !')
+      setSuccess(text.totpEnabled)
       setIsEnabling(false)
       setSetupData(null)
       setVerificationCode('')
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError('Code invalide. Veuillez réessayer.')
+      setError(text.totpInvalidCode)
     }
   }
 
   const handleToggleLogin = async () => {
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     try {
       const nextState = !currentUser.totpEnabled
       await apiPost('/api/security/2fa/toggle-login', { enabled: nextState })
-      setSuccess(
-        nextState
-          ? "Double authentification activée pour vos prochaines connexions."
-          : "Double authentification désactivée pour la connexion (votre configuration est conservée).",
-      )
+      setSuccess(nextState ? text.totpToggleLoginEnabled : text.totpToggleLoginDisabled)
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError("Impossible de modifier le paramètre de connexion.")
+      setError(text.totpToggleLoginError)
     }
   }
 
-  const runTestCode = async (e) => {
-    e.preventDefault()
+  const runTestCode = async (event) => {
+    event.preventDefault()
     setTestError('')
     setTestSuccess('')
     try {
       await apiPost('/api/security/2fa/test', { code: testCode })
-      setTestSuccess("Code 2FA valide ! La synchronisation est parfaite.")
+      setTestSuccess(text.totpTestSuccess)
       setTestCode('')
     } catch (err) {
-      setTestError("Code invalide. Vérifiez l'heure de votre appareil.")
+      setTestError(text.totpTestError)
     }
   }
 
   const disable2FA = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir désactiver et réinitialiser la 2FA ?')) return
-    setError('')
-    setSuccess('')
+    if (!window.confirm(text.totpDisableConfirm)) return
+    resetGlobalFeedback()
     setIsTesting(false)
     try {
       await apiPost('/api/security/2fa/disable')
-      setSuccess('L\'authentification à deux facteurs a été désactivée et réinitialisée.')
+      setSuccess(text.totpDisabled)
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError('Erreur lors de la désactivation.')
+      setError(text.totpDisableError)
     }
   }
 
   const startEmail2FASetup = async () => {
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     setIsEmailActionLoading(true)
     try {
       await apiPost('/api/security/2fa/email/setup')
       setEmailSetupStarted(true)
-      setSuccess('Un code a 6 chiffres vient d\'etre envoye a votre adresse e-mail.')
+      setSuccess(text.emailCodeSent)
     } catch (err) {
-      setError('Impossible d\'envoyer le code de securite par e-mail.')
+      setError(text.emailSendError)
     } finally {
       setIsEmailActionLoading(false)
     }
@@ -107,260 +192,313 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
 
   const enableEmail2FA = async (event) => {
     event.preventDefault()
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     setIsEmailActionLoading(true)
     try {
       await apiPost('/api/security/2fa/email/enable', { code: emailCode })
-      setSuccess('Double authentification par e-mail activee.')
+      setSuccess(text.emailEnabled)
       setEmailCode('')
       setEmailSetupStarted(false)
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError('Code e-mail invalide ou expire.')
+      setError(text.emailEnableError)
     } finally {
       setIsEmailActionLoading(false)
     }
   }
 
   const disableEmail2FA = async () => {
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     setIsEmailActionLoading(true)
     try {
       await apiPost('/api/security/2fa/email/disable')
-      setSuccess('Double authentification par e-mail desactivee.')
+      setSuccess(text.emailDisabled)
       setEmailCode('')
       setEmailSetupStarted(false)
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError('Impossible de desactiver la double authentification par e-mail.')
+      setError(text.emailDisableError)
     } finally {
       setIsEmailActionLoading(false)
     }
   }
 
   const toggleLoginNotifications = async () => {
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     try {
       const nextState = !currentUser.loginNotificationEnabled
       await apiPost('/api/security/2fa/login-notifications/toggle', { enabled: nextState })
-      setSuccess(nextState ? 'Notifications de connexion activees.' : 'Notifications de connexion desactivees.')
+      setSuccess(nextState ? text.loginAlertsEnabled : text.loginAlertsDisabled)
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError('Impossible de modifier les notifications de connexion.')
+      setError(text.loginAlertsToggleError)
     }
   }
 
   const sendLoginNotificationTest = async () => {
-    setError('')
-    setSuccess('')
+    resetGlobalFeedback()
     try {
       await apiPost('/api/security/2fa/login-notifications/test')
-      setSuccess('E-mail de test de notification de connexion envoye.')
+      setSuccess(text.loginAlertsTestSent)
     } catch (err) {
-      setError('Impossible d\'envoyer le test de notification.')
+      setError(text.loginAlertsTestError)
     }
   }
 
   return (
-    <div className="security-settings">
-      <h3>Sécurité & Double Authentification (A2F)</h3>
-      <p>Renforcez la sécurité de votre compte CYNA-IT en activant l'authentification à deux facteurs.</p>
+    <div className="grid gap-6">
+      <p className="text-sm leading-relaxed text-muted-foreground">{text.intro}</p>
 
-      {error && <div className="auth-feedback auth-feedback-error">{error}</div>}
-      {success && <div className="auth-feedback auth-feedback-success">{success}</div>}
+      <Feedback tone="error">{error}</Feedback>
+      <Feedback tone="success">{success}</Feedback>
 
-      <div className="security-card">
-        <h4>Code de connexion par e-mail</h4>
-        <p style={{ marginBottom: '1rem' }}>
-          Recevez un code aleatoire a 6 chiffres par e-mail apres validation du mot de passe.
+      <SectionCard
+        icon={Mail}
+        title={text.emailTitle}
+        status={
+          <StatusPill
+            active={Boolean(currentUser.emailTwoFactorEnabled)}
+            activeLabel={text.statusEnabled}
+            inactiveLabel={text.statusDisabled}
+          />
+        }
+      >
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {text.emailDescription}
         </p>
 
-        <div className="security-status">
-          <strong>Statut e-mail : </strong>
-          {currentUser.emailTwoFactorEnabled ? (
-            <span className="text-success">Active</span>
-          ) : (
-            <span className="text-danger">Desactive</span>
-          )}
-        </div>
-
         {!currentUser.emailTwoFactorEnabled ? (
-          <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-            <button className="button-primary" type="button" onClick={startEmail2FASetup} disabled={isEmailActionLoading}>
-              Envoyer un code de validation
-            </button>
+          <div className="grid gap-3">
+            <div>
+              <button
+                type="button"
+                onClick={startEmail2FASetup}
+                disabled={isEmailActionLoading}
+                className={PRIMARY_BTN}
+              >
+                <Mail className="h-4 w-4" aria-hidden="true" />
+                {text.emailSendCode}
+              </button>
+            </div>
 
-            {emailSetupStarted && (
-              <form onSubmit={enableEmail2FA} style={{ display: 'grid', gap: '0.8rem' }}>
+            {emailSetupStarted ? (
+              <form onSubmit={enableEmail2FA} className="grid gap-3">
+                <label htmlFor="email-2fa-code" className="sr-only">
+                  {text.codeInputLabel}
+                </label>
                 <input
+                  id="email-2fa-code"
                   type="text"
                   inputMode="numeric"
+                  autoComplete="one-time-code"
                   maxLength="6"
-                  placeholder="000000"
+                  placeholder={text.emailCodePlaceholder}
                   value={emailCode}
-                  onChange={(e) => setEmailCode(e.target.value.replace(/\D/g, ''))}
-                  className="verification-input"
+                  onChange={(event) => setEmailCode(event.target.value.replace(/\D/g, ''))}
                   required
+                  className={CODE_INPUT}
                 />
-                <button type="submit" className="button-primary" disabled={isEmailActionLoading}>
-                  Activer la 2FA e-mail
-                </button>
+                <div>
+                  <button type="submit" disabled={isEmailActionLoading} className={PRIMARY_BTN}>
+                    <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                    {text.emailEnable}
+                  </button>
+                </div>
               </form>
-            )}
+            ) : null}
           </div>
         ) : (
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="button-danger" type="button" onClick={disableEmail2FA} disabled={isEmailActionLoading}>
-              Desactiver la 2FA e-mail
+          <div>
+            <button
+              type="button"
+              onClick={disableEmail2FA}
+              disabled={isEmailActionLoading}
+              className={DANGER_BTN}
+            >
+              <ShieldOff className="h-4 w-4" aria-hidden="true" />
+              {text.emailDisable}
             </button>
           </div>
         )}
-      </div>
+      </SectionCard>
 
-      <div className="security-card">
-        <h4>Alertes de connexion</h4>
-        <p style={{ marginBottom: '1rem' }}>
-          Recevez un e-mail apres chaque connexion avec l'adresse IP, le systeme, le navigateur et l'heure de connexion.
+      <SectionCard icon={Shield} title={text.loginAlertsTitle}>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          {text.loginAlertsDescription}
         </p>
 
-        <label className="security-checkbox">
+        <label className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
           <input
             type="checkbox"
             checked={Boolean(currentUser.loginNotificationEnabled)}
             onChange={toggleLoginNotifications}
+            className="mt-0.5 h-4 w-4 cursor-pointer rounded border-border bg-background text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <span>Envoyer un e-mail de securite apres chaque connexion</span>
+          <span className="leading-snug">{text.loginAlertsToggleLabel}</span>
         </label>
 
-        <div className="actions" style={{ marginTop: '1rem' }}>
-          <button className="button-secondary" type="button" onClick={sendLoginNotificationTest}>
-            Envoyer un e-mail de test
+        <div>
+          <button type="button" onClick={sendLoginNotificationTest} className={GHOST_BTN}>
+            <Mail className="h-4 w-4" aria-hidden="true" />
+            {text.loginAlertsTest}
           </button>
         </div>
-      </div>
+      </SectionCard>
 
-      <div className="security-card">
-        <h4>Application d'authentification</h4>
-        <div className="security-status">
-          <strong>Configuration : </strong>
-          {currentUser.isTotpConfigured ? (
-            <span className="text-success">Configurée</span>
-          ) : (
-            <span className="text-danger">Non configurée</span>
-          )}
-        </div>
-
-        {/* 1. CAS: A2F NON CONFIGURÉE */}
-        {!currentUser.isTotpConfigured && !isEnabling && (
-          <div>
-            <p style={{ marginBottom: '1.25rem' }}>
-              L'authentification à deux facteurs n'est pas encore configurée sur votre compte. Activez-la pour générer des codes de validation à 6 chiffres via des applications telles que Google Authenticator, Authy ou Microsoft Authenticator.
+      <SectionCard
+        icon={Smartphone}
+        title={text.totpTitle}
+        status={
+          <StatusPill
+            active={Boolean(currentUser.isTotpConfigured)}
+            activeLabel={text.statusConfigured}
+            inactiveLabel={text.statusNotConfigured}
+          />
+        }
+      >
+        {!currentUser.isTotpConfigured && !isEnabling ? (
+          <div className="grid gap-4">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {text.totpNotConfiguredCopy}
             </p>
-            <button className="button-primary" onClick={startSetup}>
-              Configurer la 2FA
-            </button>
+            <div>
+              <button type="button" onClick={startSetup} className={PRIMARY_BTN}>
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                {text.totpSetupCta}
+              </button>
+            </div>
           </div>
-        )}
+        ) : null}
 
-        {/* 2. CAS: EN COURS DE CONFIGURATION */}
-        {isEnabling && setupData && (
-          <div className="setup-container">
-            <h4>Étape de configuration</h4>
-            <p>1. Scannez ce QR Code avec votre application d'authentification :</p>
-            <div className="qr-code-wrapper">
+        {isEnabling && setupData ? (
+          <div className="grid gap-4 rounded-xl border border-border bg-card p-4 lg:p-5">
+            <h4 className="text-sm font-semibold tracking-tight text-foreground">
+              {text.totpSetupHeading}
+            </h4>
+            <p className="text-sm text-muted-foreground">{text.totpScanInstruction}</p>
+            <div className="flex justify-center rounded-lg border border-border bg-white p-4">
               <QRCodeSVG value={setupData.qrCodeContent} size={200} />
             </div>
-            <p style={{ marginTop: '0.5rem', marginBottom: '1.2rem' }}>
-              Ou saisissez manuellement la clé secrète : <code>{setupData.secret}</code>
+            <p className="text-sm text-muted-foreground">
+              {text.totpManualInstruction}{' '}
+              <code className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-xs text-foreground">
+                {setupData.secret}
+              </code>
             </p>
 
-            <form onSubmit={confirmEnable} style={{ display: 'grid', gap: '0.8rem' }}>
-              <p>2. Saisissez le code à 6 chiffres généré par votre application pour confirmer l'activation :</p>
+            <form onSubmit={confirmEnable} className="grid gap-3">
+              <label htmlFor="totp-setup-code" className="text-sm text-muted-foreground">
+                {text.totpConfirmInstruction}
+              </label>
               <input
+                id="totp-setup-code"
                 type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
                 maxLength="6"
                 placeholder="000000"
                 value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
-                className="verification-input"
+                onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
                 required
+                className={CODE_INPUT}
               />
-              <div className="actions">
-                <button type="submit" className="button-primary">Confirmer et Activer</button>
-                <button type="button" className="button-secondary" onClick={() => setIsEnabling(false)}>Annuler</button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button type="submit" className={PRIMARY_BTN}>
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                  {text.totpConfirm}
+                </button>
+                <button
+                  type="button"
+                  className={GHOST_BTN}
+                  onClick={() => {
+                    setIsEnabling(false)
+                    setSetupData(null)
+                    setVerificationCode('')
+                  }}
+                >
+                  {text.cancel}
+                </button>
               </div>
             </form>
           </div>
-        )}
+        ) : null}
 
-        {/* 3. CAS: A2F CONFIGURÉE */}
-        {currentUser.isTotpConfigured && (
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            <p>
-              L'authentification à deux facteurs est configurée sur votre compte. Vous pouvez tester sa synchronisation ou choisir de l'exiger lors de vos connexions.
+        {currentUser.isTotpConfigured ? (
+          <div className="grid gap-4">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {text.totpConfiguredCopy}
             </p>
 
-            {/* Checkbox Activer lors de la connexion */}
-            <label className="security-checkbox">
+            <label className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
               <input
                 type="checkbox"
-                checked={currentUser.totpEnabled}
+                checked={Boolean(currentUser.totpEnabled)}
                 onChange={handleToggleLogin}
+                className="mt-0.5 h-4 w-4 cursor-pointer rounded border-border bg-background text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
-              <span>Exiger le code de sécurité 2FA à la connexion</span>
+              <span className="leading-snug">{text.totpToggleLoginLabel}</span>
             </label>
 
-            {/* Actions principales */}
-            <div className="actions">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                className="button-primary"
                 onClick={() => {
-                  setIsTesting(!isTesting)
+                  setIsTesting((current) => !current)
                   setTestError('')
                   setTestSuccess('')
                   setTestCode('')
                 }}
+                className={GHOST_BTN}
+                aria-expanded={isTesting}
               >
-                {isTesting ? 'Masquer le panneau de test' : 'Tester le code A2F'}
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                {isTesting ? text.totpTestHide : text.totpTestShow}
               </button>
 
-              <button type="button" className="button-danger" onClick={disable2FA}>
-                Désactiver & Réinitialiser la 2FA
+              <button type="button" onClick={disable2FA} className={DANGER_BTN}>
+                <ShieldOff className="h-4 w-4" aria-hidden="true" />
+                {text.totpDisable}
               </button>
             </div>
 
-            {/* Panneau de test */}
-            {isTesting && (
-              <div className="test-container">
-                <h4>Vérification de synchronisation</h4>
-                <p>Saisissez le code temporaire généré par votre application d'authentification pour vous assurer qu'il est correct :</p>
-                
-                {testError && <div className="auth-feedback auth-feedback-error">{testError}</div>}
-                {testSuccess && <div className="auth-feedback auth-feedback-success">{testSuccess}</div>}
+            {isTesting ? (
+              <div className="grid gap-3 rounded-xl border border-border bg-card p-4 lg:p-5">
+                <h4 className="text-sm font-semibold tracking-tight text-foreground">
+                  {text.totpTestHeading}
+                </h4>
+                <p className="text-sm text-muted-foreground">{text.totpTestInstruction}</p>
 
-                <form onSubmit={runTestCode} style={{ display: 'grid', gap: '0.8rem', marginTop: '0.5rem' }}>
+                <Feedback tone="error">{testError}</Feedback>
+                <Feedback tone="success">{testSuccess}</Feedback>
+
+                <form onSubmit={runTestCode} className="grid gap-3">
+                  <label htmlFor="totp-test-code" className="sr-only">
+                    {text.codeInputLabel}
+                  </label>
                   <input
+                    id="totp-test-code"
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength="6"
                     placeholder="000000"
                     value={testCode}
-                    onChange={(e) => setTestCode(e.target.value.replace(/\D/g, ''))}
-                    className="verification-input"
+                    onChange={(event) => setTestCode(event.target.value.replace(/\D/g, ''))}
                     required
+                    className={CODE_INPUT}
                   />
-                  <div className="actions">
-                    <button type="submit" className="button-primary">Vérifier le code</button>
+                  <div>
+                    <button type="submit" className={PRIMARY_BTN}>
+                      <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                      {text.totpTestSubmit}
+                    </button>
                   </div>
                 </form>
               </div>
-            )}
+            ) : null}
           </div>
-        )}
-      </div>
+        ) : null}
+      </SectionCard>
     </div>
   )
 }
