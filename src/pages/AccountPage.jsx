@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   CreditCard,
   Eye,
+  FileDown,
   Loader2,
   LogOut,
   Mail,
@@ -25,7 +26,8 @@ import { useTranslation } from 'react-i18next'
 import { updateMyProfile } from '../api/authApi'
 import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
 import { sendTestMail } from '../api/mailApi'
-import { getMyOrders } from '../api/orderApi'
+import { getMyOrders, getOrder } from '../api/orderApi'
+import { downloadInvoicePdf } from '../lib/invoicePdf'
 import {
   createPaymentMethod,
   deletePaymentMethod,
@@ -359,11 +361,30 @@ function ProfileTab({ user, text, onUpdated }) {
 
 function OrdersTab({ text }) {
   const { t, i18n } = useTranslation('account')
+  const { t: tCheckout } = useTranslation('checkout')
   const locale = resolveLocale(i18n.resolvedLanguage)
   const [orders, setOrders] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [yearFilter, setYearFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [pdfOrderId, setPdfOrderId] = useState(null)
+  const [pdfError, setPdfError] = useState('')
+
+  const handleDownloadInvoice = async (orderId) => {
+    setPdfError('')
+    setPdfOrderId(orderId)
+    try {
+      const fullOrder = await getOrder(orderId)
+      await downloadInvoicePdf(fullOrder, {
+        language: i18n.resolvedLanguage,
+        strings: tCheckout('invoice', { returnObjects: true }),
+      })
+    } catch (err) {
+      setPdfError(t('account.ordersDownloadInvoiceError'))
+    } finally {
+      setPdfOrderId(null)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -539,13 +560,28 @@ function OrdersTab({ text }) {
                     <span className="font-mono text-base font-semibold tabular-nums text-primary">
                       {formatPrice(order.totalPrice, locale)}
                     </span>
-                    <Link
-                      to={`/checkout/confirmation/${order.id}`}
-                      aria-label={`${text.view} ${order.reference ?? `#${order.id}`}`}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <Eye className="h-4 w-4" aria-hidden="true" />
-                    </Link>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadInvoice(order.id)}
+                        disabled={pdfOrderId === order.id}
+                        aria-label={`${t('account.ordersDownloadInvoice')} ${order.reference ?? `#${order.id}`}`}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {pdfOrderId === order.id ? (
+                          <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
+                        ) : (
+                          <FileDown className="h-4 w-4" aria-hidden="true" />
+                        )}
+                      </button>
+                      <Link
+                        to={`/checkout/confirmation/${order.id}`}
+                        aria-label={`${text.view} ${order.reference ?? `#${order.id}`}`}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <Eye className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </div>
                   </article>
                 </li>
               ))}
@@ -553,6 +589,16 @@ function OrdersTab({ text }) {
           </section>
         ))
       )}
+
+      {pdfError ? (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+          <span>{pdfError}</span>
+        </div>
+      ) : null}
     </div>
   )
 }

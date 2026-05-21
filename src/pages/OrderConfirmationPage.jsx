@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, FileDown, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getOrder } from '../api/orderApi'
+import { downloadInvoicePdf } from '../lib/invoicePdf'
 
 export function OrderConfirmationPage() {
   const { id } = useParams()
@@ -23,6 +24,24 @@ export function OrderConfirmationPage() {
   const [order, setOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+  const [pdfError, setPdfError] = useState('')
+
+  const handleDownloadInvoice = async () => {
+    if (!order) return
+    setPdfError('')
+    setIsGeneratingPdf(true)
+    try {
+      await downloadInvoicePdf(order, {
+        language: i18n.resolvedLanguage,
+        strings: t('invoice', { returnObjects: true }),
+      })
+    } catch (err) {
+      setPdfError(text.downloadInvoiceError)
+    } finally {
+      setIsGeneratingPdf(false)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -118,9 +137,22 @@ export function OrderConfirmationPage() {
         </dl>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={handleDownloadInvoice}
+            disabled={isGeneratingPdf}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+          >
+            {isGeneratingPdf ? (
+              <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
+            ) : (
+              <FileDown className="h-4 w-4" aria-hidden="true" />
+            )}
+            {text.downloadInvoice}
+          </button>
           <Link
             to="/espace-client"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-transparent px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
           >
             {text.backToAccount}
           </Link>
@@ -131,6 +163,15 @@ export function OrderConfirmationPage() {
             {text.continue}
           </Link>
         </div>
+        {pdfError ? (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          >
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <span>{pdfError}</span>
+          </div>
+        ) : null}
       </div>
     </div>
   )
