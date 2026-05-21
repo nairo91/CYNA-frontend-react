@@ -93,5 +93,15 @@
       { "label": "X", "href": "https://x.com", "external": true }
     ],
     "copyright": "© {{year}} CYNA-IT — Tous droits réservés."
+  },
+  "addressAutocomplete": {
+    "placeholder": "Commencez à taper votre adresse…",
+    "hint": "Suggestions fournies par la Base Adresse Nationale (data.gouv.fr).",
+    "noResults": "Aucune adresse trouvée.",
+    "minChars": "Saisissez au moins 3 caractères pour rechercher.",
+    "loading": "Recherche en cours…",
+    "error": "Impossible de joindre le service d'adresses. Saisissez l'adresse manuellement.",
+    "listAriaLabel": "Suggestions d'adresses",
+    "clear": "Effacer"
   }
 }

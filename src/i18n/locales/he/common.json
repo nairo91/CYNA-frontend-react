@@ -93,5 +93,15 @@
       { "label": "X", "href": "https://x.com", "external": true }
     ],
     "copyright": "© {{year}} CYNA-IT — כל הזכויות שמורות."
+  },
+  "addressAutocomplete": {
+    "placeholder": "התחילו להקליד את הכתובת…",
+    "hint": "ההצעות מסופקות על ידי בסיס הכתובות הלאומי הצרפתי (data.gouv.fr).",
+    "noResults": "לא נמצאה כתובת.",
+    "minChars": "הקלידו לפחות 3 תווים כדי לחפש.",
+    "loading": "מחפש…",
+    "error": "שירות הכתובות אינו זמין. אנא הזינו את הכתובת ידנית.",
+    "listAriaLabel": "הצעות כתובות",
+    "clear": "נקה"
   }
 }

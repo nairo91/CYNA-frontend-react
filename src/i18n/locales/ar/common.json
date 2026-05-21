@@ -93,5 +93,15 @@
       { "label": "X", "href": "https://x.com", "external": true }
     ],
     "copyright": "© {{year}} CYNA-IT — جميع الحقوق محفوظة."
+  },
+  "addressAutocomplete": {
+    "placeholder": "ابدأ بكتابة عنوانك…",
+    "hint": "الاقتراحات مقدمة من قاعدة العناوين الوطنية الفرنسية (data.gouv.fr).",
+    "noResults": "لم يتم العثور على عنوان.",
+    "minChars": "اكتب 3 أحرف على الأقل للبحث.",
+    "loading": "جاري البحث…",
+    "error": "تعذّر الوصول إلى خدمة العناوين. الرجاء إدخال العنوان يدويًا.",
+    "listAriaLabel": "اقتراحات العناوين",
+    "clear": "مسح"
   }
 }

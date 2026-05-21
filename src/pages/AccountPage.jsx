@@ -33,6 +33,7 @@ import {
   deletePaymentMethod,
   getMyPaymentMethods,
 } from '../api/paymentMethodApi'
+import { AddressAutocomplete } from '../components/AddressAutocomplete'
 import SecuritySettings from '../components/account/SecuritySettings'
 import { useAuth } from '../context/AuthContext'
 import { cn } from '../lib/utils'
@@ -788,7 +789,25 @@ function AddressesTab({ text, user }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={text.firstname} value={form.firstname} onChange={updField('firstname')} required />
             <Field label={text.lastname} value={form.lastname} onChange={updField('lastname')} required />
-            <Field className="sm:col-span-2" label={text.fieldLine1} value={form.adresse1} onChange={updField('adresse1')} required />
+            <AddressAutocomplete
+              className="sm:col-span-2"
+              label={text.fieldLine1}
+              value={form.adresse1}
+              onChange={(line1) =>
+                setForm((current) => ({ ...current, adresse1: line1 }))
+              }
+              onSelect={(fields) =>
+                setForm((current) => ({
+                  ...current,
+                  adresse1: fields.line1,
+                  zipCode: fields.postalCode || current.zipCode,
+                  city: fields.city || current.city,
+                  region: fields.region || current.region,
+                  country: fields.country || current.country,
+                }))
+              }
+              required
+            />
             <Field className="sm:col-span-2" label={text.fieldLine2} value={form.adresse2} onChange={updField('adresse2')} />
             <Field label={text.fieldPostal} value={form.zipCode} onChange={updField('zipCode')} required />
             <Field label={text.fieldCity} value={form.city} onChange={updField('city')} required />

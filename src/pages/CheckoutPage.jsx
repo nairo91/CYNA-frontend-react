@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { createAddress, getMyAddresses } from '../api/addressApi'
+import { AddressAutocomplete } from '../components/AddressAutocomplete'
 import { createCheckoutPaymentIntent } from '../api/checkoutApi'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
@@ -403,7 +404,25 @@ export function CheckoutPage() {
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <Field label={text.firstname} value={newAddress.firstname} onChange={updField('firstname')} required />
                   <Field label={text.lastname} value={newAddress.lastname} onChange={updField('lastname')} required />
-                  <Field className="sm:col-span-2" label={text.line1} value={newAddress.adresse1} onChange={updField('adresse1')} required />
+                  <AddressAutocomplete
+                    className="sm:col-span-2"
+                    label={text.line1}
+                    value={newAddress.adresse1}
+                    onChange={(line1) =>
+                      setNewAddress((current) => ({ ...current, adresse1: line1 }))
+                    }
+                    onSelect={(fields) =>
+                      setNewAddress((current) => ({
+                        ...current,
+                        adresse1: fields.line1,
+                        zipCode: fields.postalCode || current.zipCode,
+                        city: fields.city || current.city,
+                        region: fields.region || current.region,
+                        country: fields.country || current.country,
+                      }))
+                    }
+                    required
+                  />
                   <Field className="sm:col-span-2" label={text.line2} value={newAddress.adresse2} onChange={updField('adresse2')} />
                   <Field label={text.postalCode} value={newAddress.zipCode} onChange={updField('zipCode')} required />
                   <Field label={text.city} value={newAddress.city} onChange={updField('city')} required />

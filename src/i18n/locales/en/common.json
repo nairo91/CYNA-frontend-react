@@ -93,5 +93,15 @@
       { "label": "X", "href": "https://x.com", "external": true }
     ],
     "copyright": "© {{year}} CYNA-IT — All rights reserved."
+  },
+  "addressAutocomplete": {
+    "placeholder": "Start typing your address…",
+    "hint": "Suggestions powered by the French National Address Base (data.gouv.fr).",
+    "noResults": "No address found.",
+    "minChars": "Type at least 3 characters to search.",
+    "loading": "Searching…",
+    "error": "Address service unreachable. Please enter the address manually.",
+    "listAriaLabel": "Address suggestions",
+    "clear": "Clear"
   }
 }
