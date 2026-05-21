@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { createAddress, getMyAddresses } from '../api/addressApi'
 import { createCheckoutPaymentIntent } from '../api/checkoutApi'
+import { AddressAutocomplete } from '../components/ui/AddressAutocomplete'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { cn } from '../lib/utils'
@@ -313,6 +314,17 @@ export function CheckoutPage() {
   const updField = (field) => (event) =>
     setNewAddress((current) => ({ ...current, [field]: event.target.value }))
 
+  // Pré-remplissage automatique après sélection d'une suggestion BAN
+  const handleAddressSelect = ({ adresse1, zipCode, city, region }) => {
+    setNewAddress((current) => ({
+      ...current,
+      adresse1,
+      zipCode,
+      city,
+      region,
+    }))
+  }
+
   const selectedAddressObject = useMemo(() => {
     if (!selectedAddress) return null
     const id = Number(selectedAddress.split('/').pop())
@@ -403,7 +415,14 @@ export function CheckoutPage() {
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <Field label={text.firstname} value={newAddress.firstname} onChange={updField('firstname')} required />
                   <Field label={text.lastname} value={newAddress.lastname} onChange={updField('lastname')} required />
-                  <Field className="sm:col-span-2" label={text.line1} value={newAddress.adresse1} onChange={updField('adresse1')} required />
+                  <AddressAutocomplete
+                    className="sm:col-span-2"
+                    label={text.line1}
+                    value={newAddress.adresse1}
+                    onChange={(val) => setNewAddress((c) => ({ ...c, adresse1: val }))}
+                    onSelect={handleAddressSelect}
+                    required
+                  />
                   <Field className="sm:col-span-2" label={text.line2} value={newAddress.adresse2} onChange={updField('adresse2')} />
                   <Field label={text.postalCode} value={newAddress.zipCode} onChange={updField('zipCode')} required />
                   <Field label={text.city} value={newAddress.city} onChange={updField('city')} required />

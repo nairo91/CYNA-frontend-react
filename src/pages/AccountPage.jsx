@@ -31,6 +31,7 @@ import {
   deletePaymentMethod,
   getMyPaymentMethods,
 } from '../api/paymentMethodApi'
+import { AddressAutocomplete } from '../components/ui/AddressAutocomplete'
 import SecuritySettings from '../components/account/SecuritySettings'
 import { useAuth } from '../context/AuthContext'
 import { cn } from '../lib/utils'
@@ -651,6 +652,11 @@ function AddressesTab({ text, user }) {
   const updField = (field) => (event) =>
     setForm((current) => ({ ...current, [field]: event.target.value }))
 
+  // Pré-remplissage automatique après sélection d'une suggestion BAN
+  const handleAddressSelect = ({ adresse1, zipCode, city, region }) => {
+    setForm((current) => ({ ...current, adresse1, zipCode, city, region }))
+  }
+
   if (isLoading) return <LoadingSpinner />
 
   return (
@@ -742,7 +748,14 @@ function AddressesTab({ text, user }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={text.firstname} value={form.firstname} onChange={updField('firstname')} required />
             <Field label={text.lastname} value={form.lastname} onChange={updField('lastname')} required />
-            <Field className="sm:col-span-2" label={text.fieldLine1} value={form.adresse1} onChange={updField('adresse1')} required />
+            <AddressAutocomplete
+              className="sm:col-span-2"
+              label={text.fieldLine1}
+              value={form.adresse1}
+              onChange={(val) => setForm((c) => ({ ...c, adresse1: val }))}
+              onSelect={handleAddressSelect}
+              required
+            />
             <Field className="sm:col-span-2" label={text.fieldLine2} value={form.adresse2} onChange={updField('adresse2')} />
             <Field label={text.fieldPostal} value={form.zipCode} onChange={updField('zipCode')} required />
             <Field label={text.fieldCity} value={form.city} onChange={updField('city')} required />
