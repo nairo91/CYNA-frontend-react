@@ -55,7 +55,30 @@
     "status": "Statut",
     "backToAccount": "Voir mes commandes",
     "continue": "Continuer mes achats",
+    "downloadInvoice": "Télécharger la facture",
+    "downloadInvoiceError": "Impossible de générer la facture pour le moment.",
     "errorTitle": "Commande introuvable",
     "errorCopy": "Cette commande n'est pas disponible ou ne vous appartient pas."
+  },
+  "invoice": {
+    "invoice": "Facture",
+    "invoiceNumber": "Numéro",
+    "invoiceDate": "Date",
+    "status": "Statut",
+    "paidAt": "Payée le",
+    "paymentRef": "Réf. paiement",
+    "billTo": "Facturé à",
+    "issuer": "Émetteur",
+    "item": "Article",
+    "quantity": "Qté",
+    "duration": "Durée",
+    "durationUnit": "mois",
+    "unitPrice": "PU HT",
+    "lineTotal": "Total",
+    "subtotal": "Sous-total",
+    "vatLine": "TVA incluse",
+    "total": "Total TTC",
+    "company": "CYNA",
+    "footer": "CYNA — SAS au capital de 10 000 € — RCS Paris 000 000 000 — TVA FR00 000000000\nhello@cyna.fr · 28 rue de Rivoli, 75004 Paris"
   }
 }

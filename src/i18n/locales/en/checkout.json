@@ -55,7 +55,30 @@
     "status": "Status",
     "backToAccount": "View my orders",
     "continue": "Continue shopping",
+    "downloadInvoice": "Download invoice",
+    "downloadInvoiceError": "Could not generate the invoice right now.",
     "errorTitle": "Order not found",
     "errorCopy": "This order is unavailable or does not belong to you."
+  },
+  "invoice": {
+    "invoice": "Invoice",
+    "invoiceNumber": "Number",
+    "invoiceDate": "Date",
+    "status": "Status",
+    "paidAt": "Paid on",
+    "paymentRef": "Payment ref.",
+    "billTo": "Bill to",
+    "issuer": "Issuer",
+    "item": "Item",
+    "quantity": "Qty",
+    "duration": "Duration",
+    "durationUnit": "months",
+    "unitPrice": "Unit",
+    "lineTotal": "Total",
+    "subtotal": "Subtotal",
+    "vatLine": "VAT included",
+    "total": "Total inc. VAT",
+    "company": "CYNA",
+    "footer": "CYNA — SAS with capital of EUR 10,000 — Paris registry 000 000 000 — VAT FR00 000000000\nhello@cyna.fr · 28 rue de Rivoli, 75004 Paris"
   }
 }
