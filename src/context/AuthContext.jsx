@@ -80,10 +80,10 @@ export function AuthProvider({ children }) {
     }
   }, [hydrateUser])
 
-  const verify2fa = useCallback(async ({ email, password, code, rememberMe = true }) => {
+  const verify2fa = useCallback(async ({ email, password, code, rememberMe = true, provider, challenge }) => {
     setIsAuthenticating(true)
     try {
-      const response = await loginVerify2fa({ email, password, code })
+      const response = await loginVerify2fa({ email, password, code, provider, challenge })
       if (!response?.token) {
         throw new Error('Réponse de login 2FA invalide.')
       }

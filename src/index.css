@@ -1740,7 +1740,14 @@ main {
 /* SECURITE ET COMPOSANTS DOUBLE AUTHENTIFICATION (2FA) */
 .security-settings {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
+}
+
+.security-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .security-settings h3 {
@@ -1748,6 +1755,7 @@ main {
   margin: 0;
   color: #fff;
   font-weight: 700;
+  text-wrap: balance;
 }
 
 .security-settings p {
@@ -1755,40 +1763,87 @@ main {
   font-size: 0.95rem;
   color: var(--text-soft, rgba(255, 255, 255, 0.6));
   line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .security-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.25rem;
-  padding: 1.8rem;
+  border-radius: 18px;
+  padding: 1.5rem;
   display: grid;
-  gap: 1.5rem;
-  backdrop-filter: blur(8px);
+  gap: 1.1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.security-status {
-  font-size: 1.1rem;
+.security-card-header {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.security-card-kicker {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.security-card h4 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.security-card-body {
+  display: grid;
+  gap: 1rem;
+  max-width: 54rem;
+}
+
+.security-card-actions {
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+  padding-top: 0.15rem;
+}
+
+.security-card-actions-row {
   align-items: center;
-  gap: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.security-status strong {
-  color: var(--text-soft, rgba(255, 255, 255, 0.6));
-  font-weight: 600;
+.security-status-badge {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 10px);
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-.security-status .text-success {
-  color: #54d496;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(84, 212, 150, 0.3);
+.security-status-badge.is-enabled {
+  background: color-mix(in oklch, #10b981 15%, transparent);
+  border-color: color-mix(in oklch, #10b981 38%, var(--border));
+  color: #86efac;
 }
 
-.security-status .text-danger {
-  color: #ff5959;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgba(255, 89, 89, 0.3);
+.security-status-badge.is-disabled {
+  background: color-mix(in oklch, var(--destructive) 13%, transparent);
+  border-color: color-mix(in oklch, var(--destructive) 36%, var(--border));
+  color: #fda4af;
 }
 
 /* Checkbox A2F */
@@ -1798,31 +1853,38 @@ main {
   gap: 0.8rem;
   cursor: pointer;
   user-select: none;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 1rem 1.2rem;
-  border-radius: 1rem;
-  transition: all 180ms ease;
-  width: fit-content;
+  background: var(--secondary);
+  border: 1px solid var(--border);
+  min-height: 2.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius, 10px);
+  transition:
+    background 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  width: min(100%, fit-content);
 }
 
 .security-checkbox:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--accent);
+  border-color: color-mix(in oklch, var(--border) 72%, var(--ring));
+  transform: translateY(-1px);
 }
 
 .security-checkbox input {
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 0.35rem;
-  accent-color: var(--brand, #1d8dff);
+  accent-color: var(--primary);
   cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .security-checkbox span {
   font-weight: 600;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.35;
 }
 
 /* Panel de test et configuration */
@@ -1869,24 +1931,28 @@ main {
 .verification-input {
   display: block;
   width: 100%;
-  max-width: 13rem;
-  min-height: 3.2rem;
+  max-width: 12rem;
+  min-height: 2.75rem;
   padding: 0 1rem;
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius, 10px);
+  border: 1px solid var(--border);
+  background: var(--secondary);
   color: #fff;
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   text-align: center;
   letter-spacing: 0.2em;
-  transition: all 180ms ease;
+  transition:
+    background 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 120ms cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: bold;
+  font-variant-numeric: tabular-nums;
 }
 
 .verification-input:focus-visible {
-  outline: 2px solid #8de3ff;
-  border-color: #8de3ff;
-  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 55%, transparent);
 }
 
 .security-card .actions,
@@ -1896,6 +1962,346 @@ main {
   flex-wrap: wrap;
   gap: 0.8rem;
   margin-top: 0.5rem;
+}
+
+.security-code-form {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.security-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.security-field span {
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.security-action-button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius, 0.625rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0 1rem;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: center;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition:
+    transform 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    background 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 120ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.security-action-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.security-action-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.security-action-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 55%, transparent);
+}
+
+.security-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
+.security-helper-text {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.security-action-button-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.security-action-button-primary:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--primary) 88%, white);
+  border-color: color-mix(in oklch, var(--primary) 88%, white);
+}
+
+.security-action-button-secondary {
+  background: var(--secondary);
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+}
+
+.security-action-button-secondary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: color-mix(in oklch, var(--border) 72%, var(--ring));
+  color: var(--accent-foreground);
+}
+
+.security-action-button-danger {
+  background: var(--destructive);
+  border-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.security-action-button-danger:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--destructive) 88%, white);
+  border-color: color-mix(in oklch, var(--destructive) 88%, white);
+}
+
+.google-auth-shell {
+  min-height: calc(100dvh - 5rem);
+  display: grid;
+  place-items: center;
+  padding: clamp(2rem, 6vw, 5rem) 1rem;
+  color: var(--foreground);
+}
+
+.google-auth-card {
+  width: min(100%, 30rem);
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.25rem, 4vw, 1.75rem);
+  border: 1px solid color-mix(in oklch, var(--border) 82%, var(--primary));
+  border-radius: calc(var(--radius) + 0.75rem);
+  background:
+    linear-gradient(135deg, color-mix(in oklch, var(--card) 94%, var(--primary) 6%), var(--card)),
+    var(--card);
+  box-shadow:
+    0 22px 60px color-mix(in oklch, var(--foreground) 18%, transparent),
+    inset 0 1px 0 color-mix(in oklch, white 16%, transparent);
+}
+
+.google-auth-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.google-auth-icon {
+  width: 3rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 1rem;
+  background: color-mix(in oklch, var(--primary) 14%, transparent);
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 28%, transparent);
+}
+
+.google-auth-icon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.google-auth-kicker {
+  margin: 0 0 0.25rem;
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.google-auth-card h1 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.google-auth-copy,
+.google-auth-card-loading p,
+.google-auth-card-error p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.google-auth-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.google-auth-field span {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.google-auth-field input {
+  width: 100%;
+  min-height: 3.5rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.45em;
+  padding: 0 1rem 0 1.45rem;
+  text-align: center;
+  transition:
+    border-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 160ms cubic-bezier(0.2, 0, 0, 1),
+    background 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.google-auth-field input::placeholder {
+  color: color-mix(in oklch, var(--muted-foreground) 45%, transparent);
+}
+
+.google-auth-field input:focus {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent);
+}
+
+.google-auth-primary-action,
+.google-auth-secondary-action {
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    transform 140ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 140ms cubic-bezier(0.2, 0, 0, 1),
+    background 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.google-auth-primary-action {
+  border: 0;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 12px 28px color-mix(in oklch, var(--primary) 24%, transparent);
+}
+
+.google-auth-primary-action svg,
+.google-auth-secondary-action svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.google-auth-primary-action:hover:not(:disabled),
+.google-auth-secondary-action:hover {
+  transform: translateY(-1px);
+}
+
+.google-auth-primary-action:active:not(:disabled),
+.google-auth-secondary-action:active {
+  transform: scale(0.96);
+}
+
+.google-auth-primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.google-auth-secondary-action {
+  width: fit-content;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0 1rem;
+}
+
+.google-auth-feedback {
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-start;
+  border: 1px solid color-mix(in oklch, var(--destructive) 35%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--destructive) 12%, transparent);
+  color: var(--destructive);
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.google-auth-feedback svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.12rem;
+}
+
+.google-auth-card-error .google-auth-icon {
+  background: color-mix(in oklch, var(--destructive) 14%, transparent);
+  color: var(--destructive);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--destructive) 28%, transparent);
+}
+
+.google-auth-card-loading {
+  justify-items: center;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .security-card {
+    padding: 1.1rem;
+  }
+
+  .security-card-header,
+  .security-card-actions-row,
+  .security-code-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .security-status-badge {
+    width: fit-content;
+  }
+
+  .security-action-button {
+    width: 100%;
+  }
+
+  .security-checkbox {
+    width: 100%;
+  }
+
+  .verification-input {
+    max-width: none;
+  }
 }
 
 .button-danger {
