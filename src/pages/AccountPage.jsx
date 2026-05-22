@@ -9,14 +9,13 @@ import {
   FileDown,
   Loader2,
   LogOut,
-  Mail,
+
   MapPin,
   Pencil,
   Plus,
   Printer,
   Receipt,
   Search,
-  Send,
   Shield,
   Trash2,
   User,
@@ -25,7 +24,6 @@ import {
 import { useTranslation } from 'react-i18next'
 import { updateMyProfile } from '../api/authApi'
 import { createAddress, deleteAddress, getMyAddresses, updateAddress } from '../api/addressApi'
-import { sendTestMail } from '../api/mailApi'
 import { getMyOrders, getOrder } from '../api/orderApi'
 import { downloadInvoicePdf } from '../lib/invoicePdf'
 import {
@@ -56,7 +54,6 @@ const TABS = [
   { id: 'addresses', labelKey: 'tabAddresses', Icon: MapPin },
   { id: 'payments', labelKey: 'tabPayments', Icon: CreditCard },
   { id: 'security', labelKey: 'tabSecurity', Icon: Shield },
-  { id: 'mail', labelKey: 'tabMail', Icon: Mail },
 ]
 
 function formatPrice(value, locale) {
@@ -209,7 +206,6 @@ export function AccountPage() {
             {activeTab === 'security' ? (
               <SecuritySettings currentUser={user} onUserUpdate={checkAuth} />
             ) : null}
-            {activeTab === 'mail' ? <MailTab text={text} user={user} /> : null}
           </div>
         </main>
       </div>
@@ -1037,65 +1033,4 @@ function PaymentsTab({ text }) {
   )
 }
 
-function MailTab({ text, user }) {
-  const { t } = useTranslation('account')
-  const [recipient, setRecipient] = useState('juliann.ploquin@gmail.com')
-  const [isSending, setIsSending] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    setErrorMessage('')
-    setSuccessMessage('')
-    setIsSending(true)
-    try {
-      const result = await sendTestMail(recipient.trim())
-      setSuccessMessage(t('account.mailSuccess', { email: result.recipient ?? recipient.trim() }))
-    } catch (err) {
-      setErrorMessage(err?.message ?? text.genericError)
-    } finally {
-      setIsSending(false)
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="max-w-xl grid gap-4">
-      <p className="text-sm text-muted-foreground">{text.mailIntro}</p>
-      <Field
-        label={text.mailRecipient}
-        type="email"
-        value={recipient}
-        onChange={(event) => setRecipient(event.target.value)}
-        required
-      />
-      <Field label={text.mailAccount} value={user?.email ?? ''} readOnly />
-      {errorMessage ? (
-        <div
-          role="alert"
-          className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
-          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-          <span>{errorMessage}</span>
-        </div>
-      ) : null}
-      {successMessage ? (
-        <div
-          role="status"
-          className="flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300"
-        >
-          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-          <span>{successMessage}</span>
-        </div>
-      ) : null}
-      <button type="submit" disabled={isSending} className={PRIMARY_BTN}>
-        {isSending ? (
-          <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
-        ) : (
-          <Send className="h-4 w-4" aria-hidden="true" />
-        )}
-        {isSending ? text.mailSending : text.mailSend}
-      </button>
-    </form>
-  )
-}
