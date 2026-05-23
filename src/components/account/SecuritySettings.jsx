@@ -21,8 +21,11 @@ const PRIMARY_BTN =
 const GHOST_BTN =
   'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
 
+const SECONDARY_BTN =
+  'inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-primary/35 bg-primary/10 px-5 text-sm font-semibold text-primary shadow-sm transition-all duration-150 hover:border-primary/50 hover:bg-primary/15 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+
 const DANGER_BTN =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-destructive px-4 text-sm font-medium text-destructive-foreground shadow-sm transition-all duration-150 hover:bg-destructive/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-destructive px-5 text-sm font-semibold text-destructive-foreground shadow-sm transition-all duration-150 hover:bg-destructive/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
 
 const CODE_INPUT =
   'h-12 w-full max-w-[12rem] rounded-lg border border-border bg-background px-4 text-center font-mono text-xl font-semibold tracking-[0.4em] tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
@@ -97,6 +100,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
   const [isEnabling, setIsEnabling] = useState(false)
   const [setupData, setSetupData] = useState(null)
   const [verificationCode, setVerificationCode] = useState('')
+  const [verificationError, setVerificationError] = useState('')
 
   const [isTesting, setIsTesting] = useState(false)
   const [testCode, setTestCode] = useState('')
@@ -114,6 +118,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
 
   const startSetup = async () => {
     resetGlobalFeedback()
+    setVerificationError('')
     try {
       const data = await apiPost('/api/security/2fa/setup')
       setSetupData(data)
@@ -126,6 +131,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
   const confirmEnable = async (event) => {
     event.preventDefault()
     resetGlobalFeedback()
+    setVerificationError('')
     try {
       await apiPost('/api/security/2fa/enable', { code: verificationCode })
       setSuccess(text.totpEnabled)
@@ -134,7 +140,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       setVerificationCode('')
       if (onUserUpdate) onUserUpdate()
     } catch (err) {
-      setError(text.totpInvalidCode)
+      setVerificationError(text.totpInvalidCode)
     }
   }
 
@@ -401,7 +407,14 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                 onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
                 required
                 className={CODE_INPUT}
+                aria-invalid={Boolean(verificationError)}
+                aria-describedby={verificationError ? 'totp-setup-code-error' : undefined}
               />
+              <Feedback tone="error">
+                {verificationError ? (
+                  <span id="totp-setup-code-error">{verificationError}</span>
+                ) : null}
+              </Feedback>
               <div className="flex flex-wrap items-center gap-2">
                 <button type="submit" className={PRIMARY_BTN}>
                   <ShieldCheck className="h-4 w-4" aria-hidden="true" />
@@ -414,6 +427,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                     setIsEnabling(false)
                     setSetupData(null)
                     setVerificationCode('')
+                    setVerificationError('')
                   }}
                 >
                   {text.cancel}
@@ -439,7 +453,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
               <span className="leading-snug">{text.totpToggleLoginLabel}</span>
             </label>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <button
                 type="button"
                 onClick={() => {
@@ -448,15 +462,15 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                   setTestSuccess('')
                   setTestCode('')
                 }}
-                className={GHOST_BTN}
+                className={SECONDARY_BTN}
                 aria-expanded={isTesting}
               >
-                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                <KeyRound className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 {isTesting ? text.totpTestHide : text.totpTestShow}
               </button>
 
               <button type="button" onClick={disable2FA} className={DANGER_BTN}>
-                <ShieldOff className="h-4 w-4" aria-hidden="true" />
+                <ShieldOff className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 {text.totpDisable}
               </button>
             </div>

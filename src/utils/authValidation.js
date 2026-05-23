@@ -94,6 +94,20 @@ export function mapRegisterApiError(error) {
 export function mapLoginApiError(error) {
   const source = `${error?.message ?? ''} ${JSON.stringify(error?.payload ?? {})}`.toLowerCase()
 
+  if (source.includes('brevo') || source.includes('envoyer le code a2f') || source.includes('ip actuelle')) {
+    return error?.message ?? 'Impossible d envoyer le code A2F par e-mail. Verifiez la configuration Brevo.'
+  }
+
+  if (
+    source.includes('code 2fa') ||
+    source.includes('double authentification') ||
+    source.includes('invalid code') ||
+    source.includes('code invalide') ||
+    (error?.status === 400 && source.includes('code'))
+  ) {
+    return 'Code de securite invalide ou expire. Veuillez reessayer.'
+  }
+
   if (source.includes('not activated') || source.includes('not verified') || source.includes('inactive')) {
     return 'Compte non active. Verifiez votre e-mail pour valider votre inscription.'
   }

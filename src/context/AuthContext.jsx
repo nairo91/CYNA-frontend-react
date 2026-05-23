@@ -66,6 +66,9 @@ export function AuthProvider({ children }) {
     setIsAuthenticating(true)
     try {
       const response = await loginWithPassword({ email, password })
+      if (response?.error) {
+        throw new Error(response.error)
+      }
       if (response?.requires2fa) {
         return response
       }
@@ -84,6 +87,9 @@ export function AuthProvider({ children }) {
     setIsAuthenticating(true)
     try {
       const response = await loginVerify2fa({ email, password, code, provider, challenge })
+      if (response?.error) {
+        throw new Error(response.error)
+      }
       if (!response?.token) {
         throw new Error('Réponse de login 2FA invalide.')
       }
