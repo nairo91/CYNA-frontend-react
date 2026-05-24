@@ -2,27 +2,68 @@ import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'cyna_ios_install_banner_dismissed'
 
+function readDismissedState() {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+function persistDismissedState() {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, 'true')
+  } catch {
+    // Le masquage reste actif pour la session React si le stockage est indisponible.
+  }
+}
+
+export function isIosDevice() {
+  if (typeof window === 'undefined') return false
+
+  const { maxTouchPoints = 0, userAgent = '', platform = '' } = window.navigator
+  const isiPhoneOrIPad = /iPhone|iPad|iPod/i.test(userAgent)
+  const isIPadDesktopMode = /MacIntel/i.test(platform) && maxTouchPoints > 1
+
+  return isiPhoneOrIPad || isIPadDesktopMode
+}
+
+export function isRunningStandalone() {
+  if (typeof window === 'undefined') return false
+
+  const navigatorStandalone = window.navigator.standalone === true
+  const displayModeStandalone = window.matchMedia?.('(display-mode: standalone)').matches === true
+
+  return navigatorStandalone || displayModeStandalone
+}
+
 function canShowIosInstallPrompt() {
   if (typeof window === 'undefined') return false
 
-  const userAgent = window.navigator.userAgent ?? ''
-  const isIos = /iPhone|iPad/i.test(userAgent)
-  const isStandalone = window.navigator.standalone === true
-  const isDismissed = window.localStorage.getItem(STORAGE_KEY) === 'true'
-
-  return isIos && !isStandalone && !isDismissed
+  return isIosDevice() && !isRunningStandalone() && !readDismissedState()
 }
 
 export function useIosInstallPrompt() {
   const [shouldShow, setShouldShow] = useState(false)
 
   useEffect(() => {
-    setShouldShow(canShowIosInstallPrompt())
+    const refreshPromptState = () => {
+      setShouldShow(canShowIosInstallPrompt())
+    }
+
+    refreshPromptState()
+    window.addEventListener('pageshow', refreshPromptState)
+    window.addEventListener('visibilitychange', refreshPromptState)
+
+    return () => {
+      window.removeEventListener('pageshow', refreshPromptState)
+      window.removeEventListener('visibilitychange', refreshPromptState)
+    }
   }, [])
 
   const dismiss = useCallback(() => {
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(STORAGE_KEY, 'true')
+      persistDismissedState()
     }
     setShouldShow(false)
   }, [])
