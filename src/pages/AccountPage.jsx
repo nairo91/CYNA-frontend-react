@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   AlertCircle,
   CheckCircle2,
@@ -8,7 +8,6 @@ import {
   Eye,
   FileDown,
   Loader2,
-  LogOut,
 
   MapPin,
   Pencil,
@@ -37,16 +36,16 @@ import { useAuth } from '../context/AuthContext'
 import { cn } from '../lib/utils'
 
 const INPUT_CLASSES =
-  'h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+  'h-11 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-base text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 sm:h-10 sm:text-sm'
 
 const LABEL_CLASSES =
   'mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground'
 
 const PRIMARY_BTN =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:h-10 sm:w-auto'
 
 const GHOST_BTN =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:h-10 sm:w-auto'
 
 const TABS = [
   { id: 'profile', labelKey: 'tabProfile', Icon: User },
@@ -93,7 +92,7 @@ function LoadingSpinner() {
 
 function EmptyState({ Icon, label, action }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center">
+    <div className="rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center sm:p-10">
       <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
         <Icon className="h-6 w-6" aria-hidden="true" />
       </div>
@@ -105,7 +104,7 @@ function EmptyState({ Icon, label, action }) {
 
 function Field({ label, value, onChange, type = 'text', required, className, readOnly }) {
   return (
-    <label className={cn('grid gap-1.5', className)}>
+    <label className={cn('grid min-w-0 gap-1.5', className)}>
       <span className={LABEL_CLASSES.replace('mb-1.5 block ', '')}>
         {label}
         {required ? <span className="text-destructive"> *</span> : null}
@@ -125,44 +124,38 @@ function Field({ label, value, onChange, type = 'text', required, className, rea
 export function AccountPage() {
   const { t } = useTranslation('account')
   const text = t('account', { returnObjects: true })
-  const navigate = useNavigate()
-  const { user, logout, checkAuth } = useAuth()
+  const { user, checkAuth } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
-
-  const handleLogout = () => {
-    logout()
-    navigate('/', { replace: true })
-  }
 
   const activeTabInfo = TABS.find((tab) => tab.id === activeTab)
   const ActiveIcon = activeTabInfo?.Icon ?? User
 
   return (
-    <div className="mx-auto w-full max-w-[var(--page-max-width)] px-4 py-10 lg:px-6 lg:py-14">
+    <div className="mx-auto w-full max-w-[var(--page-max-width)] overflow-hidden px-3 py-8 sm:px-4 sm:py-10 lg:px-6 lg:py-14">
       <header className="mb-8">
         <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {text.eyebrow}
         </span>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-foreground lg:text-4xl">
+        <h1 className="mt-4 break-words text-2xl font-semibold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
           {user?.firstname ? `${text.greeting}, ${user.firstname}` : text.title}
         </h1>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
-        <aside>
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
+        <aside className="min-w-0">
           <nav aria-label={text.sectionsAriaLabel} className="lg:sticky lg:top-24">
-            <ul className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1.5 lg:flex-col lg:overflow-visible">
+            <ul className="flex max-w-full gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1.5 [scrollbar-width:none] lg:flex-col lg:overflow-visible">
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id
                 const { Icon } = tab
                 return (
-                  <li key={tab.id} className="flex-shrink-0">
+                  <li key={tab.id} className="flex-shrink-0 lg:w-full">
                     <button
                       type="button"
                       onClick={() => setActiveTab(tab.id)}
                       aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        'inline-flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        'inline-flex h-11 w-full min-w-max items-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:h-10 lg:min-w-0',
                         isActive
                           ? 'bg-primary text-primary-foreground'
                           : 'text-foreground/80 hover:bg-accent hover:text-foreground'
@@ -174,28 +167,15 @@ export function AccountPage() {
                   </li>
                 )
               })}
-              <li className="mt-1 hidden lg:block">
-                <div className="h-px bg-border" aria-hidden="true" />
-              </li>
-              <li className="flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="inline-flex h-10 w-full items-center gap-2 rounded-lg px-3 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  <span className="whitespace-nowrap">{text.logout}</span>
-                </button>
-              </li>
             </ul>
           </nav>
         </aside>
 
-        <main>
-          <div className="rounded-2xl border border-border bg-card p-6 lg:p-8">
-            <h2 className="mb-6 flex items-center gap-3 border-b border-border pb-4 text-xl font-semibold tracking-tight text-foreground">
+        <main className="min-w-0">
+          <div className="min-w-0 rounded-2xl border border-border bg-card p-4 sm:p-6 lg:p-8">
+            <h2 className="mb-6 flex min-w-0 items-center gap-3 border-b border-border pb-4 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
               <ActiveIcon className="h-5 w-5 text-primary" aria-hidden="true" />
-              {text[activeTabInfo?.labelKey ?? 'tabProfile']}
+              <span className="min-w-0 break-words">{text[activeTabInfo?.labelKey ?? 'tabProfile']}</span>
             </h2>
             {activeTab === 'profile' ? (
               <ProfileTab user={user} text={text} onUpdated={checkAuth} />
@@ -256,7 +236,7 @@ function ProfileTab({ user, text, onUpdated }) {
 
   if (isEditing) {
     return (
-      <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid min-w-0 gap-4 sm:grid-cols-2">
         <Field
           label={text.profileFirstname}
           value={form.firstname}
@@ -285,7 +265,7 @@ function ProfileTab({ user, text, onUpdated }) {
             <span>{errorMessage}</span>
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+        <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:flex-wrap sm:items-center">
           <button type="submit" disabled={status === 'submitting'} className={PRIMARY_BTN}>
             {status === 'submitting' ? (
               <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
@@ -313,7 +293,7 @@ function ProfileTab({ user, text, onUpdated }) {
   ]
 
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       {status === 'success' ? (
         <div
           role="status"
@@ -323,18 +303,18 @@ function ProfileTab({ user, text, onUpdated }) {
           <span>{text.profileSaved}</span>
         </div>
       ) : null}
-      <dl className="grid gap-4 sm:grid-cols-2">
+      <dl className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl border border-border bg-background p-4"
+            className="min-w-0 rounded-xl border border-border bg-background p-4"
           >
             <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {stat.label}
             </dt>
             <dd
               className={cn(
-                'mt-1 break-words text-sm font-medium',
+                'mt-1 min-w-0 break-words text-sm font-medium',
                 stat.tone === 'success' && 'text-emerald-300',
                 stat.tone === 'warning' && 'text-amber-300',
                 !stat.tone && 'text-foreground'
@@ -375,7 +355,7 @@ function OrdersTab({ text }) {
         language: i18n.resolvedLanguage,
         strings: tCheckout('invoice', { returnObjects: true }),
       })
-    } catch (err) {
+    } catch {
       setPdfError(t('account.ordersDownloadInvoiceError'))
     } finally {
       setPdfOrderId(null)
@@ -479,9 +459,9 @@ function OrdersTab({ text }) {
   }
 
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-3 sm:grid-cols-[1fr_12rem_auto]">
-        <div className="relative">
+    <div className="grid min-w-0 gap-6">
+      <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_12rem_auto]">
+        <div className="relative min-w-0">
           <Search
             className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
@@ -491,7 +471,7 @@ function OrdersTab({ text }) {
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder={text.ordersSearch}
-            className="h-10 w-full rounded-lg border border-border bg-background ps-10 pe-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+            className="h-11 w-full min-w-0 rounded-lg border border-border bg-background ps-10 pe-3 text-base text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 sm:h-10 sm:text-sm"
             aria-label={text.ordersSearch}
           />
         </div>
@@ -499,7 +479,7 @@ function OrdersTab({ text }) {
           value={yearFilter}
           onChange={(event) => setYearFilter(event.target.value)}
           aria-label={text.ordersYearFilter}
-          className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+          className="h-11 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-base text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 sm:h-10 sm:text-sm"
         >
           <option value="all">
             {text.ordersYearFilter} — {text.ordersYearAll}
@@ -536,12 +516,12 @@ function OrdersTab({ text }) {
             <ul className="grid gap-2">
               {list.map((order) => (
                 <li key={order.id}>
-                  <article className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
-                    <div className="flex flex-col">
-                      <span className="font-mono text-sm font-medium tabular-nums text-foreground">
+                  <article className="grid min-w-0 gap-3 rounded-xl border border-border bg-background p-4 sm:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1.2fr)_auto_auto_auto] lg:items-center">
+                    <div className="min-w-0">
+                      <span className="block truncate font-mono text-sm font-medium tabular-nums text-foreground">
                         {order.reference ?? `#${order.id}`}
                       </span>
-                      <span className="font-mono text-xs tabular-nums text-muted-foreground">
+                      <span className="block font-mono text-xs tabular-nums text-muted-foreground">
                         {formatDate(order.createdAt, locale)}
                       </span>
                     </div>
@@ -553,16 +533,16 @@ function OrdersTab({ text }) {
                     >
                       {statusLabel(order.status)}
                     </span>
-                    <span className="font-mono text-base font-semibold tabular-nums text-primary">
+                    <span className="font-mono text-base font-semibold tabular-nums text-primary sm:text-right">
                       {formatPrice(order.totalPrice, locale)}
                     </span>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 sm:justify-self-end">
                       <button
                         type="button"
                         onClick={() => handleDownloadInvoice(order.id)}
                         disabled={pdfOrderId === order.id}
                         aria-label={`${t('account.ordersDownloadInvoice')} ${order.reference ?? `#${order.id}`}`}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-9 sm:w-9"
                       >
                         {pdfOrderId === order.id ? (
                           <Loader2 className="h-4 w-4 motion-safe:animate-spin" aria-hidden="true" />
@@ -573,7 +553,7 @@ function OrdersTab({ text }) {
                       <Link
                         to={`/checkout/confirmation/${order.id}`}
                         aria-label={`${text.view} ${order.reference ?? `#${order.id}`}`}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-9 sm:w-9"
                       >
                         <Eye className="h-4 w-4" aria-hidden="true" />
                       </Link>
@@ -702,11 +682,11 @@ function AddressesTab({ text, user }) {
   if (isLoading) return <LoadingSpinner />
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 gap-6">
       {!showForm ? (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
+          <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <p className="min-w-0 text-sm text-muted-foreground">
               {t('account.addressesIntro')}
             </p>
             <button
@@ -729,9 +709,9 @@ function AddressesTab({ text, user }) {
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {addresses.map((address) => (
                 <li key={address.id}>
-                  <article className="flex h-full flex-col rounded-xl border border-border bg-background p-5">
-                    <header className="flex items-start justify-between gap-2">
-                      <h3 className="text-base font-semibold text-foreground">
+                  <article className="flex h-full min-w-0 flex-col rounded-xl border border-border bg-background p-4 sm:p-5">
+                    <header className="flex min-w-0 items-start justify-between gap-2">
+                      <h3 className="min-w-0 break-words text-base font-semibold text-foreground">
                         {address.firstname} {address.lastname}
                       </h3>
                       <div className="flex items-center gap-1">
@@ -739,7 +719,7 @@ function AddressesTab({ text, user }) {
                           type="button"
                           onClick={() => startEdit(address)}
                           aria-label={`${text.addressEdit} ${address.adresse1}`}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-8 sm:w-8"
                         >
                           <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                         </button>
@@ -747,23 +727,23 @@ function AddressesTab({ text, user }) {
                           type="button"
                           onClick={() => handleDelete(address.id)}
                           aria-label={`${text.delete} ${address.adresse1}`}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-8 sm:w-8"
                         >
                           <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                         </button>
                       </div>
                     </header>
-                    <div className="mt-2 space-y-0.5 text-sm text-muted-foreground">
-                      <p>{address.adresse1}</p>
-                      {address.adresse2 ? <p>{address.adresse2}</p> : null}
-                      <p className="font-mono tabular-nums">
+                    <div className="mt-2 min-w-0 space-y-0.5 text-sm text-muted-foreground">
+                      <p className="break-words">{address.adresse1}</p>
+                      {address.adresse2 ? <p className="break-words">{address.adresse2}</p> : null}
+                      <p className="break-words font-mono tabular-nums">
                         {address.zipCode} {address.city}
                       </p>
-                      <p>
+                      <p className="break-words">
                         {address.region}, {address.country}
                       </p>
                     </div>
-                    <p className="mt-3 inline-flex items-center gap-1 font-mono text-xs tabular-nums text-foreground/70">
+                    <p className="mt-3 inline-flex min-w-0 items-center gap-1 break-all font-mono text-xs tabular-nums text-foreground/70">
                       📞 {address.mobilephone}
                     </p>
                   </article>
@@ -773,21 +753,21 @@ function AddressesTab({ text, user }) {
           )}
         </>
       ) : (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-border bg-background p-5 lg:p-6">
-          <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
-            <h3 className="text-base font-semibold text-foreground">
+        <form onSubmit={handleSubmit} className="min-w-0 rounded-xl border border-border bg-background p-4 sm:p-5 lg:p-6">
+          <div className="mb-5 flex min-w-0 items-center justify-between gap-3 border-b border-border pb-3">
+            <h3 className="min-w-0 break-words text-base font-semibold text-foreground">
               {editingId ? t('account.editAddressTitle') : t('account.newAddressTitle')}
             </h3>
             <button
               type="button"
               onClick={closeForm}
               aria-label={text.cancel}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-8 sm:w-8"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <Field label={text.firstname} value={form.firstname} onChange={updField('firstname')} required />
             <Field label={text.lastname} value={form.lastname} onChange={updField('lastname')} required />
             <AddressAutocomplete
@@ -814,7 +794,7 @@ function AddressesTab({ text, user }) {
               <span>{errorMessage}</span>
             </div>
           ) : null}
-          <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
             <button type="button" onClick={closeForm} className={GHOST_BTN}>
               {text.cancel}
             </button>
@@ -891,11 +871,11 @@ function PaymentsTab({ text }) {
   if (isLoading) return <LoadingSpinner />
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 gap-6">
       {!showForm ? (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
+          <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <p className="min-w-0 text-sm text-muted-foreground">
               {t('account.paymentsIntro')}
             </p>
             <button type="button" onClick={() => setShowForm(true)} className={PRIMARY_BTN}>
@@ -910,21 +890,21 @@ function PaymentsTab({ text }) {
             <ul className="grid gap-4 sm:grid-cols-2">
               {methods.map((pm) => (
                 <li key={pm.id}>
-                  <article className="rounded-xl border border-border bg-gradient-to-br from-background to-card p-5">
-                    <header className="mb-4 flex items-center justify-between">
-                      <span className="font-mono text-sm font-semibold uppercase tracking-widest text-foreground/70">
+                  <article className="min-w-0 rounded-xl border border-border bg-gradient-to-br from-background to-card p-4 sm:p-5">
+                    <header className="mb-4 flex min-w-0 items-center justify-between gap-3">
+                      <span className="min-w-0 truncate font-mono text-sm font-semibold uppercase tracking-widest text-foreground/70">
                         {pm.brand ?? pm.provider}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleDelete(pm.id)}
                         aria-label={`${text.delete} ${pm.brand}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-8 sm:w-8"
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
                     </header>
-                    <p className="font-mono text-lg tabular-nums tracking-widest text-foreground/80">
+                    <p className="break-all font-mono text-base tabular-nums tracking-widest text-foreground/80 sm:text-lg">
                       •••• •••• •••• {pm.last4}
                     </p>
                     <p className="mt-3 font-mono text-xs tabular-nums text-muted-foreground">
@@ -939,10 +919,10 @@ function PaymentsTab({ text }) {
       ) : (
         <form
           onSubmit={handleSubmit}
-          className="max-w-xl rounded-xl border border-border bg-background p-5 lg:p-6"
+          className="w-full max-w-xl rounded-xl border border-border bg-background p-4 sm:p-5 lg:p-6"
         >
-          <div className="mb-5 flex items-center justify-between border-b border-border pb-3">
-            <h3 className="text-base font-semibold text-foreground">
+          <div className="mb-5 flex min-w-0 items-center justify-between gap-3 border-b border-border pb-3">
+            <h3 className="min-w-0 break-words text-base font-semibold text-foreground">
               {t('account.newPaymentTitle')}
             </h3>
             <button
@@ -952,7 +932,7 @@ function PaymentsTab({ text }) {
                 setErrorMessage('')
               }}
               aria-label={text.cancel}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-8 sm:w-8"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -963,14 +943,14 @@ function PaymentsTab({ text }) {
           </p>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="sm:col-span-2 grid gap-1.5">
+            <label className="grid min-w-0 gap-1.5 sm:col-span-2">
               <span className={LABEL_CLASSES.replace('mb-1.5 block ', '')}>
                 {text.paymentBrand}
               </span>
               <select
                 value={form.brand}
                 onChange={(event) => setForm({ ...form, brand: event.target.value })}
-                className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40"
+                className="h-11 w-full min-w-0 rounded-lg border border-border bg-background px-3 text-base text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 sm:h-10 sm:text-sm"
               >
                 <option value="Visa">Visa</option>
                 <option value="Mastercard">Mastercard</option>
@@ -1012,7 +992,7 @@ function PaymentsTab({ text }) {
             </div>
           ) : null}
 
-          <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
             <button
               type="button"
               onClick={() => {
