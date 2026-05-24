@@ -3,9 +3,12 @@ import { getCategories, getFeaturedProducts } from '../api/catalogApi'
 import { Carousel } from '../components/Carousel'
 import { CategoriesGrid } from '../components/CategoriesGrid'
 import { Hero } from '../components/Hero'
+import { IosInstallBanner } from '../components/IosInstallBanner'
 import { TopProducts } from '../components/TopProducts'
+import { useIosInstallPrompt } from '../hooks/useIosInstallPrompt'
 
 export function HomePage() {
+  const { shouldShow, dismiss } = useIosInstallPrompt()
   const [categories, setCategories] = useState([])
   const [featuredProducts, setFeaturedProducts] = useState([])
   const [categoriesError, setCategoriesError] = useState(false)
@@ -61,6 +64,7 @@ export function HomePage() {
     <>
       <Carousel />
       <Hero />
+      {shouldShow ? <IosInstallBanner onDismiss={dismiss} /> : null}
       <CategoriesGrid categories={categories} isLoading={isCategoriesLoading} error={categoriesError} />
       <TopProducts products={featuredProducts} isLoading={isProductsLoading} error={productsError} />
     </>
