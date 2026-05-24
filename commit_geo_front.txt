@@ -1,0 +1,21 @@
+feat(address): autocomplete adresse via API Adresse BAN (DINUM)
+
+Branche le composant AddressAutocomplete sur les formulaires d'adresse
+du checkout et de la gestion du compte utilisateur.
+
+Nouveaux fichiers :
+  src/api/geoApi.js                         — appel public GET /api/geo/address
+  src/hooks/useAddressAutocomplete.js       — hook debounce 300ms + abort
+  src/components/ui/AddressAutocomplete.jsx — combobox accessible (a11y)
+
+Fichiers modifies :
+  src/pages/CheckoutPage.jsx  — adresse1 remplace par AddressAutocomplete
+  src/pages/AccountPage.jsx   — idem dans AddressesTab (create + edit)
+
+Comportement :
+  - Frappe >= 3 chars -> suggestions API Adresse (debounce 300ms)
+  - Selection -> pre-remplit adresse1, zipCode, city, region
+  - Navigation clavier (fleches, entree, echap)
+  - Fermeture au clic exterieur
+  - Fallback silencieux si API indisponible (champ texte libre)
+  - Aucune nouvelle dependance npm
