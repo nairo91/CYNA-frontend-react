@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const STORAGE_KEY = 'cyna_ios_install_banner_dismissed'
+const STORAGE_KEY = 'cyna_ios_install_banner_dismissed_v2'
 
 function readDismissedState() {
   try {
@@ -32,7 +32,11 @@ export function isRunningStandalone() {
   if (typeof window === 'undefined') return false
 
   const navigatorStandalone = window.navigator.standalone === true
-  const displayModeStandalone = window.matchMedia?.('(display-mode: standalone)').matches === true
+  const standaloneQuery =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(display-mode: standalone)')
+      : null
+  const displayModeStandalone = standaloneQuery?.matches === true
 
   return navigatorStandalone || displayModeStandalone
 }
