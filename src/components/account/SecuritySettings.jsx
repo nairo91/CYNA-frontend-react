@@ -16,19 +16,19 @@ import { apiPost } from '../../api/http'
 import { cn } from '../../lib/utils'
 
 const PRIMARY_BTN =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-150 hover:bg-primary/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:h-10 sm:w-auto'
 
 const GHOST_BTN =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-transparent px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:h-10 sm:w-auto'
 
 const SECONDARY_BTN =
-  'inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-primary/35 bg-primary/10 px-5 text-sm font-semibold text-primary shadow-sm transition-all duration-150 hover:border-primary/50 hover:bg-primary/15 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 whitespace-normal rounded-lg border border-primary/35 bg-primary/10 px-5 text-center text-sm font-semibold text-primary shadow-sm transition-all duration-150 hover:border-primary/50 hover:bg-primary/15 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:w-auto sm:whitespace-nowrap'
 
 const DANGER_BTN =
-  'inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-destructive px-5 text-sm font-semibold text-destructive-foreground shadow-sm transition-all duration-150 hover:bg-destructive/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card'
+  'inline-flex h-11 w-full items-center justify-center gap-2 whitespace-normal rounded-lg bg-destructive px-5 text-center text-sm font-semibold text-destructive-foreground shadow-sm transition-all duration-150 hover:bg-destructive/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card sm:w-auto sm:whitespace-nowrap'
 
 const CODE_INPUT =
-  'h-12 w-full max-w-[12rem] rounded-lg border border-border bg-background px-4 text-center font-mono text-xl font-semibold tracking-[0.4em] tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+  'h-12 w-full min-w-0 rounded-lg border border-border bg-background px-4 text-center font-mono text-xl font-semibold tracking-[0.28em] tabular-nums text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40 sm:max-w-[12rem] sm:tracking-[0.4em]'
 
 function Feedback({ tone, children }) {
   if (!children) return null
@@ -37,14 +37,14 @@ function Feedback({ tone, children }) {
     <div
       role={tone === 'success' ? 'status' : 'alert'}
       className={cn(
-        'flex items-start gap-2 rounded-lg border px-3 py-2 text-sm',
+        'flex min-w-0 items-start gap-2 rounded-lg border px-3 py-2 text-sm',
         tone === 'success'
           ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
           : 'border-destructive/30 bg-destructive/10 text-destructive'
       )}
     >
       <Icon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-      <span>{children}</span>
+      <span className="min-w-0 break-words">{children}</span>
     </div>
   )
 }
@@ -53,7 +53,7 @@ function StatusPill({ active, activeLabel, inactiveLabel }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        'inline-flex max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
         active
           ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
           : 'border-border bg-background text-muted-foreground'
@@ -73,19 +73,19 @@ function StatusPill({ active, activeLabel, inactiveLabel }) {
 
 function SectionCard({ icon: Icon, title, status, children }) {
   return (
-    <section className="rounded-2xl border border-border bg-background p-5 lg:p-6">
-      <header className="mb-4 flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+    <section className="min-w-0 rounded-2xl border border-border bg-background p-4 sm:p-5 lg:p-6">
+      <header className="mb-4 grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary sm:h-9 sm:w-9">
             <Icon className="h-4 w-4" aria-hidden="true" />
           </span>
-          <h3 className="text-base font-semibold tracking-tight text-foreground">
+          <h3 className="min-w-0 break-words text-base font-semibold tracking-tight text-foreground">
             {title}
           </h3>
         </div>
-        {status ? <div className="flex-shrink-0">{status}</div> : null}
+        {status ? <div className="min-w-0 sm:flex-shrink-0">{status}</div> : null}
       </header>
-      <div className="space-y-4">{children}</div>
+      <div className="min-w-0 space-y-4">{children}</div>
     </section>
   )
 }
@@ -123,7 +123,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       const data = await apiPost('/api/security/2fa/setup')
       setSetupData(data)
       setIsEnabling(true)
-    } catch (err) {
+    } catch {
       setError(text.totpSetupError)
     }
   }
@@ -139,7 +139,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       setSetupData(null)
       setVerificationCode('')
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setVerificationError(text.totpInvalidCode)
     }
   }
@@ -151,7 +151,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       await apiPost('/api/security/2fa/toggle-login', { enabled: nextState })
       setSuccess(nextState ? text.totpToggleLoginEnabled : text.totpToggleLoginDisabled)
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setError(text.totpToggleLoginError)
     }
   }
@@ -164,7 +164,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       await apiPost('/api/security/2fa/test', { code: testCode })
       setTestSuccess(text.totpTestSuccess)
       setTestCode('')
-    } catch (err) {
+    } catch {
       setTestError(text.totpTestError)
     }
   }
@@ -177,7 +177,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       await apiPost('/api/security/2fa/disable')
       setSuccess(text.totpDisabled)
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setError(text.totpDisableError)
     }
   }
@@ -189,7 +189,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       await apiPost('/api/security/2fa/email/setup')
       setEmailSetupStarted(true)
       setSuccess(text.emailCodeSent)
-    } catch (err) {
+    } catch {
       setError(text.emailSendError)
     } finally {
       setIsEmailActionLoading(false)
@@ -206,7 +206,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       setEmailCode('')
       setEmailSetupStarted(false)
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setError(text.emailEnableError)
     } finally {
       setIsEmailActionLoading(false)
@@ -222,7 +222,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       setEmailCode('')
       setEmailSetupStarted(false)
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setError(text.emailDisableError)
     } finally {
       setIsEmailActionLoading(false)
@@ -236,7 +236,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
       await apiPost('/api/security/2fa/login-notifications/toggle', { enabled: nextState })
       setSuccess(nextState ? text.loginAlertsEnabled : text.loginAlertsDisabled)
       if (onUserUpdate) onUserUpdate()
-    } catch (err) {
+    } catch {
       setError(text.loginAlertsToggleError)
     }
   }
@@ -246,13 +246,13 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
     try {
       await apiPost('/api/security/2fa/login-notifications/test')
       setSuccess(text.loginAlertsTestSent)
-    } catch (err) {
+    } catch {
       setError(text.loginAlertsTestError)
     }
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 gap-6">
       <p className="text-sm leading-relaxed text-muted-foreground">{text.intro}</p>
 
       <Feedback tone="error">{error}</Feedback>
@@ -274,8 +274,8 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
         </p>
 
         {!currentUser.emailTwoFactorEnabled ? (
-          <div className="grid gap-3">
-            <div>
+          <div className="grid min-w-0 gap-3">
+            <div className="min-w-0">
               <button
                 type="button"
                 onClick={startEmail2FASetup}
@@ -288,7 +288,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
             </div>
 
             {emailSetupStarted ? (
-              <form onSubmit={enableEmail2FA} className="grid gap-3">
+              <form onSubmit={enableEmail2FA} className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,12rem)_auto] sm:items-center">
                 <label htmlFor="email-2fa-code" className="sr-only">
                   {text.codeInputLabel}
                 </label>
@@ -304,7 +304,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                   required
                   className={CODE_INPUT}
                 />
-                <div>
+                <div className="min-w-0">
                   <button type="submit" disabled={isEmailActionLoading} className={PRIMARY_BTN}>
                     <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                     {text.emailEnable}
@@ -314,7 +314,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
             ) : null}
           </div>
         ) : (
-          <div>
+          <div className="min-w-0">
             <button
               type="button"
               onClick={disableEmail2FA}
@@ -333,17 +333,17 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
           {text.loginAlertsDescription}
         </p>
 
-        <label className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
+        <label className="flex min-w-0 items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
           <input
             type="checkbox"
             checked={Boolean(currentUser.loginNotificationEnabled)}
             onChange={toggleLoginNotifications}
             className="mt-0.5 h-4 w-4 cursor-pointer rounded border-border bg-background text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
-          <span className="leading-snug">{text.loginAlertsToggleLabel}</span>
+          <span className="min-w-0 break-words leading-snug">{text.loginAlertsToggleLabel}</span>
         </label>
 
-        <div>
+        <div className="min-w-0">
           <button type="button" onClick={sendLoginNotificationTest} className={GHOST_BTN}>
             <Mail className="h-4 w-4" aria-hidden="true" />
             {text.loginAlertsTest}
@@ -363,11 +363,11 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
         }
       >
         {!currentUser.isTotpConfigured && !isEnabling ? (
-          <div className="grid gap-4">
+          <div className="grid min-w-0 gap-4">
             <p className="text-sm leading-relaxed text-muted-foreground">
               {text.totpNotConfiguredCopy}
             </p>
-            <div>
+            <div className="min-w-0">
               <button type="button" onClick={startSetup} className={PRIMARY_BTN}>
                 <KeyRound className="h-4 w-4" aria-hidden="true" />
                 {text.totpSetupCta}
@@ -377,22 +377,22 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
         ) : null}
 
         {isEnabling && setupData ? (
-          <div className="grid gap-4 rounded-xl border border-border bg-card p-4 lg:p-5">
+          <div className="grid min-w-0 gap-4 rounded-xl border border-border bg-card p-4 lg:p-5">
             <h4 className="text-sm font-semibold tracking-tight text-foreground">
               {text.totpSetupHeading}
             </h4>
             <p className="text-sm text-muted-foreground">{text.totpScanInstruction}</p>
-            <div className="flex justify-center rounded-lg border border-border bg-white p-4">
-              <QRCodeSVG value={setupData.qrCodeContent} size={200} />
+            <div className="flex max-w-full justify-center overflow-hidden rounded-lg border border-border bg-white p-3 sm:p-4">
+              <QRCodeSVG value={setupData.qrCodeContent} size={180} />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="min-w-0 break-words text-sm text-muted-foreground">
               {text.totpManualInstruction}{' '}
-              <code className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-xs text-foreground">
+              <code className="break-all rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-xs text-foreground">
                 {setupData.secret}
               </code>
             </p>
 
-            <form onSubmit={confirmEnable} className="grid gap-3">
+            <form onSubmit={confirmEnable} className="grid min-w-0 gap-3">
               <label htmlFor="totp-setup-code" className="text-sm text-muted-foreground">
                 {text.totpConfirmInstruction}
               </label>
@@ -415,7 +415,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                   <span id="totp-setup-code-error">{verificationError}</span>
                 ) : null}
               </Feedback>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                 <button type="submit" className={PRIMARY_BTN}>
                   <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                   {text.totpConfirm}
@@ -438,22 +438,22 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
         ) : null}
 
         {currentUser.isTotpConfigured ? (
-          <div className="grid gap-4">
+          <div className="grid min-w-0 gap-4">
             <p className="text-sm leading-relaxed text-muted-foreground">
               {text.totpConfiguredCopy}
             </p>
 
-            <label className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
+            <label className="flex min-w-0 items-start gap-3 rounded-lg border border-border bg-card p-3 text-sm text-foreground transition-colors hover:bg-accent">
               <input
                 type="checkbox"
                 checked={Boolean(currentUser.totpEnabled)}
                 onChange={handleToggleLogin}
                 className="mt-0.5 h-4 w-4 cursor-pointer rounded border-border bg-background text-primary accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
-              <span className="leading-snug">{text.totpToggleLoginLabel}</span>
+              <span className="min-w-0 break-words leading-snug">{text.totpToggleLoginLabel}</span>
             </label>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
               <button
                 type="button"
                 onClick={() => {
@@ -476,7 +476,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
             </div>
 
             {isTesting ? (
-              <div className="grid gap-3 rounded-xl border border-border bg-card p-4 lg:p-5">
+              <div className="grid min-w-0 gap-3 rounded-xl border border-border bg-card p-4 lg:p-5">
                 <h4 className="text-sm font-semibold tracking-tight text-foreground">
                   {text.totpTestHeading}
                 </h4>
@@ -485,7 +485,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                 <Feedback tone="error">{testError}</Feedback>
                 <Feedback tone="success">{testSuccess}</Feedback>
 
-                <form onSubmit={runTestCode} className="grid gap-3">
+                <form onSubmit={runTestCode} className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,12rem)_auto] sm:items-center">
                   <label htmlFor="totp-test-code" className="sr-only">
                     {text.codeInputLabel}
                   </label>
@@ -501,7 +501,7 @@ export default function SecuritySettings({ currentUser, onUserUpdate }) {
                     required
                     className={CODE_INPUT}
                   />
-                  <div>
+                  <div className="min-w-0">
                     <button type="submit" className={PRIMARY_BTN}>
                       <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                       {text.totpTestSubmit}
